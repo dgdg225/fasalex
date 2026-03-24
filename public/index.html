@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#0D1F0F"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>FasalEx</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0D1F0F;
+  --bg2:#142617;
+  --bg3:#1C3320;
+  --green:#2D6A2F;
+  --lime:#52B765;
+  --amber:#E8A020;
+  --amber2:#F5B53F;
+  --cream:#FDF6E8;
+  --muted:#5A7A5E;
+  --red:#D94F3D;
+  --dairy:#3D8ECC;
+  --ocean:#0077B6;
+  --safe:env(safe-area-inset-bottom,16px)
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',-apple-system,sans-serif;color:#fff;font-size:15px}
+#app{width:100%;max-width:430px;height:100dvh;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);overflow:hidden;position:relative}
+.page{display:none;flex-direction:column;height:100%;overflow:hidden}
+.page.active{display:flex;animation:pgIn .22s ease}
+@keyframes pgIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(16px + var(--safe))}
+.scroll::-webkit-scrollbar{width:0}
+
+/* ── Typography ── */
+.display{font-family:'Syne',sans-serif;font-weight:800}
+.serif{font-family:'Syne',sans-serif;font-weight:700}
+.mono{font-family:'DM Mono',monospace}
+h1{font-family:'Syne',sans-serif;font-size:26px;line-height:1.2;margin-bottom:4px}
+h2{font-family:'Syne',sans-serif;font-size:20px;margin-bottom:12px}
+h3{font-size:15px;font-weight:600;margin-bottom:8px}
+.lbl{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.8px;text-transform:uppercase;display:block;margin-bottom:6px}
+
+/* ── Inputs ── */
+input,select,textarea{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:13px 15px;color:#fff;font-size:15px;width:100%;outline:none;-webkit-appearance:none;appearance:none;font-family:'DM Sans',sans-serif}
+input:focus,select:focus{border-color:var(--lime)}
+input::placeholder{color:rgba(255,255,255,.28)}
+select option{background:#142617;color:#fff}
+
+/* ── Buttons ── */
+.btn{border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:transform .12s,opacity .12s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn:active{transform:scale(.97);opacity:.88}
+.btn-amber{background:linear-gradient(135deg,var(--amber),var(--amber2));color:#0D1F0F;border-radius:16px;padding:15px 22px;font-size:16px;width:100%}
+.btn-outline{background:transparent;color:var(--lime);border:1.5px solid var(--lime);border-radius:14px;padding:13px 20px;font-size:14px;width:100%}
+.btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:13px 20px;font-size:14px;width:100%}
+.icon-btn{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+
+/* ── Cards ── */
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px}
+.card-green{background:linear-gradient(135deg,rgba(29,51,32,.9),rgba(45,106,47,.5));border:1px solid rgba(82,183,101,.2);border-radius:18px;padding:18px}
+.card-amber{background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.18);border-radius:18px;padding:16px}
+
+/* ── Chips ── */
+.chip{padding:8px 14px;border-radius:20px;background:rgba(82,183,101,.1);border:1px solid rgba(82,183,101,.2);color:var(--lime);font-size:13px;cursor:pointer;white-space:nowrap;display:inline-block;transition:all .15s;font-family:'DM Sans',sans-serif}
+.chip.active{background:var(--lime);color:#0D1F0F;font-weight:700;border-color:var(--lime)}
+
+/* ── Page Header ── */
+.page-header{display:flex;align-items:center;gap:12px;padding:52px 18px 12px;flex-shrink:0}
+.page-title{flex:1;font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.field{margin-bottom:14px}
+
+/* ── Badges ── */
+.badge{padding:3px 9px;border-radius:8px;font-size:11px;font-weight:700}
+.badge-green{background:rgba(39,174,96,.2);color:#4ADE80}
+.badge-amber{background:rgba(232,160,32,.2);color:var(--amber)}
+.badge-red{background:rgba(209,79,61,.2);color:var(--red)}
+.g-A{color:#4ADE80}.g-B{color:var(--amber)}.g-C{color:#F97316}.g-D{color:var(--red)}
+
+/* ── Tabs ── */
+.tab-strip{display:flex;gap:4px;padding:0 16px 12px;overflow-x:auto;flex-shrink:0}
+.tab-strip::-webkit-scrollbar{height:0}
+.tab-btn{padding:8px 16px;border-radius:20px;border:none;background:rgba(255,255,255,.06);color:var(--muted);font-size:13px;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'DM Sans',sans-serif;font-weight:500}
+.tab-btn.active{background:var(--amber);color:#0D1F0F;font-weight:700}
+
+/* ── Bottom Nav ── */
+#nav{display:flex;background:rgba(13,31,15,.97);border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;padding-bottom:var(--safe)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border:none;background:transparent;color:var(--muted);font-size:9px;font-weight:500;cursor:pointer;letter-spacing:.3px;font-family:'DM Sans',sans-serif}
+.nav-btn svg{width:22px;height:22px}
+.nav-btn.active{color:var(--amber)}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--amber);display:none}
+.nav-btn.active .nav-dot{display:block}
+
+/* ── Camera ── */
+.cam-option{position:relative;border-radius:14px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:18px 8px;transition:all .2s;border:2px dashed rgba(82,183,101,.25);background:rgba(82,183,101,.04)}
+.cam-option:active{background:rgba(82,183,101,.1)}
+.cam-option input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10;font-size:0}
+.cam-preview{border-radius:18px;overflow:hidden;background:#000;position:relative;aspect-ratio:4/3;width:100%;display:none}
+.cam-preview img{width:100%;height:100%;object-fit:cover}
+
+/* ── Progress ── */
+.progress{height:6px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin:4px 0}
+.progress-fill{height:100%;border-radius:4px;transition:width 1s ease}
+
+/* ── Overlays ── */
+.overlay{position:absolute;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center}
+.overlay.show{display:flex;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── DeepGazer Scan Animation ── */
+.dg-hex{width:110px;height:110px;position:relative;margin:0 auto 28px}
+.dg-hex svg{width:110px;height:110px;animation:hexPulse 2.5s ease-in-out infinite}
+@keyframes hexPulse{0%,100%{opacity:.8;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+.dg-eye{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;background:var(--amber);animation:eyePulse 1.5s ease-in-out infinite}
+@keyframes eyePulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(.7)}}
+.dg-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:55px;height:55px;border-radius:50%;border:2px solid rgba(232,160,32,.4);animation:ringExpand 2s ease-out infinite}
+@keyframes ringExpand{0%{transform:translate(-50%,-50%) scale(.6);opacity:.8}100%{transform:translate(-50%,-50%) scale(1.8);opacity:0}}
+.dg-step{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:14px;background:rgba(255,255,255,.04);margin-bottom:8px;width:100%;text-align:left}
+.dg-step-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:rgba(255,255,255,.06)}
+.dg-step.done .dg-step-icon{background:rgba(74,222,128,.15)}
+.dg-step.active .dg-step-icon{background:rgba(232,160,32,.15)}
+.dg-step-label{font-size:13px;color:rgba(255,255,255,.55);flex:1}
+.dg-step.done .dg-step-label{color:rgba(255,255,255,.8)}
+.dg-step.active .dg-step-label{color:#fff;font-weight:600}
+.dg-check{font-size:16px;color:var(--lime);flex-shrink:0}
+.dg-spinner{width:16px;height:16px;border:2px solid rgba(232,160,32,.3);border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Identify overlay ── */
+.id-overlay{position:absolute;inset:0;background:rgba(13,31,15,.92);z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;border-radius:18px;gap:10px}
+.id-spinner{width:36px;height:36px;border:3px solid rgba(82,183,101,.2);border-top-color:var(--lime);border-radius:50%;animation:spin .8s linear infinite}
+.conf-bar{height:8px;border-radius:6px;background:rgba(255,255,255,.08);margin:8px 0}
+.conf-fill{height:100%;border-radius:6px;transition:width .8s ease}
+.id-pulse{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--lime);animation:idp 1s ease-in-out infinite;margin-right:5px}
+@keyframes idp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* ── Toast ── */
+.toast-el{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-10px);background:#1C3320;border:1px solid rgba(82,183,101,.35);border-radius:12px;padding:11px 20px;font-size:13px;z-index:9999;animation:toastAnim .3s ease both;max-width:340px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.45);pointer-events:none;white-space:nowrap}
+@keyframes toastAnim{from{opacity:0;transform:translateX(-50%) translateY(0)}to{opacity:1;transform:translateX(-50%) translateY(-10px)}}
+
+/* ── Misc ── */
+.divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:14px 0}
+.row{display:flex;align-items:center;gap:10px}
+.flex1{flex:1}
+.dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;flex-shrink:0}
+.wizard-steps{display:flex;gap:6px;margin-bottom:20px}
+.wstep{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.1);transition:background .3s}
+.wstep.done{background:var(--lime)}.wstep.active{background:var(--amber)}
+.sector-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sector-card{border-radius:16px;padding:14px 12px;border:2px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;transition:all .2s}
+.sector-card.active{border-color:var(--lime);background:rgba(82,183,101,.1)}
+.sector-card .s-emoji{font-size:26px;display:block;margin-bottom:5px}
+.sector-card .s-name{font-size:13px;font-weight:700}
+.sector-card .s-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.id-card{background:linear-gradient(135deg,rgba(82,183,101,.12),rgba(82,183,101,.04));border:1.5px solid rgba(82,183,101,.35);border-radius:18px;padding:16px;margin-bottom:12px}
+
+/* ── Splash Screen ── */
+#splash{position:absolute;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.splash-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:42px;letter-spacing:-1px}
+.splash-logo span{color:var(--amber)}
+.splash-sub{color:var(--muted);font-size:14px;margin-top:6px;letter-spacing:.5px}
+.splash-tagline{color:rgba(255,255,255,.4);font-size:12px;margin-top:24px;letter-spacing:1px;text-transform:uppercase}
+.splash-bar{width:80px;height:3px;background:rgba(255,255,255,.08);border-radius:4px;margin-top:28px;overflow:hidden}
+.splash-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber2));border-radius:4px;animation:splashLoad 2s ease forwards}
+@keyframes splashLoad{from{width:0}to{width:100%}}
+.dg-badge{font-family:'DM Mono',monospace;font-size:11px;color:rgba(82,183,101,.6);margin-top:10px;letter-spacing:.5px}
+
+/* ── Welcome carousel ── */
+.carousel{overflow:hidden;width:100%}
+.carousel-track{display:flex;transition:transform .4s ease}
+.slide{min-width:100%;padding:0 4px}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:16px}
+.dot-el{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .3s}
+.dot-el.active{background:var(--amber);width:20px;border-radius:4px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ SPLASH ══════════════════════════════════════════ -->
+<div id="splash">
+  <div style="margin-bottom:8px">
+    <svg width="56" height="56" viewBox="0 0 56 56"><polygon points="28,4 50,16 50,40 28,52 6,40 6,16" fill="rgba(232,160,32,.15)" stroke="rgba(232,160,32,.6)" stroke-width="1.5"/><circle cx="28" cy="28" r="10" fill="var(--amber)" opacity=".9"/><circle cx="28" cy="28" r="5" fill="#0D1F0F"/></svg>
+  </div>
+  <div class="splash-logo">Fasal<span>Ex</span></div>
+  <div class="splash-sub">Harvest Exchange</div>
+  <div class="splash-tagline">Powered by DeepGazerAI™</div>
+  <div class="splash-bar"><div class="splash-fill"></div></div>
+  <div class="dg-badge">See True · Trade Fair</div>
+</div>
+
+<!-- ══ REGISTER — Step 1 ═══════════════════════════════ -->
+<div id="page-reg1" class="page">
+  <div class="scroll" style="padding:0 18px 24px">
+    <div style="padding-top:calc(52px + env(safe-area-inset-top,0px));margin-bottom:28px">
+      <div class="display" style="font-size:30px;line-height:1.1">Welcome to<br/><span style="color:var(--amber)">FasalEx</span></div>
+      <div style="color:var(--muted);font-size:14px;margin-top:10px">Know your grade. Get fair price.</div>
+    </div>
+    <div class="wizard-steps"><div class="wstep active" id="ws1-1"></div><div class="wstep" id="ws1-2"></div></div>
+    <div class="field"><label class="lbl">Your Name</label><input id="r-name" placeholder="e.g. Ramesh Kumar" autocomplete="name"/></div>
+    <div class="field"><label class="lbl">Phone Number</label><input id="r-phone" type="tel" placeholder="+91 98765 43210" inputmode="tel"/></div>
+    <div class="field"><label class="lbl">State</label>
+      <select id="r-state">
+        <option value="">Select state…</option>
+        ${['Andhra Pradesh','Assam','Bihar','Chhattisgarh','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'].map(s=>`<option>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="row field">
+      <div class="flex1"><label class="lbl">District</label><input id="r-dist" placeholder="District"/></div>
+      <div class="flex1"><label class="lbl">Village/Town</label><input id="r-vil" placeholder="Village"/></div>
+    </div>
+    <div class="field"><label class="lbl">Language</label>
+      <select id="r-lang">
+        <option value="en">English</option><option value="hi">हिन्दी</option>
+        <option value="kn">ಕನ್ನಡ</option><option value="te">తెలుగు</option>
+        <option value="ta">தமிழ்</option><option value="mr">मराठी</option>
+      </select>
+    </div>
+    <button class="btn btn-amber" style="margin-top:8px" onclick="goReg2()">Continue →</button>
+  </div>
+</div>
+
+<!-- ══ REGISTER — Step 2 ═══════════════════════════════ -->
+<div id="page-reg2" class="page">
+  <div class="scroll" style="padding:0 18px 24px">
+    <div style="padding-top:calc(52px + env(safe-area-inset-top,0px));margin-bottom:24px">
+      <button class="icon-btn" style="margin-bottom:14px" onclick="navigate('page-reg1')">←</button>
+      <div class="display" style="font-size:26px">What do you<br/>grow or trade?</div>
+    </div>
+    <div class="wizard-steps"><div class="wstep done" id="ws2-1"></div><div class="wstep active" id="ws2-2"></div></div>
+    <label class="lbl" style="margin-bottom:10px">Your Sector</label>
+    <div class="sector-grid" id="sectorGrid"></div>
+    <label class="lbl" style="margin-bottom:10px;margin-top:4px">Your Role</label>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px" id="roleGrid"></div>
+    <button class="btn btn-amber" onclick="finishReg()">Start Using FasalEx →</button>
+  </div>
+</div>
+
+<!-- ══ HOME ════════════════════════════════════════════ -->
+<div id="page-home" class="page">
+  <div class="scroll" style="padding:0 18px 16px">
+    <div style="padding-top:calc(48px + env(safe-area-inset-top,0px));margin-bottom:20px">
+      <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <div>
+          <div style="color:var(--muted);font-size:12px;font-weight:500;letter-spacing:.5px">GOOD MORNING</div>
+          <div class="display" style="font-size:24px" id="homeGreet">Farmer</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:3px" id="homeSector">Agriculture · FasalEx</div>
+        </div>
+        <div id="homeAvatar" style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--lime));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#0D1F0F">F</div>
+      </div>
+
+      <!-- Big Scan CTA -->
+      <div style="background:linear-gradient(135deg,rgba(29,51,32,.95),rgba(45,106,47,.6));border:1px solid rgba(82,183,101,.25);border-radius:24px;padding:24px 20px;text-align:center;margin-bottom:16px;cursor:pointer;position:relative;overflow:hidden" onclick="navigate('page-scan')">
+        <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(232,160,32,.08)"></div>
+        <div style="margin-bottom:12px">
+          <svg width="56" height="56" viewBox="0 0 56 56" style="filter:drop-shadow(0 0 16px rgba(232,160,32,.4))"><polygon points="28,4 50,16 50,40 28,52 6,40 6,16" fill="rgba(232,160,32,.2)" stroke="rgba(232,160,32,.8)" stroke-width="1.5"/><circle cx="28" cy="28" r="12" fill="rgba(232,160,32,.25)"/><circle cx="28" cy="28" r="6" fill="var(--amber)"/></svg>
+        </div>
+        <div class="display" style="font-size:22px;margin-bottom:6px">Scan Produce</div>
+        <div style="color:rgba(255,255,255,.6);font-size:13px">Photo → Grade → Price in seconds</div>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="row" style="gap:10px;margin-bottom:16px">
+        <div class="card flex1" style="text-align:center;padding:14px 10px">
+          <div class="display" style="font-size:22px;color:var(--amber)" id="homeScans">0</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">Scans</div>
+        </div>
+        <div class="card flex1" style="text-align:center;padding:14px 10px">
+          <div class="display" style="font-size:18px;color:#4ADE80" id="homeGrade">—</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">Last Grade</div>
+        </div>
+        <div class="card flex1" style="text-align:center;padding:14px 10px">
+          <div style="font-size:11px;color:#4ADE80;font-weight:600">✓ Active</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">Server</div>
+        </div>
+      </div>
+
+      <!-- Recent -->
+      <div style="margin-bottom:10px">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <div style="font-weight:600;font-size:14px">Recent Scans</div>
+          <button class="btn" style="color:var(--amber);font-size:12px;padding:0;background:none;border:none" onclick="navigate('page-history')">View All</button>
+        </div>
+        <div id="homeRecent"><div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No scans yet. Tap Scan to start!</div></div>
+      </div>
+    </div>
+  </div>
+  <div id="nav">
+    <button class="nav-btn active" id="nb-home" onclick="navigate('page-home');setNav('nb-home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      HOME<div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nb-scan" onclick="navigate('page-scan');setNav('nb-scan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+      SCAN<div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nb-market" onclick="navigate('page-market');setNav('nb-market');initMarket()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      PRICES<div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nb-history" onclick="navigate('page-history');setNav('nb-history');initHistory()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      HISTORY<div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nb-profile" onclick="navigate('page-profile');setNav('nb-profile');initProfile()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      PROFILE<div class="nav-dot"></div>
+    </button>
+  </div>
+</div>
+
+<!-- ══ SCAN ════════════════════════════════════════════ -->
+<div id="page-scan" class="page">
+  <div class="page-header" style="padding-top:calc(52px + env(safe-area-inset-top,0px))">
+    <button class="icon-btn" onclick="navigate('page-home');setNav('nb-home')">←</button>
+    <div class="page-title">New Scan</div>
+    <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">DeepGazerAI™</div>
+  </div>
+  <div class="scroll" style="padding:0 18px 24px">
+
+    <!-- Step 1: Photo -->
+    <div id="scan-step-photo">
+      <label class="lbl">Step 1 — Capture Produce Photo</label>
+      <div style="position:relative">
+        <div id="camPreview" class="cam-preview" style="margin-bottom:12px">
+          <img id="camImg" src="" alt=""/>
+          <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);border-radius:8px;padding:4px 8px;font-size:11px;color:#4ADE80">✓ Photo ready</div>
+        </div>
+        <div id="idOverlay" class="id-overlay"><div class="id-spinner"></div><div style="font-size:13px;color:var(--muted)">Identifying…</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div class="cam-option">
+          <input type="file" id="camCapture" accept="image/*" capture="environment" onchange="handlePhoto(this)"/>
+          <div style="font-size:28px">📷</div>
+          <div style="font-size:12px;font-weight:600">Camera</div>
+          <div style="font-size:10px;color:var(--muted)">Take photo</div>
+        </div>
+        <div class="cam-option">
+          <input type="file" id="camGallery" accept="image/*" onchange="handlePhoto(this)"/>
+          <div style="font-size:28px">🖼️</div>
+          <div style="font-size:12px;font-weight:600">Gallery</div>
+          <div style="font-size:10px;color:var(--muted)">Choose photo</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:13px;padding:12px;margin-bottom:12px" onclick="skipPhoto()">Skip photo — text only</button>
+    </div>
+
+    <!-- Step 2: AI Identification -->
+    <div id="scan-step-id" style="display:none">
+      <label class="lbl">Step 2 — AI Identification</label>
+      <div class="id-card" id="idCard">
+        <div class="row" style="margin-bottom:10px">
+          <div style="font-size:36px" id="idEmoji">🌾</div>
+          <div class="flex1" style="margin-left:10px">
+            <div style="font-size:11px;color:var(--lime);font-weight:600;margin-bottom:2px"><span class="id-pulse"></span>AI IDENTIFIED</div>
+            <div class="display" style="font-size:20px" id="idProduce">—</div>
+            <div style="color:var(--muted);font-size:12px" id="idSector">—</div>
+          </div>
+          <div style="text-align:right">
+            <div class="display" style="font-size:24px;color:var(--lime)" id="idConf">—</div>
+            <div style="font-size:10px;color:var(--muted)">CONF.</div>
+          </div>
+        </div>
+        <div class="conf-bar"><div class="conf-fill" id="confFill" style="width:0%;background:linear-gradient(90deg,var(--green),var(--lime))"></div></div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:6px" id="idNote"></div>
+      </div>
+      <div id="manualOverride" style="display:none">
+        <label class="lbl">Correct Identification</label>
+        <div class="field"><input id="sc-custom" placeholder="Type produce name…"/></div>
+        <div class="field">
+          <select id="sc-produce" onchange="updateSector(this.value)">
+            <option value="">Select from list…</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" style="gap:8px;margin-bottom:12px">
+        <button class="btn btn-ghost flex1" style="font-size:13px;padding:11px" onclick="changeIdentify()">✏️ Change</button>
+        <button class="btn btn-amber flex1" style="font-size:13px;padding:11px" onclick="confirmIdentify()">Confirm →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Quantity -->
+    <div id="scan-step-qty" style="display:none">
+      <label class="lbl">Step 3 — Quantity & Details</label>
+      <div class="card-green" style="margin-bottom:14px">
+        <div class="row"><div style="font-size:28px" id="qtyEmoji">🌾</div><div style="margin-left:10px"><div class="display" style="font-size:18px" id="qtyProduce">—</div><div style="font-size:12px;color:var(--muted)" id="qtySector">—</div></div></div>
+      </div>
+      <div class="row field" style="gap:10px">
+        <div class="flex1"><label class="lbl">Quantity</label><input id="sc-qty" type="number" placeholder="100" inputmode="decimal"/></div>
+        <div style="width:120px"><label class="lbl">Unit</label>
+          <select id="sc-unit">
+            <option>kg</option><option>quintal</option><option>tonne</option><option>piece</option><option>dozen</option><option>litre</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label class="lbl">Notes (optional)</label><input id="sc-notes" placeholder="Any observations…"/></div>
+      <button class="btn btn-amber" id="analyzeBtn" onclick="analyze()">🔬 Analyze with DeepGazerAI →</button>
+      <button class="btn btn-ghost" id="analyzeNoCamBtn" style="display:none;margin-top:8px" onclick="analyze()">Analyze without photo</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ DEEPGAZER ANALYSING OVERLAY ════════════════════ -->
+<div class="overlay" id="dgOverlay">
+  <div class="dg-hex">
+    <svg viewBox="0 0 110 110"><polygon points="55,6 100,30 100,80 55,104 10,80 10,30" fill="rgba(232,160,32,.12)" stroke="rgba(232,160,32,.5)" stroke-width="1.5"/><polygon points="55,20 88,38 88,72 55,90 22,72 22,38" fill="rgba(232,160,32,.06)" stroke="rgba(232,160,32,.25)" stroke-width="1"/></svg>
+    <div class="dg-ring"></div>
+    <div class="dg-eye"></div>
+  </div>
+  <div class="display" style="font-size:20px;margin-bottom:24px">DeepGazerAI™ Analysing…</div>
+  <div style="width:100%;max-width:320px" id="dgSteps"></div>
+  <div style="color:var(--muted);font-size:11px;margin-top:16px;font-family:'DM Mono',monospace">Powered by DeepGazerAI · Patent Pending</div>
+</div>
+
+<!-- ══ REPORT ══════════════════════════════════════════ -->
+<div id="page-report" class="page">
+  <div class="page-header" style="padding-top:calc(52px + env(safe-area-inset-top,0px))">
+    <button class="icon-btn" onclick="navigate('page-home');setNav('nb-home')">←</button>
+    <div class="page-title">Grade Report</div>
+    <button class="btn btn-amber" style="width:auto;padding:9px 16px;font-size:13px" onclick="shareReport()">⬆ Share</button>
+  </div>
+  <div class="tab-strip" id="reportTabs">
+    <button class="tab-btn active" onclick="switchTab(0,this)">Report</button>
+    <button class="tab-btn" onclick="switchTab(1,this)">Standards</button>
+    <button class="tab-btn" onclick="switchTab(2,this)">Buyers</button>
+    <button class="tab-btn" onclick="switchTab(3,this)">Market</button>
+    <button class="tab-btn" onclick="switchTab(4,this)">DGport</button>
+  </div>
+  <div class="scroll" style="padding:0 16px 24px">
+    <div id="tab0"></div>
+    <div id="tab1" style="display:none"></div>
+    <div id="tab2" style="display:none"></div>
+    <div id="tab3" style="display:none"></div>
+    <div id="tab4" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ══ MARKET ══════════════════════════════════════════ -->
+<div id="page-market" class="page">
+  <div class="page-header" style="padding-top:calc(52px + env(safe-area-inset-top,0px))">
+    <div class="page-title">Live Prices</div>
+    <button class="icon-btn" onclick="fetchLivePrices()" id="marketRefreshBtn">↻</button>
+  </div>
+  <div style="padding:0 16px 8px;flex-shrink:0;overflow-x:auto;display:flex;gap:8px" id="marketChips">
+    <button class="chip active" onclick="filterMarket(this,'all')">All</button>
+    <button class="chip" onclick="filterMarket(this,'agri')">🌾 Agri</button>
+    <button class="chip" onclick="filterMarket(this,'horti')">🥬 Horti</button>
+    <button class="chip" onclick="filterMarket(this,'ah')">🥛 Dairy</button>
+    <button class="chip" onclick="filterMarket(this,'fish')">🐟 Fisheries</button>
+  </div>
+  <div class="scroll" style="padding:0 16px 16px" id="marketList">
+    <div style="text-align:center;padding:40px 0;color:var(--muted)">Loading prices…</div>
+  </div>
+</div>
+
+<!-- ══ HISTORY ═════════════════════════════════════════ -->
+<div id="page-history" class="page">
+  <div class="page-header" style="padding-top:calc(52px + env(safe-area-inset-top,0px))">
+    <button class="icon-btn" onclick="navigate('page-home');setNav('nb-home')">←</button>
+    <div class="page-title">Scan History</div>
+  </div>
+  <div class="scroll" style="padding:0 16px 16px">
+    <div id="historyList"></div>
+    <div id="historyEmpty" style="display:none;text-align:center;padding:48px 20px;color:var(--muted)">
+      <div style="font-size:40px;margin-bottom:12px">📋</div>
+      <div style="font-weight:600;margin-bottom:6px">No scans yet</div>
+      <div style="font-size:13px">Scan your first produce to see history</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE ═════════════════════════════════════════ -->
+<div id="page-profile" class="page">
+  <div class="page-header" style="padding-top:calc(52px + env(safe-area-inset-top,0px))">
+    <button class="icon-btn" onclick="navigate('page-home');setNav('nb-home')">←</button>
+    <div class="page-title">My Profile</div>
+  </div>
+  <div class="scroll" style="padding:0 16px 24px" id="profileContent"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+const SECTORS = {
+  agri:  {emoji:'🌾',label:'Agriculture',  color:'#52B765',standards:'AGMARK / FSSAI FSS 2011'},
+  horti: {emoji:'🥬',label:'Horticulture', color:'#4ADE80',standards:'AGMARK / APEDA / EU 543/2011'},
+  flori: {emoji:'🌸',label:'Floriculture', color:'#F472B6',standards:'NHB / APEDA Standards'},
+  api:   {emoji:'🍯',label:'Apiculture',   color:'#F59E0B',standards:'FSSAI / BIS IS:4941 / Codex 12-1981'},
+  ah:    {emoji:'🥛',label:'Dairy / AH',   color:'#60A5FA',standards:'FSSAI / BIS IS:1479 / Codex 206-1999'},
+  med:   {emoji:'🌿',label:'Medicinal',    color:'#34D399',standards:'AYUSH / FSSAI Standards'},
+  fish:  {emoji:'🐟',label:'Fisheries',    color:'#38BDF8',standards:'MPEDA / EIC / HACCP / EU 854/2004'},
+};
+const ROLES = ['Farmer','Trader','Manufacturer','Exporter','Retailer','Consultant'];
+const PRODUCE_LIST = {
+  agri:  ['Wheat','Rice','Maize','Sorghum','Bajra','Soybean','Chickpea','Toor Dal','Moong Dal','Cotton','Groundnut','Mustard','Sunflower','Sugarcane','Tobacco'],
+  horti: ['Tomato','Potato','Onion','Cabbage','Cauliflower','Brinjal','Okra','Capsicum','Cucumber','Carrot','Peas','Spinach','Mango','Banana','Grapes','Apple','Pomegranate','Guava','Papaya','Orange'],
+  flori: ['Rose','Marigold','Jasmine','Chrysanthemum','Gerbera','Carnation','Lily','Orchid','Lotus','Tuberose'],
+  api:   ['Honey','Beeswax','Propolis','Pollen','Royal Jelly'],
+  ah:    ['Milk','Paneer','Ghee','Butter','Curd','Cheese','Eggs','Broiler Chicken','Mutton','Pork'],
+  med:   ['Turmeric','Ginger','Garlic','Neem','Ashwagandha','Amla','Tulsi','Aloe Vera','Brahmi','Senna'],
+  fish:  ['Rohu','Katla','Hilsa','Pomfret','Mackerel','Sardine','Prawn','Shrimp','Crab','Lobster','Tilapia'],
+};
+
+let S = {
+  user:{name:'',phone:'',role:'Farmer',sector:'agri',language:'en',state:'',district:'',village:''},
+  history:[],
+  currentReport:null,
+  scanState:{imageBase64:null,imageDataURL:null,produce:'',sector:'agri'},
+  marketData:[],
+};
+let currentGPS = null;
+let _cachedAddress = null;
+
+function save(){try{localStorage.setItem('fasalex_v2',JSON.stringify(S));}catch(e){}}
+function load(){try{const d=localStorage.getItem('fasalex_v2');if(d){const p=JSON.parse(d);S={...S,...p};}}catch(e){}}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function navigate(id){
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');});
+  const pg=document.getElementById(id);
+  if(pg)pg.classList.add('active');
+}
+function setNav(id){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const nb=document.getElementById(id);
+  if(nb)nb.classList.add('active');
+}
+function toast(msg,color){
+  document.querySelectorAll('.toast-el').forEach(t=>t.remove());
+  const el=document.createElement('div');
+  el.className='toast-el';
+  el.textContent=msg;
+  if(color)el.style.borderColor=color+'55';
+  document.getElementById('app').appendChild(el);
+  setTimeout(()=>el.remove(),2800);
+}
+
+// ══════════════════════════════════════════════════════
+// REGISTRATION
+// ══════════════════════════════════════════════════════
+function buildSectorGrid(){
+  document.getElementById('sectorGrid').innerHTML=Object.entries(SECTORS).map(([k,v])=>
+    `<div class="sector-card" id="sc-${k}" onclick="selectSector('${k}')"><span class="s-emoji">${v.emoji}</span><div class="s-name">${v.label}</div></div>`
+  ).join('');
+  document.getElementById('roleGrid').innerHTML=ROLES.map(r=>
+    `<button class="chip" id="role-${r}" onclick="selectRole('${r}')">${r}</button>`
+  ).join('');
+  selectSector('agri');
+  selectRole('Farmer');
+}
+function selectSector(k){
+  document.querySelectorAll('.sector-card').forEach(c=>c.classList.remove('active'));
+  document.getElementById('sc-'+k)?.classList.add('active');
+  S.scanState.sector=k;S.user.sector=k;
+}
+function selectRole(r){
+  document.querySelectorAll('#roleGrid .chip').forEach(c=>c.classList.remove('active'));
+  document.getElementById('role-'+r)?.classList.add('active');
+  S.user.role=r;
+}
+function goReg2(){
+  const name=document.getElementById('r-name').value.trim();
+  if(!name){toast('Please enter your name','#E8A020');return;}
+  S.user.name=name;
+  S.user.phone=document.getElementById('r-phone').value.trim();
+  S.user.state=document.getElementById('r-state').value;
+  S.user.district=document.getElementById('r-dist').value.trim();
+  S.user.village=document.getElementById('r-vil').value.trim();
+  S.user.language=document.getElementById('r-lang').value;
+  buildSectorGrid();
+  navigate('page-reg2');
+}
+function finishReg(){
+  save();
+  initHome();
+  navigate('page-home');
+  setNav('nb-home');
+  toast('Welcome to FasalEx, '+S.user.name.split(' ')[0]+'! 🌾');
+}
+
+// ══════════════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════════════
+function initHome(){
+  const u=S.user;
+  const s=SECTORS[u.sector||'agri'];
+  document.getElementById('homeGreet').textContent=u.name||'Farmer';
+  document.getElementById('homeSector').textContent=s.emoji+' '+s.label+' · FasalEx';
+  document.getElementById('homeAvatar').textContent=(u.name||'F')[0].toUpperCase();
+  document.getElementById('homeScans').textContent=S.history.length;
+  const last=S.history[0]?.report;
+  document.getElementById('homeGrade').textContent=last?last.overallGrade:'—';
+  const gc={A:'#4ADE80',B:'var(--amber)',C:'#F97316',D:'var(--red)'};
+  if(last)document.getElementById('homeGrade').style.color=gc[last.overallGrade]||'#fff';
+  const recent=document.getElementById('homeRecent');
+  if(!S.history.length){recent.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No scans yet. Tap Scan to start!</div>';return;}
+  recent.innerHTML=S.history.slice(0,3).map((h,i)=>{
+    const r=h.report;
+    return `<div class="card row" style="margin-bottom:8px;cursor:pointer;gap:12px" onclick="viewHistory(${i})">
+      <div style="width:42px;height:42px;border-radius:12px;background:${gc[r.overallGrade]}18;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:${gc[r.overallGrade]};flex-shrink:0">${r.overallGrade}</div>
+      <div class="flex1"><div style="font-weight:600;font-size:13px">${r.produce}</div><div style="color:var(--muted);font-size:11px">${r.qty} · ${r.date}</div></div>
+      <div style="color:var(--amber);font-weight:700;font-size:13px;flex-shrink:0">${r.estimatedRevenue}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// SCAN — PHOTO HANDLING
+// ══════════════════════════════════════════════════════
+function handlePhoto(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const dataURL=e.target.result;
+    S.scanState.imageDataURL=dataURL;
+    // Compress to max 800px
+    S.scanState.imageBase64=await compressImage(dataURL,800,0.82);
+    // Show preview
+    document.getElementById('camImg').src=dataURL;
+    document.getElementById('camPreview').style.display='block';
+    // AI identify
+    identifyProduce(S.scanState.imageBase64);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function compressImage(dataURL,maxPx,quality){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>maxPx||h>maxPx){const s=maxPx/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(c.toDataURL('image/jpeg',quality).split(',')[1]);
+    };
+    img.src=dataURL;
+  });
+}
+
+async function identifyProduce(b64){
+  const overlay=document.getElementById('idOverlay');
+  overlay.style.display='flex';
+  document.getElementById('scan-step-id').style.display='none';
+  try{
+    const res=await fetch('/api/identify',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({imageBase64:b64})
+    });
+    const d=await res.json();
+    overlay.style.display='none';
+    showIDResult(d);
+  }catch(e){
+    overlay.style.display='none';
+    showManualID();
+  }
+}
+
+function showIDResult(d){
+  const s=SECTORS[d.sector]||SECTORS.agri;
+  document.getElementById('idEmoji').textContent=d.emoji||s.emoji;
+  document.getElementById('idProduce').textContent=d.produce||'Unknown';
+  document.getElementById('idSector').textContent=s.label;
+  document.getElementById('idConf').textContent=(d.confidence||70)+'%';
+  document.getElementById('confFill').style.width=(d.confidence||70)+'%';
+  document.getElementById('confFill').style.background=
+    (d.confidence||70)>=80?'linear-gradient(90deg,var(--green),var(--lime))':
+    (d.confidence||70)>=60?'linear-gradient(90deg,#7A4F00,var(--amber))':
+    'linear-gradient(90deg,#5C1A1A,var(--red))';
+  document.getElementById('idNote').textContent=d.note||'';
+  S.scanState.produce=d.produce||'';
+  S.scanState.sector=d.sector||S.user.sector||'agri';
+  document.getElementById('scan-step-id').style.display='block';
+  document.getElementById('manualOverride').style.display='none';
+  updateProduceList(S.scanState.sector);
+}
+
+function showManualID(){
+  document.getElementById('idEmoji').textContent='❓';
+  document.getElementById('idProduce').textContent='Unknown';
+  document.getElementById('idSector').textContent='Please select below';
+  document.getElementById('idConf').textContent='—';
+  document.getElementById('confFill').style.width='0%';
+  document.getElementById('idNote').textContent='Could not identify. Please select manually.';
+  document.getElementById('scan-step-id').style.display='block';
+  document.getElementById('manualOverride').style.display='block';
+  updateProduceList(S.user.sector||'agri');
+}
+
+function skipPhoto(){
+  S.scanState.imageBase64=null;S.scanState.imageDataURL=null;
+  showManualID();
+}
+
+function changeIdentify(){
+  const mo=document.getElementById('manualOverride');
+  mo.style.display=mo.style.display==='none'?'block':'none';
+}
+
+function updateSector(val){
+  for(const[sec,prods]of Object.entries(PRODUCE_LIST)){
+    if(prods.includes(val)){S.scanState.sector=sec;break;}
+  }
+}
+
+function updateProduceList(sector){
+  const sel=document.getElementById('sc-produce');
+  const prods=PRODUCE_LIST[sector]||PRODUCE_LIST.agri;
+  sel.innerHTML='<option value="">Select from list…</option>'+prods.map(p=>`<option>${p}</option>`).join('');
+}
+
+function confirmIdentify(){
+  const custom=document.getElementById('sc-custom').value.trim();
+  const selected=document.getElementById('sc-produce').value;
+  const final=custom||selected||S.scanState.produce;
+  if(!final){toast('Please select or type produce name','#E8A020');return;}
+  S.scanState.produce=final;
+  if(custom||selected)updateSector(final);
+  const s=SECTORS[S.scanState.sector]||SECTORS.agri;
+  document.getElementById('qtyEmoji').textContent=s.emoji;
+  document.getElementById('qtyProduce').textContent=final;
+  document.getElementById('qtySector').textContent=s.label;
+  document.getElementById('scan-step-id').style.display='none';
+  document.getElementById('scan-step-qty').style.display='block';
+  document.getElementById('analyzeBtn').style.display='flex';
+  document.getElementById('analyzeNoCamBtn').style.display='none';
+}
+
+// ══════════════════════════════════════════════════════
+// ANALYZE — DeepGazer Processing
+// ══════════════════════════════════════════════════════
+const DG_STEPS=[
+  {icon:'📍',label:'Stamping photo with GPS'},
+  {icon:'🗜️',label:'Compressing image'},
+  {icon:'🧠',label:'AI grading produce'},
+  {icon:'📊',label:'Fetching mandi prices'},
+  {icon:'📜',label:'Generating certificate'},
+];
+
+function renderDGSteps(activeIndex){
+  document.getElementById('dgSteps').innerHTML=DG_STEPS.map((s,i)=>{
+    const done=i<activeIndex;const active=i===activeIndex;
+    return `<div class="dg-step ${done?'done':active?'active':''}">
+      <div class="dg-step-icon">${s.icon}</div>
+      <div class="dg-step-label">${s.label}</div>
+      ${done?'<div class="dg-check">✓</div>':active?'<div class="dg-spinner"></div>':''}
+    </div>`;
+  }).join('');
+}
+
+async function analyze(){
+  const produce=S.scanState.produce;
+  if(!produce){toast('Please confirm produce first','#E8A020');return;}
+  const qty=document.getElementById('sc-qty').value||'?';
+  const unit=document.getElementById('sc-unit').value;
+  const notes=document.getElementById('sc-notes')?.value||'';
+  const sector=S.scanState.sector;
+
+  // Show DeepGazer overlay
+  document.getElementById('dgOverlay').classList.add('show');
+  renderDGSteps(0);
+
+  // Step 0: GPS
+  if(!currentGPS){
+    try{
+      const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:4000,enableHighAccuracy:true}));
+      currentGPS={lat:pos.coords.latitude.toFixed(6),lon:pos.coords.longitude.toFixed(6),alt:pos.coords.altitude?Math.round(pos.coords.altitude):null};
+    }catch(e){
+      currentGPS={lat:null,lon:null,alt:null};
+    }
+  }
+
+  await delay(600);renderDGSteps(1);
+  await delay(500);renderDGSteps(2);
+
+  try{
+    const body={
+      produce,sector,qty,unit,notes,
+      language:S.user.language||'en',
+      farmerName:S.user.name||'Farmer',
+      farmerState:S.user.state||'',
+      farmerDistrict:S.user.district||'',
+      gps:currentGPS,
+      imageBase64:S.scanState.imageBase64||null,
+    };
+    const res=await fetch('/api/analyze',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+
+    renderDGSteps(3);
+    await delay(600);
+    renderDGSteps(4);
+    await delay(500);
+
+    const report=await res.json();
+    if(report.error)throw new Error(report.error);
+
+    document.getElementById('dgOverlay').classList.remove('show');
+    report._imageDataURL=S.scanState.imageDataURL;
+    report._gpsTag=currentGPS;
+    S.currentReport=report;
+    S.history.unshift({report,date:new Date().toISOString()});
+    if(S.history.length>50)S.history.pop();
+    save();
+    renderReport();
+    navigate('page-report');
+    if(report._demo)toast('⚡ Demo mode (no API key)');
+  }catch(err){
+    document.getElementById('dgOverlay').classList.remove('show');
+    toast('Analysis failed: '+err.message,'#D94F3D');
+  }
+}
+
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+
+// ══════════════════════════════════════════════════════
+// RENDER REPORT
+// ══════════════════════════════════════════════════════
+function renderReport(){
+  const r=S.currentReport;if(!r)return;
+  const s=r.sector||'agri';
+  const sec=SECTORS[s]||SECTORS.agri;
+  const gc={A:'#4ADE80',B:'var(--amber)',C:'#F97316',D:'var(--red)'};
+
+  // ── Tab 0: Report ──
+  document.getElementById('tab0').innerHTML=`
+    <div style="background:linear-gradient(135deg,${sec.color}18,rgba(255,255,255,.02));border:1px solid ${sec.color}33;border-radius:22px;padding:20px;margin-bottom:14px">
+      <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+        <div>
+          <div style="color:${sec.color};font-size:11px;font-weight:700;letter-spacing:1px">${sec.emoji} ${sec.label.toUpperCase()}</div>
+          <div class="display" style="font-size:24px;margin:4px 0">${r.produce}</div>
+          <div style="color:rgba(255,255,255,.45);font-size:11px">📍 ${r.gps?r.gps.lat+'°N '+r.gps.lon+'°E':'Location tagged'} · ${r.date}</div>
+          <div style="color:rgba(255,255,255,.45);font-size:11px;margin-top:1px">👤 ${r.farmerName} · ${r.qty}</div>
+        </div>
+        <div style="text-align:center;flex-shrink:0">
+          <div style="width:60px;height:60px;border-radius:18px;background:${gc[r.overallGrade]}18;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:${gc[r.overallGrade]}">${r.overallGrade}</div>
+          <div style="color:${gc[r.overallGrade]};font-size:11px;font-weight:700;margin-top:4px">${r.gradeLabel}</div>
+          <div style="color:var(--muted);font-size:10px">${r.confidence}% AI</div>
+        </div>
+      </div>
+      ${r._imageDataURL?`<div style="border-radius:14px;overflow:hidden;margin-bottom:14px"><img src="${r._imageDataURL}" style="width:100%;display:block"/></div>`:''}
+      <div style="display:flex;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)">
+        <div><div style="color:rgba(255,255,255,.3);font-size:10px;letter-spacing:.5px">SHELF LIFE</div><div style="font-weight:600;font-size:14px;margin-top:2px">${r.shelfLife}</div></div>
+        <div><div style="color:rgba(255,255,255,.3);font-size:10px;letter-spacing:.5px">REVENUE EST.</div><div style="font-weight:700;font-size:14px;color:var(--amber);margin-top:2px">${r.estimatedRevenue}</div></div>
+        <div><div style="color:rgba(255,255,255,.3);font-size:10px;letter-spacing:.5px">ACTION</div><div style="font-weight:600;font-size:12px;color:var(--lime);margin-top:2px">${{sell_now:'⚡ Sell Now',store_wait:'🏠 Store',process_add_value:'🏭 Process',partial_sell:'✂️ Split'}[r.bestAction]||'⚡ Sell'}</div></div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:10px">Grade Distribution</h3>
+    ${Object.entries(r.grades||{}).map(([g,info])=>`
+      <div class="card row" style="margin-bottom:10px;gap:14px">
+        <div style="width:44px;height:44px;border-radius:13px;background:${gc[g]}18;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${gc[g]};flex-shrink:0">${g}</div>
+        <div class="flex1">
+          <div class="row" style="justify-content:space-between;margin-bottom:5px">
+            <span style="font-weight:600;font-size:13px">${info.label}</span>
+            <span style="color:var(--amber);font-weight:700;font-size:13px">${info.pct}%</span>
+          </div>
+          <div class="progress"><div class="progress-fill" style="width:${info.pct}%;background:${gc[g]}"></div></div>
+          <div style="color:var(--muted);font-size:11px;margin-top:3px">${info.priceRange}</div>
+        </div>
+      </div>`).join('')}
+
+    <div class="card-amber" style="margin-bottom:14px">
+      <div style="color:var(--amber);font-weight:700;font-size:13px;margin-bottom:8px">🤖 AI Analysis</div>
+      <div style="color:rgba(255,255,255,.88);font-size:13px;line-height:1.7">${r.aiRemark}</div>
+      ${r.aiRemarkLocal?`<hr class="divider"/><div style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.7">${r.aiRemarkLocal}</div>`:''}
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(232,160,32,.12);color:var(--muted);font-size:12px">📊 ${r.marketInsight}</div>
+    </div>
+    ${r.expertTip?`<div class="card" style="background:rgba(82,183,101,.06);border-color:rgba(82,183,101,.15);margin-bottom:14px"><div style="color:var(--lime);font-weight:700;font-size:12px;margin-bottom:6px">💡 Expert Tip</div><div style="font-size:13px;color:rgba(255,255,255,.8)">${r.expertTip}</div></div>`:''}
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;letter-spacing:.5px">WHAT DID YOU ACTUALLY SELL FOR?</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input id="actualPrice" type="number" placeholder="Actual ₹/unit received" inputmode="decimal" style="font-size:13px"/>
+        <input id="actualMandi" type="text" placeholder="Market/Mandi name" style="font-size:13px"/>
+      </div>
+      <button class="btn btn-ghost" style="padding:10px;font-size:13px;width:100%" onclick="saveActualPrice()">✓ Save Actual Price · Improves AI</button>
+    </div>
+    <button class="btn btn-amber" onclick="switchTab(2,document.querySelectorAll('.tab-btn')[2])" style="margin-bottom:8px">Connect to Buyers →</button>`;
+
+  // ── Tab 1: Standards ──
+  document.getElementById('tab1').innerHTML=`
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-weight:600;font-size:13px;margin-bottom:4px">Governing Standards</div>
+      <div style="color:${sec.color};font-size:13px;line-height:1.6">${sec.standards}</div>
+    </div>
+    <h3>AI Scan vs Official Standard</h3>
+    ${(r.parameters||[]).map(p=>`
+      <div class="card row" style="margin-bottom:8px;justify-content:space-between">
+        <div class="flex1">
+          <div style="font-weight:600;font-size:13px">${p.name}</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:2px">Standard: ${p.standard}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:10px">
+          <div style="color:${p.pass?'#4ADE80':'#F97316'};font-weight:600;font-size:12px">${p.found}</div>
+          <span class="badge ${p.pass?'badge-green':'badge-red'}">${p.pass?'PASS':'CHECK'}</span>
+        </div>
+      </div>`).join('')}
+    <div style="margin-top:10px;padding:12px;background:rgba(255,255,255,.03);border-radius:10px;font-size:11px;color:var(--muted);line-height:1.6">
+      ⚠️ AI report is indicative only. For official certification, contact an AGMARK/FSSAI/MPEDA accredited lab. FasalEx / DeepGazerAI™ disclaims liability for trade decisions based solely on this report.
+    </div>`;
+
+  // ── Tab 2: Buyers ──
+  const buyers=r.buyers||[];
+  document.getElementById('tab2').innerHTML=`
+    <div style="color:var(--muted);font-size:13px;margin-bottom:12px">📍 ${buyers.length} verified buyers matched for ${r.produce}</div>
+    ${buyers.map((b,i)=>`
+      <div class="card" style="margin-bottom:12px">
+        <div class="row" style="margin-bottom:10px">
+          <div style="width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,var(--green),var(--lime));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;flex-shrink:0">${b.name.slice(0,2).toUpperCase()}</div>
+          <div class="flex1">
+            <div style="font-weight:600;font-size:14px">${b.name} ${b.verified?'<span class="badge badge-green">✓</span>':''}</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:2px">${b.role} · ${b.dist}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="color:var(--amber);font-weight:800;font-size:16px;font-family:'Syne',sans-serif">${b.offer}</div>
+            <div style="color:var(--lime);font-size:11px">${['Best Price','Nearest','Alt Option'][i]||'Option'}</div>
+          </div>
+        </div>
+        <div style="background:rgba(82,183,101,.07);border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:10px;color:rgba(255,255,255,.65)">
+          📞 ${b.phone} · ★ ${b.rating} · 📍 ${b.dist}
+        </div>
+        <div class="row" style="gap:8px">
+          <button class="btn btn-ghost flex1" style="padding:9px;font-size:13px" onclick="toast('In-app chat — coming soon!')">💬 Chat</button>
+          <a href="tel:${(b.phone||'').replace(/[^+\d]/g,'')}" class="btn btn-outline flex1" style="padding:9px;font-size:13px;border-radius:14px">📞 Call</a>
+          <button class="btn btn-amber flex1" style="padding:9px;font-size:13px" onclick="waMsg('${b.name}','${b.phone}')">📱 WA</button>
+        </div>
+      </div>`).join('')}`;
+
+  // ── Tab 3: Market ──
+  document.getElementById('tab3').innerHTML=`
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <div style="font-weight:600;font-size:14px">Live Mandi Prices</div>
+      <div style="font-size:11px;color:var(--muted)">AGMARKNET · India</div>
+    </div>
+    <div id="reportMarketPrices"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Loading…</div></div>
+    <div style="background:rgba(255,255,255,.03);border-radius:12px;padding:12px;margin-top:12px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">REFERENCE PRICES (AI ESTIMATED)</div>
+      ${(r.marketPrices||[]).map(m=>`
+        <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+          <div style="font-size:13px">${m.market}</div>
+          <div style="font-weight:700;font-size:13px;color:var(--amber)">${m.price}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // ── Tab 4: DGport Certificate ──
+  const hash=btoa(JSON.stringify({p:r.produce,g:r.overallGrade,t:r.date})).slice(0,16);
+  document.getElementById('tab4').innerHTML=`
+    <div style="border:1px solid rgba(82,183,101,.3);border-radius:18px;overflow:hidden;margin-bottom:14px">
+      <div style="background:linear-gradient(135deg,var(--bg3),rgba(45,106,47,.5));padding:16px">
+        <div class="row" style="justify-content:space-between;margin-bottom:4px">
+          <div style="font-size:10px;color:var(--lime);font-weight:700;letter-spacing:1px">AGMARK · FSSAI · MPEDA · APEDA · NHB · CODEX</div>
+          <div style="font-size:10px;color:var(--muted)">CERTIFICATE TYPE</div>
+        </div>
+        <div class="row" style="justify-content:space-between;align-items:flex-end">
+          <div>
+            <div class="display" style="font-size:18px;color:var(--lime)">FasalEx™</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5)">DeepGazerAI™ GRADING CERTIFICATE</div>
+          </div>
+          <div style="background:var(--amber);color:#0D1F0F;font-family:'Syne',sans-serif;font-weight:800;font-size:22px;width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center">${r.overallGrade}</div>
+        </div>
+      </div>
+      <div style="padding:16px;background:rgba(255,255,255,.02)">
+        <div class="row" style="justify-content:space-between;margin-bottom:12px">
+          <div><div style="color:var(--muted);font-size:10px">COMMODITY</div><div style="font-weight:600;font-size:14px;margin-top:2px">${r.produce.toUpperCase()}</div></div>
+          <div style="text-align:right"><div style="color:var(--muted);font-size:10px">CONFIDENCE</div><div style="font-weight:600;font-size:14px;margin-top:2px;color:var(--lime)">${r.confidence}%</div></div>
+        </div>
+        <div class="row" style="justify-content:space-between;margin-bottom:8px">
+          <div><div style="color:var(--muted);font-size:10px">BEST PRICE</div><div style="font-weight:600;font-size:13px;margin-top:2px;color:var(--amber)">${(r.marketPrices||[])[0]?.price||'—'}</div></div>
+          <div style="text-align:right"><div style="color:var(--muted);font-size:10px">REVENUE EST.</div><div style="font-weight:600;font-size:13px;margin-top:2px;color:var(--amber)">${r.estimatedRevenue}</div></div>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,.07);padding-top:10px;margin-top:4px">
+          <div class="row" style="justify-content:space-between">
+            <div style="font-size:11px;color:var(--muted)">GPS: ${r.gps?.lat?r.gps.lat+'°N '+r.gps.lon+'°E':'Not tagged'}</div>
+            <div style="font-size:11px;color:var(--muted)">${r.date}</div>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:4px;font-family:'DM Mono',monospace">CERT HASH: ${hash}…</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.7;padding:12px;background:rgba(255,255,255,.02);border-radius:12px;margin-bottom:14px">
+      LEGAL REFERENCES: AGMARK: Agricultural Produce Act 1937 · FSSAI: Food Safety Act 2006 · MPEDA: Marine Products Export Act 1972 · APEDA: Agri & Processed Food Act 1985 · NHB: National Horticulture Board · CODEX Alimentarius (FAO/WHO) · BIS Standards<br/><br/>
+      ⚠️ AI-generated for guidance only. Official AGMARK certification required for legal trade. NayanAI™ / DeepGazerAI™ are proprietary AI systems under provisional patent protection. KrushiEx / FasalEx · deepgazerai.com
+    </div>
+    <button class="btn btn-amber" onclick="shareReport()">📤 Share Certificate</button>`;
+
+  switchTab(0,document.querySelectorAll('.tab-btn')[0]);
+  // Fetch live market prices
+  fetchReportMarketPrices(r.produce,r.sector);
+}
+
+async function fetchReportMarketPrices(produce,sector){
+  try{
+    const res=await fetch('/api/market-prices?produce='+encodeURIComponent(produce)+'&sector='+encodeURIComponent(sector||'agri'));
+    const data=await res.json();
+    if(data&&data.prices&&document.getElementById('reportMarketPrices')){
+      document.getElementById('reportMarketPrices').innerHTML=data.prices.map(p=>`
+        <div class="card row" style="margin-bottom:8px;justify-content:space-between">
+          <div style="font-size:13px;font-weight:600">${p.market}</div>
+          <div style="text-align:right"><div style="font-weight:700;font-size:14px;color:var(--amber)">${p.price}</div><div style="font-size:11px;color:${p.up?'#4ADE80':'var(--red)'}">₹${Math.abs(p.change)}/qtl ${p.up?'▲':'▼'}</div></div>
+        </div>`).join('');
+    }
+  }catch(e){
+    if(document.getElementById('reportMarketPrices'))
+      document.getElementById('reportMarketPrices').innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px">⚠️ Live prices unavailable. Get API key at data.gov.in</div>`;
+  }
+}
+
+function switchTab(i,el){
+  [0,1,2,3,4].forEach(x=>{
+    document.getElementById('tab'+x).style.display=x===i?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,x)=>b.classList.toggle('active',x===i));
+}
+
+function saveActualPrice(){
+  const price=document.getElementById('actualPrice')?.value;
+  const mandi=document.getElementById('actualMandi')?.value;
+  if(!price){toast('Enter actual price received','#E8A020');return;}
+  if(S.currentReport){S.currentReport.actualPrice=price;S.currentReport.actualMandi=mandi;if(S.history[0])S.history[0].report=S.currentReport;save();}
+  toast('✓ Saved! Helps improve AI for all farmers 🙏');
+}
+
+function waMsg(name,phone){
+  const r=S.currentReport;
+  const msg=encodeURIComponent(`Hello ${name.split(' ')[0]},\n\nI have *${r?.produce}* for sale.\nGrade: *${r?.overallGrade}* (${r?.gradeLabel})\nQty: ${r?.qty}\nEstimated price: ${r?.estimatedRevenue}\nGPS: ${r?._gpsTag?.lat||'—'}°N\n\nVia FasalEx · See True. Trade Fair.`);
+  window.open(`https://wa.me/${(phone||'').replace(/[^+\d]/g,'')}?text=${msg}`,'_blank');
+}
+
+// ══════════════════════════════════════════════════════
+// SHARE
+// ══════════════════════════════════════════════════════
+async function shareReport(){
+  const r=S.currentReport;if(!r)return;
+  const txt=`🌾 FasalEx Grade Report\n\nProduce: ${r.produce}\nGrade: ${r.overallGrade} — ${r.gradeLabel}\nConfidence: ${r.confidence}%\nQty: ${r.qty}\nRevenue Est: ${r.estimatedRevenue}\nAction: ${r.bestAction?.replace(/_/g,' ')}\n\nAI Analysis: ${r.aiRemark}\n\nGPS: ${r._gpsTag?.lat||'—'}°N ${r._gpsTag?.lon||'—'}°E\n${r.date}\n\nPowered by FasalEx · deepgazerai.com\nSee True. Trade Fair.`;
+  try{
+    if(navigator.share){await navigator.share({title:'FasalEx Grade Report',text:txt});}
+    else{await navigator.clipboard.writeText(txt);toast('📋 Report copied to clipboard!');}
+  }catch(e){
+    try{await navigator.clipboard.writeText(txt);toast('📋 Copied to clipboard');}catch(e2){}
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// MARKET
+// ══════════════════════════════════════════════════════
+async function initMarket(){
+  try{
+    const res=await fetch('/api/market');
+    const data=await res.json();
+    S.marketData=data;
+    renderMarket('all');
+  }catch(e){renderMarket('all');}
+}
+function filterMarket(btn,sector){
+  document.querySelectorAll('#marketChips .chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderMarket(sector);
+}
+function renderMarket(sector){
+  const data=sector==='all'?S.marketData:S.marketData.filter(m=>m.sector===sector);
+  if(!data.length){document.getElementById('marketList').innerHTML='<div style="color:var(--muted);text-align:center;padding:32px">No data for this sector</div>';return;}
+  const gc={'#4ADE80':'▲','var(--red)':'▼'};
+  document.getElementById('marketList').innerHTML=data.map(m=>`
+    <div class="card row" style="margin-bottom:8px">
+      <span style="font-size:22px">${SECTORS[m.sector]?.emoji||'🌾'}</span>
+      <div class="flex1" style="margin-left:10px">
+        <div style="font-weight:600;font-size:13px">${m.name}</div>
+        <div style="color:var(--muted);font-size:11px">AGMARKNET · Today</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:700;font-size:15px">${m.price}</div>
+        <div style="font-size:12px;font-weight:600;color:${m.up?'#4ADE80':'var(--red)'}">${m.up?'▲':'▼'} ${m.chg}</div>
+      </div>
+    </div>`).join('');
+}
+async function fetchLivePrices(){
+  document.getElementById('marketRefreshBtn').textContent='⌛';
+  await initMarket();
+  document.getElementById('marketRefreshBtn').textContent='↻';
+  toast('Prices refreshed');
+}
+
+// ══════════════════════════════════════════════════════
+// HISTORY
+// ══════════════════════════════════════════════════════
+function initHistory(){
+  const list=document.getElementById('historyList');
+  const empty=document.getElementById('historyEmpty');
+  if(!S.history.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const gc={A:'#4ADE80',B:'var(--amber)',C:'#F97316',D:'var(--red)'};
+  list.innerHTML=S.history.map((h,i)=>{
+    const r=h.report;
+    return `<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="viewHistory(${i})">
+      <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div class="row">
+          <div style="width:44px;height:44px;border-radius:13px;background:${gc[r.overallGrade]}18;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:${gc[r.overallGrade]};flex-shrink:0">${r.overallGrade}</div>
+          <div style="margin-left:10px">
+            <div style="font-weight:600;font-size:13px">${r.produce}</div>
+            <div style="color:var(--muted);font-size:11px;margin-top:1px">${r.qty} · ${r.date}</div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="color:var(--amber);font-weight:700;font-size:14px">${r.estimatedRevenue}</div>
+          <span class="badge badge-green">Graded</span>
+        </div>
+      </div>
+      <div style="padding-top:8px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between">
+        <span style="font-size:11px;color:var(--muted)">${r.gradeLabel} · ${r.confidence}% AI</span>
+        <span style="font-size:12px;color:var(--lime)">View →</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function viewHistory(i){
+  S.currentReport=S.history[i].report;
+  renderReport();
+  navigate('page-report');
+}
+
+// ══════════════════════════════════════════════════════
+// PROFILE
+// ══════════════════════════════════════════════════════
+function initProfile(){
+  const u=S.user;
+  const s=SECTORS[u.sector||'agri'];
+  document.getElementById('profileContent').innerHTML=`
+    <div class="card-green" style="text-align:center;margin-bottom:16px;padding:24px">
+      <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin:0 auto 12px">${(u.name||'F')[0].toUpperCase()}</div>
+      <div class="display" style="font-size:22px">${u.name||'Your Name'}</div>
+      <div style="color:rgba(255,255,255,.6);font-size:13px;margin-top:3px">${u.role||'Farmer'} · ${s.emoji} ${s.label}</div>
+      ${u.state?`<div style="color:rgba(255,255,255,.45);font-size:12px;margin-top:2px">📍 ${[u.village,u.district,u.state].filter(Boolean).join(', ')}</div>`:''}
+      <div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <span class="badge badge-green">✓ Active</span>
+        <span class="badge badge-amber">${S.history.length} Scans</span>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <h3>Edit Profile</h3>
+      <div class="field"><label class="lbl">Name</label><input id="p-name" value="${u.name}" oninput="S.user.name=this.value"/></div>
+      <div class="field"><label class="lbl">Phone</label><input id="p-phone" type="tel" value="${u.phone||''}" oninput="S.user.phone=this.value"/></div>
+      <div class="field"><label class="lbl">State</label><input id="p-state" value="${u.state||''}" oninput="S.user.state=this.value"/></div>
+      <div class="row field">
+        <div class="flex1"><label class="lbl">District</label><input id="p-dist" value="${u.district||''}" oninput="S.user.district=this.value"/></div>
+        <div class="flex1"><label class="lbl">Village</label><input id="p-vil" value="${u.village||''}" oninput="S.user.village=this.value"/></div>
+      </div>
+      <div class="field"><label class="lbl">Language</label>
+        <select id="p-lang" onchange="S.user.language=this.value">
+          ${[['en','English'],['hi','हिन्दी'],['kn','ಕನ್ನಡ'],['te','తెలుగు'],['ta','தமிழ்'],['mr','मराठी']].map(([v,l])=>`<option value="${v}" ${u.language===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-amber" onclick="save();toast('✓ Profile saved!')">Save Changes</button>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <h3>📊 Summary</h3>
+      <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:var(--muted);font-size:13px">Total Scans</span><span style="font-weight:600">${S.history.length}</span></div>
+      <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="color:var(--muted);font-size:13px">Grade A Scans</span><span style="font-weight:600;color:#4ADE80">${S.history.filter(h=>h.report?.overallGrade==='A').length}</span></div>
+      <div class="row" style="justify-content:space-between;padding:8px 0"><span style="color:var(--muted);font-size:13px">Revenue Est.</span><span style="font-weight:600;color:var(--amber)">₹${S.history.reduce((a,h)=>a+(parseInt((h.report?.estimatedRevenue||'0').replace(/[₹,\s]/g,'').split('–')[0])||0),0).toLocaleString('en-IN')}</span></div>
+    </div>
+    <button class="btn" style="background:rgba(209,79,61,.1);border:1px solid rgba(209,79,61,.2);color:var(--red);border-radius:14px;padding:13px;width:100%;margin-bottom:8px;font-family:'DM Sans',sans-serif" onclick="if(confirm('Clear all history?')){S.history=[];save();initProfile();toast('History cleared')}">🗑 Clear History</button>
+    <button class="btn btn-ghost" style="margin-bottom:20px" onclick="if(confirm('Reset app?')){S={user:{name:'',phone:'',role:'Farmer',sector:'agri',language:'en',state:'',district:'',village:''},history:[],currentReport:null,scanState:{imageBase64:null,imageDataURL:null,produce:'',sector:'agri'},marketData:[]};save();navigate('page-reg1');}">↩ Reset App</button>`;
+}
+
+// ══════════════════════════════════════════════════════
+// GPS & REVERSE GEOCODE
+// ══════════════════════════════════════════════════════
+async function reverseGeocode(lat,lon){
+  if(_cachedAddress)return _cachedAddress;
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,{headers:{'Accept-Language':'en'}});
+    const d=await res.json();
+    const a=d.address||{};
+    const parts=[a.road||a.hamlet||a.village||a.suburb||'',a.county||a.district||a.city||'',(a.state||'')+(a.postcode?' '+a.postcode:''),a.country||'India'].filter(Boolean);
+    _cachedAddress=parts.join(', ');
+    return _cachedAddress;
+  }catch(e){
+    return [S.user.village,S.user.district,S.user.state,'India'].filter(Boolean).join(', ')||'India';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════
+async function boot(){
+  load();
+  // Wait for splash
+  await delay(2300);
+  document.getElementById('splash').style.opacity='0';
+  document.getElementById('splash').style.transition='opacity .4s ease';
+  await delay(400);
+  document.getElementById('splash').style.display='none';
+
+  // Init GPS quietly
+  navigator.geolocation?.getCurrentPosition(pos=>{
+    currentGPS={lat:pos.coords.latitude.toFixed(6),lon:pos.coords.longitude.toFixed(6),alt:pos.coords.altitude?Math.round(pos.coords.altitude):null};
+  },()=>{},{timeout:5000,enableHighAccuracy:true});
+
+  if(S.user.name){
+    initHome();
+    navigate('page-home');
+    setNav('nb-home');
+    // Load market data quietly
+    fetch('/api/market').then(r=>r.json()).then(d=>{S.marketData=d;}).catch(()=>{});
+  }else{
+    navigate('page-reg1');
+  }
+}
+
+document.addEventListener('DOMContentLoaded',boot);
+</script>
+</body>
+</html>
