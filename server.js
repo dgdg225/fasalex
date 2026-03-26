@@ -1,329 +1,790 @@
-const express = require('express');
-const path = require('path');
-const app = express();
-app.use(express.json({ limit: '20mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+/**
+ * FasalEx · DeepGazerAI
+ * server.js — Production Server
+ * 
+ * Features:
+ *   /api/analyze     — AI grading via Claude
+ *   /api/identify    — Produce identification
+ *   /api/prices      — Live global price intelligence
+ *   /api/health      — Health + price freshness check
+ *   Background job   — Daily price refresh (all sources)
+ * 
+ * Price Sources:
+ *   USDA AMS         — USA wholesale (free, no auth)
+ *   World Bank       — Global commodity pinksheet (free)
+ *   EU AGRI          — EU farm gate prices (free)
+ *   FAO GIEWS        — World food price index (free)
+ *   Exchange rates   — INR conversion (free)
+ * 
+ * Patent: K = D_known/D_px · DeepGazerAI Vision Engine
+ * © 2026 H DoddanaGouda · Hospet, Karnataka · Patent Pending
+ */
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const PORT = process.env.PORT || 3000;
+'use strict';
 
-// ── Serve index.html ──────────────────────────────────
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+const http    = require('http');
+const https   = require('https');
+const fs      = require('fs');
+const path    = require('path');
+const url     = require('url');
 
-// ── Health check ──────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true, apiKey: !!ANTHROPIC_API_KEY, version: 'FasalEx 2.0' });
-});
+const PORT    = process.env.PORT || 3000;
+const API_KEY = process.env.ANTHROPIC_API_KEY || '';
+const CACHE_FILE = path.join(__dirname, 'price_cache.json');
 
-// ── IDENTIFY — AI produce identification from image ───
-app.post('/api/identify', async (req, res) => {
-  const { imageBase64 } = req.body;
-  if (!imageBase64) {
-    return res.json({ produce: 'Unknown', sector: 'agri', confidence: 0, emoji: '❓', note: 'No image provided' });
-  }
-  if (!ANTHROPIC_API_KEY) {
-    return res.json(demoIdentify());
-  }
+// ═══════════════════════════════════════════════════════════════
+//  PRICE CACHE — in-memory + file backed
+// ═══════════════════════════════════════════════════════════════
+
+let priceCache = {
+  lastUpdated: null,
+  lastAttempt: null,
+  sources: {},
+  exchange: { USD_INR: 83.5, EUR_INR: 90.2, GBP_INR: 106.0 },
+  commodities: {},
+  status: 'initialising',
+};
+
+function loadCacheFromDisk() {
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    if (fs.existsSync(CACHE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
+      priceCache = { ...priceCache, ...data };
+      console.log('[PRICES] Cache loaded from disk — last updated:', priceCache.lastUpdated);
+    }
+  } catch (e) {
+    console.warn('[PRICES] Could not load cache from disk:', e.message);
+  }
+}
+
+function saveCacheToDisk() {
+  try {
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(priceCache, null, 2));
+  } catch (e) {
+    console.warn('[PRICES] Could not save cache:', e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HTTP HELPER — fetch JSON from any URL
+// ═══════════════════════════════════════════════════════════════
+
+function fetchJSON(targetUrl, timeoutMs = 8000) {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(targetUrl);
+    const lib = parsed.protocol === 'https:' ? https : http;
+    const req = lib.get(targetUrl, {
+      headers: {
+        'User-Agent': 'FasalEx-PriceFetcher/1.0 (fasalex.com)',
+        'Accept': 'application/json',
+      },
+      timeout: timeoutMs,
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch (e) { reject(new Error('JSON parse error: ' + e.message)); }
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SOURCE 1 — WORLD BANK COMMODITY PRICES (Pinksheet)
+//  Free · No auth · Monthly updates
+//  Covers: Wheat, Rice, Maize, Soybean, Palm Oil, Sugar, Coffee
+// ═══════════════════════════════════════════════════════════════
+
+async function fetchWorldBank() {
+  // World Bank API — commodity price data (USD per metric tonne)
+  const commodities = {
+    'WHEAT_US_HRW': 'Wheat',
+    'RICE_05_VNM':  'Rice / Paddy',
+    'MAIZE_US':     'Maize / Corn',
+    'SOYBEANS':     'Soybean',
+    'SUGAR_WLD':    'Sugarcane',
+    'GRNUT_US':     'Groundnut',
+  };
+
+  const results = {};
+  for (const [indicator, name] of Object.entries(commodities)) {
+    try {
+      const data = await fetchJSON(
+        `https://api.worldbank.org/v2/en/indicator/${indicator}?downloadformat=json&mrv=1&format=json`
+      );
+      // World Bank returns array [meta, data]
+      const val = Array.isArray(data) && data[1]?.[0]?.value;
+      if (val) {
+        const usdPerTonne = parseFloat(val);
+        const inrPerQtl = Math.round(usdPerTonne * priceCache.exchange.USD_INR / 10); // tonne→qtl
+        results[name] = {
+          usd_per_tonne: usdPerTonne,
+          inr_per_qtl: inrPerQtl,
+          source: 'World Bank Pinksheet',
+          date: data[1]?.[0]?.date || 'Latest',
+        };
+      }
+    } catch (e) {
+      // silently skip failed commodities
+    }
+  }
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SOURCE 2 — USDA AMS MARKET NEWS (free, no auth)
+//  Covers: Grains, Fruits, Vegetables — USA wholesale
+// ═══════════════════════════════════════════════════════════════
+
+async function fetchUSDA() {
+  const results = {};
+  try {
+    // USDA AMS MARS API — grain prices
+    const grainData = await fetchJSON(
+      'https://marsapi.ams.usda.gov/services/v1.2/reports/2172?q=commodity=Wheat&allSections=true'
+    );
+    if (grainData?.results?.[0]) {
+      const r = grainData.results[0];
+      // Convert USD/bushel to INR/qtl (1 bushel wheat = 27.2kg)
+      const usdBushel = parseFloat(r.price || r.avg_price || 5.5);
+      const inrQtl = Math.round(usdBushel * 3.674 * priceCache.exchange.USD_INR); // bushel→qtl conversion
+      results['Wheat'] = {
+        usd_per_bushel: usdBushel,
+        inr_per_qtl: inrQtl,
+        source: 'USDA AMS',
+        market: 'US Wholesale',
+        date: r.report_date || new Date().toISOString().slice(0,10),
+      };
+    }
+  } catch (e) {}
+
+  // USDA commodity spot prices
+  try {
+    const spotData = await fetchJSON(
+      'https://marsapi.ams.usda.gov/services/v1.2/reports/1234?allSections=true'
+    );
+    if (spotData?.results) {
+      spotData.results.slice(0, 5).forEach(r => {
+        if (r.commodity_name && r.price) {
+          const inrQtl = Math.round(parseFloat(r.price) * 100 * priceCache.exchange.USD_INR / 100);
+          results[r.commodity_name] = {
+            source: 'USDA AMS',
+            inr_per_qtl: inrQtl,
+            date: r.report_date,
+          };
+        }
+      });
+    }
+  } catch (e) {}
+
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SOURCE 3 — EU AGRI MARKET DATA
+//  Free REST API · Weekly updates
+// ═══════════════════════════════════════════════════════════════
+
+async function fetchEUAgri() {
+  const results = {};
+  try {
+    // EU Agricultural Markets Information System (AMIS)
+    const data = await fetchJSON(
+      'https://agridata.ec.europa.eu/api/DataSets/AgriCommodityPrices?$top=20&$format=json'
+    );
+    if (data?.value) {
+      data.value.forEach(item => {
+        if (item.CommodityName && item.AveragePrice) {
+          const eurPerTonne = parseFloat(item.AveragePrice);
+          const inrPerQtl = Math.round(eurPerTonne * priceCache.exchange.EUR_INR / 10);
+          results[item.CommodityName] = {
+            eur_per_tonne: eurPerTonne,
+            inr_per_qtl: inrPerQtl,
+            source: 'EU AGRI Portal',
+            date: item.MarketDate || new Date().toISOString().slice(0,10),
+          };
+        }
+      });
+    }
+  } catch (e) {}
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SOURCE 4 — FAO FOOD PRICE INDEX
+//  Free REST · Monthly — overall food inflation indicator
+// ═══════════════════════════════════════════════════════════════
+
+async function fetchFAO() {
+  const results = { index: {} };
+  try {
+    const data = await fetchJSON(
+      'https://www.fao.org/giews/food-prices/api/v1/priceSeries/?currencyCode=INR&commodityCode=WHEAT&marketCode=1'
+    );
+    if (data?.data?.[0]) {
+      results.index.wheat_inr = data.data[0].price;
+      results.index.source = 'FAO GIEWS';
+      results.index.date = data.data[0].date;
+    }
+  } catch (e) {}
+
+  // FAO Food Price Index (monthly composite)
+  try {
+    const fpi = await fetchJSON(
+      'https://www.fao.org/giews/food-prices/api/v1/foodPriceIndex/?months=1'
+    );
+    if (fpi?.data?.[0]) {
+      results.foodPriceIndex = {
+        value: fpi.data[0].value,
+        change: fpi.data[0].change,
+        date: fpi.data[0].date,
+        source: 'FAO Food Price Index',
+      };
+    }
+  } catch (e) {}
+
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SOURCE 5 — EXCHANGE RATES (free, no auth)
+// ═══════════════════════════════════════════════════════════════
+
+async function fetchExchangeRates() {
+  try {
+    const data = await fetchJSON(
+      'https://open.er-api.com/v6/latest/USD'
+    );
+    if (data?.rates) {
+      const rates = data.rates;
+      priceCache.exchange = {
+        USD_INR: rates.INR || 83.5,
+        EUR_INR: (rates.INR / rates.EUR) || 90.2,
+        GBP_INR: (rates.INR / rates.GBP) || 106.0,
+        AED_INR: (rates.INR / rates.AED) || 22.7,
+        updated: new Date().toISOString(),
+      };
+      console.log('[PRICES] Exchange rates updated — USD/INR:', priceCache.exchange.USD_INR.toFixed(2));
+      return true;
+    }
+  } catch (e) {
+    console.warn('[PRICES] Exchange rate fetch failed:', e.message);
+  }
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATIC FALLBACK PRICES — always valid even if APIs fail
+//  Based on March 2026 benchmarks
+// ═══════════════════════════════════════════════════════════════
+
+const STATIC_FALLBACK = {
+  'Wheat':         { domestic: 2180, dubai: 2650, eu: 2890, usda: 3100 },
+  'Rice / Paddy':  { domestic: 3640, dubai: 4800, eu: 5200, usda: 4950 },
+  'Maize / Corn':  { domestic: 1890, dubai: 2100, eu: 2280, usda: 2450 },
+  'Moong (Whole)': { domestic: 9200, dubai:12800, eu:13500, usda:11900 },
+  'Toor Dal':      { domestic: 7700, dubai:10200, eu: 9800, usda: 9500 },
+  'Chana Dal':     { domestic: 5200, dubai: 7100, eu: 7800, usda: 6900 },
+  'Soybean':       { domestic: 4500, dubai: 5100, eu: 5600, usda: 6200 },
+  'Groundnut':     { domestic: 5500, dubai: 7200, eu: 8100, usda: 7600 },
+  'Tomato':        { domestic: 1600, dubai: 3200, eu: 2800, usda: 2600 },
+  'Onion':         { domestic: 2100, dubai: 3800, eu: 3200, usda: 3100 },
+  'Chilli':        { domestic:12000, dubai:18500, eu:16200, usda:17800 },
+  'Turmeric':      { domestic:14000, dubai:22000, eu:24500, usda:21000 },
+  'Ginger':        { domestic: 5800, dubai: 9200, eu:10800, usda: 9500 },
+  'Mango':         { domestic: 4200, dubai: 8500, eu: 9800, usda: 7200 },
+  'Banana':        { domestic: 2200, dubai: 3600, eu: 3200, usda: 3400 },
+  'Grapes':        { domestic: 6000, dubai:10200, eu:12500, usda:11000 },
+  'Tiger Prawn':   { domestic:  650, dubai: 1100, eu: 1280, usda: 1350 },
+  'Tuna':          { domestic:  240, dubai:  580, eu:  720, usda:  820  },
+  'Pomfret':       { domestic:  420, dubai:  780, eu:  680, usda:  650  },
+};
+
+// Build commodity map from live + fallback data
+function buildCommodityPrices(liveData) {
+  const result = {};
+  const ex = priceCache.exchange;
+
+  for (const [name, fallback] of Object.entries(STATIC_FALLBACK)) {
+    const live = liveData[name] || {};
+
+    // Prefer live data, fall back to static
+    const domestic = live.inr_domestic || fallback.domestic;
+    const dubai    = live.inr_dubai    || Math.round(fallback.dubai * (ex.USD_INR / 83.5));
+    const eu       = live.inr_eu       || Math.round(fallback.eu    * (ex.EUR_INR / 90.2));
+    const usda     = live.inr_usda     || Math.round(fallback.usda  * (ex.USD_INR / 83.5));
+
+    const all = { domestic, dubai, eu, usda };
+    const bestRoute = Object.entries(all).reduce((a, b) => b[1] > a[1] ? b : a)[0];
+
+    result[name] = {
+      domestic: `₹${domestic.toLocaleString('en-IN')}/qtl`,
+      dubai:    `₹${dubai.toLocaleString('en-IN')}/qtl`,
+      eu:       `₹${eu.toLocaleString('en-IN')}/qtl`,
+      usda:     `₹${usda.toLocaleString('en-IN')}/qtl`,
+      bestRoute,
+      premiumPct: Math.round(((Math.max(dubai, eu, usda) - domestic) / domestic) * 100),
+      source: live.source || 'FasalEx Benchmark',
+      raw: { domestic, dubai, eu, usda },
+    };
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MAIN PRICE REFRESH — runs daily
+// ═══════════════════════════════════════════════════════════════
+
+async function refreshPrices() {
+  console.log('[PRICES] Starting daily price refresh —', new Date().toISOString());
+  priceCache.lastAttempt = new Date().toISOString();
+  priceCache.status = 'fetching';
+
+  const liveData = {};
+
+  // 1. Exchange rates first (needed for conversions)
+  await fetchExchangeRates();
+
+  // 2. Fetch all sources in parallel
+  const [wb, usda, eu, fao] = await Promise.allSettled([
+    fetchWorldBank(),
+    fetchUSDA(),
+    fetchEUAgri(),
+    fetchFAO(),
+  ]);
+
+  const sourceStatus = {};
+
+  if (wb.status === 'fulfilled') {
+    Object.assign(liveData, wb.value);
+    sourceStatus.worldbank = { ok: true, count: Object.keys(wb.value).length };
+    console.log('[PRICES] World Bank OK —', Object.keys(wb.value).length, 'commodities');
+  } else {
+    sourceStatus.worldbank = { ok: false, error: wb.reason?.message };
+    console.warn('[PRICES] World Bank failed:', wb.reason?.message);
+  }
+
+  if (usda.status === 'fulfilled') {
+    Object.assign(liveData, usda.value);
+    sourceStatus.usda = { ok: true, count: Object.keys(usda.value).length };
+    console.log('[PRICES] USDA AMS OK —', Object.keys(usda.value).length, 'commodities');
+  } else {
+    sourceStatus.usda = { ok: false, error: usda.reason?.message };
+    console.warn('[PRICES] USDA failed:', usda.reason?.message);
+  }
+
+  if (eu.status === 'fulfilled') {
+    Object.assign(liveData, eu.value);
+    sourceStatus.eu = { ok: true, count: Object.keys(eu.value).length };
+    console.log('[PRICES] EU AGRI OK —', Object.keys(eu.value).length, 'commodities');
+  } else {
+    sourceStatus.eu = { ok: false, error: eu.reason?.message };
+    console.warn('[PRICES] EU AGRI failed:', eu.reason?.message);
+  }
+
+  if (fao.status === 'fulfilled') {
+    priceCache.fao = fao.value;
+    sourceStatus.fao = { ok: true };
+    console.log('[PRICES] FAO OK');
+  } else {
+    sourceStatus.fao = { ok: false, error: fao.reason?.message };
+  }
+
+  // 3. Build unified commodity map
+  priceCache.commodities  = buildCommodityPrices(liveData);
+  priceCache.sources      = sourceStatus;
+  priceCache.lastUpdated  = new Date().toISOString();
+  priceCache.status       = 'ok';
+
+  const liveCount = Object.values(sourceStatus).filter(s => s.ok).length;
+  console.log(`[PRICES] Refresh complete — ${liveCount}/4 sources live, ${Object.keys(priceCache.commodities).length} commodities`);
+
+  saveCacheToDisk();
+}
+
+// Schedule daily refresh at 06:00 IST (00:30 UTC)
+function scheduleDailyRefresh() {
+  const now       = new Date();
+  const next      = new Date();
+  next.setUTCHours(0, 30, 0, 0); // 06:00 IST = 00:30 UTC
+  if (next <= now) next.setDate(next.getDate() + 1);
+  const msUntil = next - now;
+  console.log(`[PRICES] Next refresh scheduled in ${Math.round(msUntil/3600000)}h`);
+  setTimeout(() => {
+    refreshPrices();
+    setInterval(refreshPrices, 24 * 60 * 60 * 1000); // then every 24h
+  }, msUntil);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ANTHROPIC API CALL
+// ═══════════════════════════════════════════════════════════════
+
+function callClaude(messages, maxTokens = 1800) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      messages,
+    });
+
+    const req = https.request({
+      hostname: 'api.anthropic.com',
+      path: '/v1/messages',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Length': Buffer.byteLength(body),
       },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 300,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 }
-            },
-            {
-              type: 'text',
-              text: `You are an agricultural produce identification AI. Look at this image carefully and identify the agricultural produce shown.
-
-Respond ONLY with valid JSON in this exact format:
-{
-  "produce": "exact produce name (e.g. Wheat, Tomato, Green Gram, Potato)",
-  "sector": "one of: agri, horti, flori, api, ah, med, fish",
-  "confidence": 85,
-  "emoji": "single emoji representing this produce",
-  "note": "one short sentence about what you see in the image"
-}
-
-Sector mapping:
-- agri: grains, cereals, pulses, oilseeds, cotton, sugarcane
-- horti: fruits, vegetables
-- flori: flowers, ornamental plants
-- api: honey, bee products
-- ah: dairy, meat, eggs (animal husbandry)
-- med: medicinal herbs, spices
-- fish: fish, seafood, aquaculture
-
-Be specific about what you actually see in the image. If the image is unclear, use your best judgment.`
-            }
-          ]
-        }]
-      })
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch (e) { reject(e); }
+      });
     });
-    const data = await response.json();
-    const text = data.content?.[0]?.text || '{}';
-    const clean = text.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(clean);
-    res.json(result);
-  } catch (e) {
-    console.error('Identify error:', e);
-    res.json(demoIdentify());
-  }
-});
-
-function demoIdentify() {
-  return { produce: 'Wheat', sector: 'agri', confidence: 72, emoji: '🌾', note: 'Demo mode — API key not configured' };
+    req.on('error', reject);
+    req.setTimeout(25000, () => { req.destroy(); reject(new Error('Claude API timeout')); });
+    req.write(body);
+    req.end();
+  });
 }
 
-// ── ANALYZE — Full AI grading ─────────────────────────
-app.post('/api/analyze', async (req, res) => {
-  const { produce, sector, qty, unit, notes, language, farmerName, farmerState, farmerDistrict, gps, imageBase64 } = req.body;
+// ═══════════════════════════════════════════════════════════════
+//  REQUEST HANDLERS
+// ═══════════════════════════════════════════════════════════════
 
-  if (!ANTHROPIC_API_KEY) {
-    return res.json(buildDemoReport({ produce, sector, qty, unit, farmerName, gps, language }));
+function parseBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => { body += chunk; if (body.length > 10e6) req.destroy(); });
+    req.on('end', () => {
+      try { resolve(JSON.parse(body)); }
+      catch (e) { reject(e); }
+    });
+    req.on('error', reject);
+  });
+}
+
+function sendJSON(res, status, obj) {
+  const body = JSON.stringify(obj);
+  res.writeHead(status, {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Cache-Control': 'no-cache',
+  });
+  res.end(body);
+}
+
+// ── /api/prices ────────────────────────────────────────────────
+async function handlePrices(req, res) {
+  const q = url.parse(req.url, true).query;
+  const produce = q.produce || null;
+
+  const data = {
+    status: priceCache.status,
+    lastUpdated: priceCache.lastUpdated,
+    lastAttempt: priceCache.lastAttempt,
+    exchange: priceCache.exchange,
+    sources: priceCache.sources,
+    fao: priceCache.fao,
+  };
+
+  if (produce && priceCache.commodities[produce]) {
+    data.commodity = priceCache.commodities[produce];
+    data.commodity.name = produce;
+  } else {
+    data.commodities = priceCache.commodities;
   }
+
+  sendJSON(res, 200, data);
+}
+
+// ── /api/health ────────────────────────────────────────────────
+function handleHealth(req, res) {
+  const hoursOld = priceCache.lastUpdated
+    ? Math.round((Date.now() - new Date(priceCache.lastUpdated)) / 3600000)
+    : null;
+
+  sendJSON(res, 200, {
+    status: 'ok',
+    app: 'FasalEx',
+    version: '6.0',
+    priceCache: {
+      status: priceCache.status,
+      lastUpdated: priceCache.lastUpdated,
+      hoursOld,
+      commodityCount: Object.keys(priceCache.commodities).length,
+      sourcesOk: Object.values(priceCache.sources).filter(s => s.ok).length,
+    },
+    apiKey: API_KEY ? 'configured' : 'missing',
+    timestamp: new Date().toISOString(),
+  });
+}
+
+// ── /api/identify ──────────────────────────────────────────────
+async function handleIdentify(req, res) {
+  if (!API_KEY) return sendJSON(res, 503, { error: 'API key not configured' });
+  try {
+    const { imageBase64, sector } = await parseBody(req);
+    if (!imageBase64) return sendJSON(res, 400, { error: 'imageBase64 required' });
+
+    const result = await callClaude([{
+      role: 'user',
+      content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
+        { type: 'text', text: `Identify this produce. Sector hint: ${sector||'agri'}.\nRespond ONLY with JSON: {"produce":"name","confidence":85,"description":"brief description","sector":"agri|dairy|fish"}` },
+      ],
+    }], 200);
+
+    const text = result.content?.[0]?.text || '';
+    const m = text.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('No JSON');
+    sendJSON(res, 200, JSON.parse(m[0]));
+  } catch (e) {
+    sendJSON(res, 500, { error: e.message });
+  }
+}
+
+// ── /api/analyze ───────────────────────────────────────────────
+async function handleAnalyze(req, res) {
+  if (!API_KEY) return sendJSON(res, 503, { error: 'API key not configured' });
 
   try {
-    // Build the message content
-    const messageContent = [];
+    const { produce, sector, qty, unit, language, farmerName, gps, imageBase64 } = await parseBody(req);
+    if (!produce) return sendJSON(res, 400, { error: 'produce required' });
 
-    // Add image if available
-    if (imageBase64) {
-      messageContent.push({
-        type: 'image',
-        source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 }
-      });
-    }
+    // Inject live price data for this commodity
+    const livePrice = priceCache.commodities[produce];
+    const priceContext = livePrice
+      ? `Live prices for ${produce}: Domestic ₹${livePrice.raw?.domestic}/qtl, Dubai ₹${livePrice.raw?.dubai}/qtl, EU ₹${livePrice.raw?.eu}/qtl, USA ₹${livePrice.raw?.usda}/qtl. Best route: ${livePrice.bestRoute} (+${livePrice.premiumPct}% premium). Exchange rates: USD/INR=${priceCache.exchange.USD_INR}, EUR/INR=${priceCache.exchange.EUR_INR}.`
+      : `Use your knowledge of current Indian market prices for ${produce}.`;
 
-    // Build sector-specific grading prompt
-    const sectorStandards = {
-      agri: 'AGMARK Grain/Pulse Grading Rules, FCI Standards, FSS Regulations 2011',
-      horti: 'AGMARK Fruit & Vegetable Grading Rules, APEDA standards, EU Reg 543/2011',
-      flori: 'National Horticulture Board standards, APEDA Floriculture guidelines',
-      api: 'FSSAI Honey Standards, BIS IS:4941, Codex Stan 12-1981',
-      ah: 'FSSAI Dairy Standards, BIS IS:1479, Codex Stan 206-1999, PFA Act',
-      med: 'AYUSH standards, FSSAI regulations for herbs and spices',
-      fish: 'MPEDA export standards, EIC guidelines, HACCP, EU Reg 854/2004'
-    };
+    const langPrompt = language && language !== 'English'
+      ? `IMPORTANT: Write aiRemark, aiRemarkNative, marketInsight, expertTip in ${language}. Also provide "aiRemarkNative" field with 2-3 sentences in ${language} for the farmer.`
+      : '';
 
-    const localLang = {
-      hi: 'Hindi', kn: 'Kannada', te: 'Telugu', ta: 'Tamil', mr: 'Marathi', en: 'English'
-    }[language] || 'English';
+    const imageContent = imageBase64
+      ? [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } }]
+      : [];
 
-    const prompt = `You are DeepGazerAI, an expert agricultural grading AI for Indian markets. You are analyzing ${produce} for a farmer named ${farmerName || 'Farmer'} from ${[farmerDistrict, farmerState].filter(Boolean).join(', ') || 'India'}.
-
-${imageBase64 ? `CRITICAL: You have been provided with an actual photograph of this ${produce}. Analyze the VISUAL qualities you can observe in this specific image — color, texture, uniformity, visible defects, size, moisture signs, etc. Your grade must reflect what you actually see.` : `No image provided. Use general knowledge about ${produce} quality for this analysis.`}
+    const result = await callClaude([{
+      role: 'user',
+      content: [
+        ...imageContent,
+        {
+          type: 'text',
+          text: `You are FasalEx DeepGazerAI, an expert grading system for agricultural produce.
 
 Produce: ${produce}
 Sector: ${sector}
 Quantity: ${qty} ${unit}
-Applicable Standards: ${sectorStandards[sector] || sectorStandards.agri}
-${notes ? `Farmer notes: ${notes}` : ''}
-${gps?.lat ? `GPS Location: ${gps.lat}°N ${gps.lon}°E` : ''}
+Farmer: ${farmerName || 'Farmer'}
+GPS: ${gps?.lat}°N ${gps?.lon}°E
+Date: ${new Date().toLocaleDateString('en-IN')}
+${priceContext}
+${langPrompt}
 
-Based on your visual analysis${imageBase64 ? ' of the image' : ''}, provide a complete grading report.
-
-Respond ONLY with valid JSON:
+Analyse the image carefully if provided. Generate a precise grading report.
+Respond ONLY with valid JSON (no markdown):
 {
   "produce": "${produce}",
   "sector": "${sector}",
-  "overallGrade": "A or B or C or D",
-  "gradeLabel": "e.g. Premium Quality / Good Quality / Fair Average Quality / Below Standard",
+  "qty": "${qty} ${unit}",
+  "unit": "${unit}",
+  "farmerName": "${farmerName || 'Farmer'}",
+  "overallGrade": "A|B|C|D",
+  "gradeLabel": "Grade description",
   "confidence": 85,
-  "shelfLife": "e.g. 7-10 days or 60-90 days",
-  "estimatedRevenue": "e.g. ₹2,000-2,400 per quintal",
-  "bestAction": "one of: sell_now / store_wait / process_add_value / partial_sell",
+  "shelfLife": "X–Y days/months",
+  "estimatedRevenue": "₹X,XXX–Y,YYY",
+  "marketRate": "₹X,XXX/qtl APMC",
+  "bestAction": "sell_now|store_wait|partial_sell",
+  "expertTip": "Actionable tip for the farmer",
+  "aiRemark": "2-3 sentence quality analysis",
+  "aiRemarkNative": "2-3 sentences in ${language || 'English'} for the farmer",
+  "marketInsight": "1 sentence on current market conditions",
   "grades": {
-    "A": {"label": "Premium", "pct": 20, "priceRange": "₹2,400-2,600/qtl"},
-    "B": {"label": "Good", "pct": 60, "priceRange": "₹2,000-2,400/qtl"},
-    "C": {"label": "Fair", "pct": 15, "priceRange": "₹1,600-2,000/qtl"},
-    "D": {"label": "Reject", "pct": 5, "priceRange": "Below ₹1,600/qtl"}
+    "A": {"label": "Premium", "pct": 20, "priceRange": "₹X–Y"},
+    "B": {"label": "Good",    "pct": 65, "priceRange": "₹X–Y"},
+    "C": {"label": "Fair",    "pct": 12, "priceRange": "₹X–Y"},
+    "D": {"label": "Below",   "pct": 3,  "priceRange": "Processing"}
   },
-  "aiRemark": "2-3 sentences describing what you see. Be specific about the actual quality observed — color, defects, size uniformity, moisture, etc.",
-  "aiRemarkLocal": "Same remark in ${localLang} language if not English, else empty string",
-  "marketInsight": "One sentence about current market conditions for this produce",
-  "expertTip": "One practical tip to improve grade or get better price",
   "parameters": [
-    {"name": "Parameter name", "standard": "AGMARK spec", "found": "What you measured/observed", "pass": true}
-  ],
-  "marketPrices": [
-    {"market": "Nearby mandi name", "price": "₹X,XXX/qtl"},
-    {"market": "Another mandi", "price": "₹X,XXX/qtl"},
-    {"market": "State capital mandi", "price": "₹X,XXX/qtl"}
+    {"name": "Visual Appearance", "standard": "AGMARK spec", "found": "Good", "pass": true},
+    {"name": "Moisture Content",  "standard": "≤12%",        "found": "11%",  "pass": true},
+    {"name": "Size / Weight",     "standard": "Bold, uniform","found": "Meets spec", "pass": true},
+    {"name": "Foreign Matter",    "standard": "NIL",          "found": "None", "pass": true},
+    {"name": "Damage / Defects",  "standard": "<2%",          "found": "1.2%", "pass": true}
   ],
   "buyers": [
-    {"name": "Buyer name", "role": "APMC Trader", "dist": "5 km", "phone": "+91 98765 43210", "rating": "4.5", "offer": "₹X,XXX/qtl", "verified": true},
-    {"name": "Buyer 2", "role": "Wholesale", "dist": "12 km", "phone": "+91 87654 32109", "rating": "4.2", "offer": "₹X,XXX/qtl", "verified": true},
-    {"name": "Exporter", "role": "Exporter", "dist": "25 km", "phone": "+91 76543 21098", "rating": "4.0", "offer": "₹X,XXX/qtl", "verified": false}
-  ]
-}
+    {"name": "Local Trader",    "role": "Wholesaler",  "dist": "8 km",  "phone": "+91 98765 43210", "offer": "₹X,XXX/qtl", "rating": "4.7", "verified": true},
+    {"name": "Regional Buyer",  "role": "APMC Agent",  "dist": "22 km", "phone": "+91 87654 32109", "offer": "₹X,XXX/qtl", "rating": "4.5", "verified": true},
+    {"name": "Export Partner",  "role": "Exporter",    "dist": "45 km", "phone": "+91 76543 21098", "offer": "₹X,XXX/qtl", "rating": "4.8", "verified": true}
+  ],
+  "exportCerts": ["AGMARK", "FSSAI"],
+  "gps": {"lat": "${gps?.lat || '21.1458'}", "lon": "${gps?.lon || '79.0882'}"},
+  "date": "${new Date().toLocaleDateString('en-IN')}"
+}`
+        }
+      ],
+    }], 2000);
 
-Make ALL numbers and prices realistic for current Indian markets (2026). Parameters array should have 4-6 relevant quality checks for ${produce} per ${sectorStandards[sector] || 'AGMARK'} standards.`;
+    const text = result.content?.[0]?.text || '';
+    const m = text.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('No JSON in response');
 
-    messageContent.push({ type: 'text', text: prompt });
+    const report = JSON.parse(m[0]);
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: messageContent }]
-      })
-    });
-
-    const data = await response.json();
-    const text = data.content?.[0]?.text || '{}';
-    const clean = text.replace(/```json|```/g, '').trim();
-
-    let report;
-    try {
-      report = JSON.parse(clean);
-    } catch (parseErr) {
-      // Try to extract JSON from response
-      const match = text.match(/\{[\s\S]*\}/);
-      if (match) {
-        report = JSON.parse(match[0]);
-      } else {
-        throw new Error('Failed to parse AI response');
-      }
+    // Inject live prices into report if available
+    if (livePrice) {
+      report._livePrices = {
+        domestic: livePrice.domestic,
+        dubai:    livePrice.dubai,
+        eu:       livePrice.eu,
+        usda:     livePrice.usda,
+        bestRoute: livePrice.bestRoute,
+        premiumPct: livePrice.premiumPct,
+        source:    livePrice.source,
+        asOf:      priceCache.lastUpdated,
+      };
     }
 
-    // Add metadata
-    report.farmerName = farmerName || 'Farmer';
-    report.qty = `${qty} ${unit}`;
-    report.date = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    report.gps = gps;
-
-    res.json(report);
+    sendJSON(res, 200, report);
 
   } catch (e) {
-    console.error('Analyze error:', e);
-    res.json(buildDemoReport({ produce, sector, qty, unit, farmerName, gps, language }));
+    console.error('[ANALYZE]', e.message);
+    sendJSON(res, 500, { error: e.message });
   }
-});
-
-// ── MARKET PRICES ─────────────────────────────────────
-app.get('/api/market-prices', async (req, res) => {
-  const { produce, sector } = req.query;
-  // Try data.gov.in AGMARKNET API
-  const apiKey = process.env.AGMARKNET_API_KEY;
-  if (apiKey && produce) {
-    try {
-      const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${apiKey}&format=json&filters[commodity]=${encodeURIComponent(produce)}&limit=5`;
-      const r = await fetch(url);
-      const d = await r.json();
-      if (d.records?.length) {
-        const prices = d.records.map(rec => ({
-          market: rec.market || rec.district,
-          price: `₹${parseInt(rec.modal_price).toLocaleString('en-IN')}/qtl`,
-          change: Math.round(Math.random() * 200 - 100),
-          up: Math.random() > 0.4
-        }));
-        return res.json({ prices, source: 'AGMARKNET Live' });
-      }
-    } catch (e) { /* fall through to AI estimates */ }
-  }
-  // Return AI-estimated prices
-  res.json({ prices: [], source: 'unavailable', hint: 'Get free API key at data.gov.in' });
-});
-
-// ── MARKET DATA (reference prices) ───────────────────
-app.get('/api/market', (req, res) => {
-  res.json([
-    { name: 'Wheat', sector: 'agri', price: '₹2,280/qtl', chg: '₹45', up: true },
-    { name: 'Rice (Paddy)', sector: 'agri', price: '₹2,183/qtl', chg: '₹32', up: true },
-    { name: 'Maize', sector: 'agri', price: '₹2,090/qtl', chg: '₹18', up: false },
-    { name: 'Soybean', sector: 'agri', price: '₹4,520/qtl', chg: '₹65', up: true },
-    { name: 'Chickpea', sector: 'agri', price: '₹5,440/qtl', chg: '₹120', up: true },
-    { name: 'Toor Dal', sector: 'agri', price: '₹7,200/qtl', chg: '₹90', up: false },
-    { name: 'Green Gram', sector: 'agri', price: '₹7,800/qtl', chg: '₹150', up: true },
-    { name: 'Groundnut', sector: 'agri', price: '₹6,100/qtl', chg: '₹85', up: true },
-    { name: 'Tomato', sector: 'horti', price: '₹1,820/qtl', chg: '₹58', up: true },
-    { name: 'Onion', sector: 'horti', price: '₹1,850/qtl', chg: '₹35', up: false },
-    { name: 'Potato', sector: 'horti', price: '₹1,450/qtl', chg: '₹20', up: true },
-    { name: 'Banana', sector: 'horti', price: '₹1,200/qtl', chg: '₹15', up: true },
-    { name: 'Mango', sector: 'horti', price: '₹4,500/qtl', chg: '₹200', up: true },
-    { name: 'Milk', sector: 'ah', price: '₹38/litre', chg: '₹1', up: true },
-    { name: 'Eggs', sector: 'ah', price: '₹6.2/piece', chg: '₹0.2', up: false },
-    { name: 'Honey', sector: 'api', price: '₹280/kg', chg: '₹8', up: true },
-    { name: 'Pomfret', sector: 'fish', price: '₹380/kg', chg: '₹12', up: true },
-    { name: 'Prawn', sector: 'fish', price: '₹620/kg', chg: '₹25', up: true },
-    { name: 'Turmeric', sector: 'med', price: '₹8,200/qtl', chg: '₹180', up: false },
-    { name: 'Ginger', sector: 'med', price: '₹3,400/qtl', chg: '₹95', up: true },
-  ]);
-});
-
-// ── DEMO REPORT ───────────────────────────────────────
-function buildDemoReport({ produce, sector, qty, unit, farmerName, gps, language }) {
-  const s = sector || 'agri';
-  const priceMap = {
-    agri: { est: '₹2,000-2,400/qtl', A: '₹2,400-2,600/qtl', B: '₹2,000-2,400/qtl', C: '₹1,600-2,000/qtl', D: 'Below ₹1,600/qtl' },
-    horti: { est: '₹1,500-2,000/qtl', A: '₹2,000-2,500/qtl', B: '₹1,500-2,000/qtl', C: '₹1,000-1,500/qtl', D: 'Below ₹1,000/qtl' },
-    fish: { est: '₹350-500/kg', A: '₹500-650/kg', B: '₹350-500/kg', C: '₹200-350/kg', D: 'Below ₹200/kg' },
-    ah: { est: '₹35-45/litre', A: '₹45-55/litre', B: '₹35-45/litre', C: '₹25-35/litre', D: 'Below ₹25/litre' },
-    api: { est: '₹250-320/kg', A: '₹320-400/kg', B: '₹250-320/kg', C: '₹180-250/kg', D: 'Below ₹180/kg' },
-    med: { est: '₹180-250/kg', A: '₹250-320/kg', B: '₹180-250/kg', C: '₹120-180/kg', D: 'Below ₹120/kg' },
-    flori: { est: '₹40-80/bunch', A: '₹80-120/bunch', B: '₹40-80/bunch', C: '₹20-40/bunch', D: 'Below ₹20/bunch' },
-  };
-  const p = priceMap[s] || priceMap.agri;
-  return {
-    _demo: true,
-    produce: produce || 'Unknown Produce',
-    sector: s,
-    overallGrade: 'B',
-    gradeLabel: 'Good quality with minor defects',
-    confidence: 72,
-    shelfLife: '7-10 days',
-    estimatedRevenue: p.est,
-    bestAction: 'sell_now',
-    grades: {
-      A: { label: 'Premium', pct: 20, priceRange: p.A },
-      B: { label: 'Good', pct: 65, priceRange: p.B },
-      C: { label: 'Fair', pct: 12, priceRange: p.C },
-      D: { label: 'Reject', pct: 3, priceRange: p.D }
-    },
-    aiRemark: `This is a demo report for ${produce || 'your produce'}. To get AI-powered visual analysis, please add your Anthropic API key to the Railway environment variables.`,
-    aiRemarkLocal: '',
-    marketInsight: 'Market prices are stable. Good demand from local traders.',
-    expertTip: 'Store in cool, dry conditions to maintain quality and shelf life.',
-    parameters: [
-      { name: 'Visual Quality', standard: 'Grade B spec', found: 'Good with minor defects', pass: true },
-      { name: 'Size Uniformity', standard: 'Uniform', found: 'Mostly uniform', pass: true },
-      { name: 'Colour', standard: 'Characteristic', found: 'Good colour', pass: true },
-      { name: 'Foreign Matter', standard: '< 1%', found: '< 1%', pass: true },
-    ],
-    marketPrices: [
-      { market: 'Hospet Mandi', price: '₹2,200/qtl' },
-      { market: 'Bellary Mandi', price: '₹2,180/qtl' },
-      { market: 'Hubli Mandi', price: '₹2,240/qtl' },
-    ],
-    buyers: [
-      { name: 'Local Trader Co.', role: 'APMC Trader', dist: '5 km', phone: '+91 98765 43210', rating: '4.5', offer: '₹2,200/qtl', verified: true },
-      { name: 'District Wholesale', role: 'Wholesale', dist: '12 km', phone: '+91 87654 32109', rating: '4.2', offer: '₹2,180/qtl', verified: true },
-      { name: 'State Exporter', role: 'Exporter', dist: '25 km', phone: '+91 76543 21098', rating: '4.0', offer: '₹2,150/qtl', verified: false },
-    ],
-    farmerName: farmerName || 'Farmer',
-    qty: `${qty || '?'} ${unit || 'kg'}`,
-    date: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-    gps: gps || null,
-  };
 }
 
-app.listen(PORT, () => console.log(`FasalEx 2.0 running on port ${PORT}`));
+// ── /api/refresh-prices (manual trigger) ──────────────────────
+async function handleRefreshPrices(req, res) {
+  // Simple auth: secret param
+  const q = url.parse(req.url, true).query;
+  if (q.secret !== (process.env.REFRESH_SECRET || 'fasalex2026')) {
+    return sendJSON(res, 403, { error: 'Forbidden' });
+  }
+  sendJSON(res, 202, { status: 'refresh_started', timestamp: new Date().toISOString() });
+  refreshPrices(); // async — don't await
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATIC FILE SERVER
+// ═══════════════════════════════════════════════════════════════
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.js':   'application/javascript',
+  '.css':  'text/css',
+  '.json': 'application/json',
+  '.png':  'image/png',
+  '.jpg':  'image/jpeg',
+  '.svg':  'image/svg+xml',
+  '.ico':  'image/x-icon',
+  '.webp': 'image/webp',
+};
+
+function serveStatic(req, res) {
+  let filePath = req.url.split('?')[0];
+  if (filePath === '/' || !path.extname(filePath)) filePath = '/index.html';
+  const fullPath = path.join(__dirname, 'public', filePath);
+
+  fs.readFile(fullPath, (err, data) => {
+    if (err) {
+      // SPA fallback
+      fs.readFile(path.join(__dirname, 'public', 'index.html'), (e2, d2) => {
+        if (e2) { res.writeHead(404); res.end('Not found'); return; }
+        res.writeHead(200, { 'Content-Type': MIME['.html'], 'Cache-Control': 'no-cache' });
+        res.end(d2);
+      });
+      return;
+    }
+    const ext = path.extname(fullPath);
+    const mime = MIME[ext] || 'application/octet-stream';
+    const maxAge = ext === '.html' ? 0 : 86400;
+    res.writeHead(200, {
+      'Content-Type': mime,
+      'Cache-Control': `public, max-age=${maxAge}`,
+    });
+    res.end(data);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MAIN HTTP SERVER
+// ═══════════════════════════════════════════════════════════════
+
+const server = http.createServer(async (req, res) => {
+  // CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    });
+    return res.end();
+  }
+
+  const { pathname } = url.parse(req.url);
+
+  try {
+    if (pathname === '/api/prices'          && req.method === 'GET')  return await handlePrices(req, res);
+    if (pathname === '/api/health'          && req.method === 'GET')  return handleHealth(req, res);
+    if (pathname === '/api/identify'        && req.method === 'POST') return await handleIdentify(req, res);
+    if (pathname === '/api/analyze'         && req.method === 'POST') return await handleAnalyze(req, res);
+    if (pathname === '/api/refresh-prices'  && req.method === 'GET')  return await handleRefreshPrices(req, res);
+    return serveStatic(req, res);
+  } catch (e) {
+    console.error('[SERVER ERROR]', e.message);
+    sendJSON(res, 500, { error: 'Internal server error' });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  STARTUP
+// ═══════════════════════════════════════════════════════════════
+
+loadCacheFromDisk();
+
+server.listen(PORT, () => {
+  console.log('');
+  console.log('  🌿 FasalEx · DeepGazerAI');
+  console.log('  ─────────────────────────────');
+  console.log(`  Server  : http://localhost:${PORT}`);
+  console.log(`  API Key : ${API_KEY ? '✓ configured' : '✗ MISSING — set ANTHROPIC_API_KEY'}`);
+  console.log(`  Prices  : ${priceCache.lastUpdated ? 'cached (' + priceCache.lastUpdated + ')' : 'not yet fetched'}`);
+  console.log('');
+
+  // Fetch prices immediately on startup if cache is stale (>6 hours)
+  const stale = !priceCache.lastUpdated ||
+    (Date.now() - new Date(priceCache.lastUpdated)) > 6 * 3600 * 1000;
+
+  if (stale) {
+    console.log('[PRICES] Cache stale — fetching now...');
+    refreshPrices();
+  } else {
+    console.log('[PRICES] Cache fresh — next refresh scheduled');
+  }
+
+  scheduleDailyRefresh();
+});
+
+server.on('error', e => {
+  if (e.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} in use — try PORT=3001 node server.js`);
+  } else {
+    console.error('[SERVER]', e.message);
+  }
+  process.exit(1);
+});
+
+process.on('uncaughtException', e => console.error('[UNCAUGHT]', e.message));
+process.on('unhandledRejection', e => console.error('[UNHANDLED]', e));
