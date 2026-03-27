@@ -1452,8 +1452,6 @@ const AGMARK_THRESHOLDS = {
   'Onion':        { size:'45-60mm dia Grade S/M', colour:'Dry outer skin', damage_max:2, fm_max:0, moisture_est:'≤80%', grade1_size:45, unit:'mm dia' },
   'Potato':       { size:'>45mm dia', colour:'Uniform, no greening', damage_max:2, fm_max:0, moisture_est:'≤85%', grade1_size:45, unit:'mm dia' },
   'Chilli':       { size:'Uniform 6-8cm length', colour:'>90% red ASTA', damage_max:2, fm_max:0.5, moisture_est:'≤10%', grade1_size:60, unit:'mm length' },
-  'Turmeric':     { size:'Bold fingers >40mm', colour:'Bright yellow uniform', damage_max:1, fm_max:0.5, moisture_est:'≤8%', grade1_size:40, unit:'mm' },
-  'Ginger':       { size:'Firm no shrivelling', colour:'Pale yellow inside', damage_max:2, fm_max:1, moisture_est:'≤80%', grade1_size:0, unit:'visual' },
   'Mango':        { size:'Alphonso 200-350g, dia>65mm', colour:'Yellow/orange uniform', damage_max:1, fm_max:0, moisture_est:'—', grade1_size:65, unit:'mm dia' },
   'Banana':       { size:'G9 16-22cm length', colour:'Yellow uniform 80% maturity', damage_max:2, fm_max:0, moisture_est:'—', grade1_size:160, unit:'mm length' },
   'Grapes':       { size:'>16mm berry dia', colour:'Uniform variety colour', damage_max:2, fm_max:0, moisture_est:'—', grade1_size:16, unit:'mm dia' },
@@ -2566,17 +2564,24 @@ async function triggerAIDetectionFromFile(){
     const data = await response.json();
     if(data.error) throw new Error(data.error);
 
-    // Match to PRODUCE_DB for emoji
-    const dbMatch = PRODUCE_DB.find(p =>
-      p.name.toLowerCase() === (data.produce||'').toLowerCase() ||
-      p.name.toLowerCase().includes((data.produce||'').toLowerCase().split(' ')[0])
+    // Match emoji from PRODUCE_PROFILES (existing data)
+    const _allP = (typeof PRODUCE_PROFILES !== 'undefined') ? PRODUCE_PROFILES :
+      [{name:'Wheat',emoji:'🌾'},{name:'Rice',emoji:'🌾'},{name:'Moong',emoji:'🫘'},
+       {name:'Chana',emoji:'🫘'},{name:'Tomato',emoji:'🍅'},{name:'Onion',emoji:'🧅'},
+       {name:'Mango',emoji:'🥭'},{name:'Banana',emoji:'🍌'},{name:'Tiger Prawn',emoji:'🦐'},
+       {name:'Milk',emoji:'🥛'},{name:'Ghee',emoji:'🫙'},{name:'Paneer',emoji:'🧀'}];
+    const dbMatch = _allP.find(p =>
+      p.name && (p.name.toLowerCase() === (data.produce||'').toLowerCase() ||
+      (data.produce||'').toLowerCase().includes(p.name.toLowerCase().split(' ')[0]))
     );
     const emoji = dbMatch?.emoji || (data.sector==='dairy'?'🥛':data.sector==='fish'?'🐟':'🌾');
-    const tag = dbMatch?.tag || 'grain';
+    const tag = data.tag || 'grain';
     if(data.sector && data.sector !== S.scan.sector) scanSetSector(data.sector);
     showAIDetectedCard(data.produce, (data.confidence||85)+'%', emoji, tag, data.description);
     return;
 
+  } catch(e) {
+    console.warn('[IDENTIFY] API failed:', e.message);
     showProducePicker();
   }
 }
