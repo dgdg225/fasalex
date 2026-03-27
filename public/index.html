@@ -1826,7 +1826,7 @@ function initHome(){
   const u=S.user;
   document.getElementById('homeGreeting').textContent=(u.name||'Farmer')+' 👋';
   document.getElementById('homeAvatar').textContent=(u.name||'F')[0].toUpperCase();
-  document.getElementById('homeSector').textContent=SECTOR[u.sector||'agri'].emoji+' '+SECTOR[u.sector||'agri'].label;
+  const _sec=SECTOR[u.sector||'agri']||SECTOR['agri'];document.getElementById('homeSector').textContent=_sec.emoji+' '+_sec.label;
   const rem=!u.subscribed?Math.max(0,FREE_LIMIT-S.freeScans):null;
   document.getElementById('homeTxLeft').textContent=rem!==null?rem+' free scans left':'Pro ✓';
   document.getElementById('statScans').textContent=S.history.length;
@@ -1860,7 +1860,7 @@ function initHome(){
 
 function viewHistory(i){
   S.currentReport=S.history[i]?.report;
-  if(S.currentReport){renderReport();navigate('report');}
+  if(S.currentReport){try{renderReport();}catch(e){console.error('[render]',e);} navigate('report');}
 }
 
 // ══════════════════════════════════════════════════
@@ -1902,7 +1902,7 @@ function scanSetSector(s){
   const unit=document.getElementById('sc-unit');
   const units=s==='dairy'?['Litre','kg','ml']:s==='fish'?['kg','Tonne','Dozen']:['qtl','kg','Tonne'];
   unit.innerHTML=units.map(u=>`<option>${u}</option>`).join('');
-  document.getElementById('overlayEmoji').textContent=SECTOR[s].emoji;
+  document.getElementById('overlayEmoji').textContent=sectorInfo.emoji;
 }
 
 // ── AR CAMERA (native-first, WebRTC fallback) ────────
@@ -2729,7 +2729,7 @@ async function analyze(){
     clearInterval(stepTimer); ov.classList.remove('show'); stEl.innerHTML='';
     S.currentReport=report; S.history.unshift({report,date:new Date().toISOString()});
     if(S.history.length>20) S.history.pop();
-    S.freeScans++; save(); renderReport(); navigate('report');
+    S.freeScans++; save(); try{renderReport();}catch(e){console.error('[render]',e);} navigate('report');
 
   }catch(serverErr){
     // ── Fallback: generate report directly via Claude API from browser ──
@@ -2824,7 +2824,7 @@ Use real Indian market prices for ${produce}. Grade it accurately based on the i
       S.currentReport=report;
       S.history.unshift({report,date:new Date().toISOString()});
       if(S.history.length>20) S.history.pop();
-      S.freeScans++; save(); renderReport(); navigate('report');
+      S.freeScans++; save(); try{renderReport();}catch(e){console.error('[render]',e);} navigate('report');
       if(lang!=='English') toast('✓ Report generated in '+lang+' 🌐');
 
     }catch(apiErr){
@@ -2834,7 +2834,7 @@ Use real Indian market prices for ${produce}. Grade it accurately based on the i
       S.currentReport=demoReport;
       S.history.unshift({report:demoReport,date:new Date().toISOString()});
       if(S.history.length>20) S.history.pop();
-      S.freeScans++; save(); renderReport(); navigate('report');
+      S.freeScans++; save(); try{renderReport();}catch(e){console.error('[render]',e);} navigate('report');
       toast('⚡ Offline demo report — connect internet for AI grading','#E9C46A');
     }
   }
@@ -3020,7 +3020,9 @@ function renderReport(){
   const r=S.currentReport;if(!r)return;
   const s=r.sector||'agri';
   const gc={A:'#22C55E',B:'#F4A100',C:'#F97316',D:'#E63946'};
-  const std={agri:'AGMARK / FSSAI / EU Reg 543/2011 / Codex Standard',dairy:'FSSAI / BIS IS:1479 / Codex Stan 206-1999',fish:'MPEDA / EIC / EU Reg 854/2004 / HACCP'};
+  const std={agri:'AGMARK / FSSAI / EU Reg 543/2011 / Codex Standard',dairy:'FSSAI / BIS IS:1479 / Codex Stan 206-1999',fish:'MPEDA / EIC / EU Reg 854/2004 / HACCP',horti:'NHB / AGMARK / FSSAI / Codex 293',spices:'Spices Board / AGMARK / ISO 3632 / ASTA',flori:'NHB / APEDA / GlobalG.A.P.',api:'FSSAI / BIS IS 4941 / Codex Stan 12',organic:'NPOP / USDA NOP / EU 834/2007',medicinal:'Ayush / FSSAI / WHO-GMP'};
+  // Safe SECTOR lookup — use agri as fallback
+  const sectorInfo = SECTOR[s] || SECTOR['agri'] || {emoji:'🌾',label:'Agriculture',color:'var(--mint)'};
 
   // TAB 0 — REPORT
   const actionMap={
@@ -3034,10 +3036,10 @@ function renderReport(){
 
   document.getElementById('tab0').innerHTML=`
     <!-- ── Header card ── -->
-    <div style="background:linear-gradient(135deg,${SECTOR[s].color}18,rgba(255,255,255,.02));border:1px solid ${SECTOR[s].color}44;border-radius:22px;padding:18px;margin-bottom:12px">
+    <div style="background:linear-gradient(135deg,${sectorInfo.color||"var(--mint)"}18,rgba(255,255,255,.02));border:1px solid ${(sectorInfo.color||"var(--mint)").replace("var(--mint)","#52B788")}44;border-radius:22px;padding:18px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
         <div>
-          <div style="color:${SECTOR[s].color};font-size:10px;font-weight:700;letter-spacing:1.2px;margin-bottom:5px">${SECTOR[s].emoji} ${SECTOR[s].label.toUpperCase()}</div>
+          <div style="color:${(sectorInfo.color||"#52B788")};font-size:10px;font-weight:700;letter-spacing:1.2px;margin-bottom:5px">${sectorInfo.emoji} ${sectorInfo.label.toUpperCase()}</div>
           <div style="font-family:var(--ff);font-size:26px;font-weight:600;margin-bottom:4px">${r.produce}</div>
           <div class="caption">📍 ${r.gps?r.gps.lat+'°N '+r.gps.lon+'°E':'GPS Tagged'} · ${r.date}</div>
           <div class="caption" style="margin-top:2px">👤 ${r.farmerName} · ${r.qty}</div>
@@ -3106,26 +3108,20 @@ function renderReport(){
     </div>`:''}
 
     <button class="btn btn-primary" onclick="switchTab(2)">Connect to Buyers →</button>
-    ${S.scan.zResult?.Z_mm?`
+    ${(()=>{try{const z=S.scan.zResult;if(!z||!z.Z_mm)return '';return `
     <div style="background:rgba(79,195,247,.07);border:1px solid rgba(79,195,247,.2);border-radius:12px;padding:10px 14px;margin-top:10px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(79,195,247,.8);margin-bottom:6px">📐 DEEPGAZERAI Z-AXIS MEASUREMENT</div>
-      <div style="display:flex;gap:16px;flex-wrap:wrap">
-        <div><span style="font-size:10px;color:rgba(255,255,255,.35)">Working Distance</span><div style="font-size:16px;font-weight:800;color:var(--mint)">${S.scan.zResult.Z_mm}mm</div></div>
-        ${S.scan.zResult.tilt_deg>3?`<div><span style="font-size:10px;color:rgba(255,255,255,.35)">Tilt</span><div style="font-size:16px;font-weight:700;color:var(--gold)">${S.scan.zResult.tilt_deg}°</div></div>`:''}
-        ${S.scan.zResult.K_corrected?`<div><span style="font-size:10px;color:rgba(255,255,255,.35)">K Corrected</span><div style="font-size:13px;font-weight:700;color:#52B788">✓ Active</div></div>`:''}
-        ${S.scan.zResult.lidar_active?`<div><span style="font-size:10px;color:rgba(255,255,255,.35)">LiDAR</span><div style="font-size:13px;font-weight:700;color:#9bb3ff">● Active</div></div>`:''}
-      </div>
-      <div style="font-size:9px;color:rgba(255,255,255,.25);margin-top:4px">${S.scan.zResult.accuracy} · Method: ${S.scan.zResult.method}</div>
-    </div>`:''}
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(79,195,247,.8);margin-bottom:6px">📐 Z-AXIS · ${z.Z_mm}mm${z.tilt_deg>3?' · Tilt '+z.tilt_deg+'°':''}${z.lidar_active?' · LiDAR ●':''}</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.25)">${z.accuracy||''} · ${z.method||''}</div>
+    </div>`;}catch(e){return '';}})()}
     <button class="btn btn-secondary" onclick="shareReport()" style="margin-top:10px">📜 Share DG Certificate</button>
-    <div style="font-size:10px;color:rgba(255,255,255,.25);text-align:center;margin-top:6px">Cert ID: ${generateCertHash(r,r.gps)}</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.25);text-align:center;margin-top:6px">Cert ID: ${(()=>{try{return generateCertHash(r,r.gps);}catch(e){return 'DG-PENDING';}})()}</div>
   `;
 
   // TAB 1 — STANDARDS
   document.getElementById('tab1').innerHTML=`
     <div class="card" style="margin-bottom:12px">
       <div style="font-weight:600;font-size:13px;margin-bottom:5px">Governing Standards</div>
-      <div style="color:${SECTOR[s].color};font-size:13px;line-height:1.7">${std[s]}</div>
+      <div style="color:${(sectorInfo.color||"#52B788")};font-size:13px;line-height:1.7">${std[s]}</div>
     </div>
     <h3 style="font-size:12px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:10px">PARAMETER RESULTS</h3>
     ${(r.parameters||[]).map(p=>`
@@ -3589,7 +3585,7 @@ function initProfile(){
     <div class="card-accent" style="text-align:center;margin-bottom:16px;padding:24px">
       <div style="width:64px;height:64px;border-radius:20px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 12px;font-family:var(--ff)">${(u.name||'F')[0].toUpperCase()}</div>
       <div style="font-family:var(--ff);font-size:22px">${u.name||'Your Name'}</div>
-      <div style="color:rgba(255,255,255,.5);font-size:12px;margin-top:4px">${roleLabels[u.role]||'Farmer'} · ${SECTOR[u.sector||'agri'].emoji} ${SECTOR[u.sector||'agri'].label}</div>
+      <div style="color:rgba(255,255,255,.5);font-size:12px;margin-top:4px">${roleLabels[u.role]||'Farmer'} · ${(SECTOR[u.sector||'agri']||SECTOR['agri']).emoji} ${(SECTOR[u.sector||'agri']||SECTOR['agri']).label}</div>
       <div style="color:rgba(255,255,255,.35);font-size:11px;margin-top:2px">${u.phone||'—'} · ${u.state||'—'}</div>
       <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
         <span class="badge badge-green">✓ Verified</span>
