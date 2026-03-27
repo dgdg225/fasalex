@@ -276,6 +276,32 @@ async function fetchExchangeRates() {
   return false;
 }
 
+
+// ══════════════════════════════════════════════════
+//  AGMARK VISUAL THRESHOLDS (server-side)
+//  Injected into AI grading prompt per commodity
+// ══════════════════════════════════════════════════
+const AGMARK_SRV = {
+  'Wheat':         { gr1:'Bold >2.5mm, <1% damage, <0.25% FM, golden colour', gr2:'<2% damage, <0.5% FM', moisture:'≤12%' },
+  'Rice / Paddy':  { gr1:'Long grain >6mm, <1% broken, <0.25% FM, white/cream', gr2:'<3% broken, <0.5% FM', moisture:'≤14%' },
+  'Maize / Corn':  { gr1:'Kernel >8mm, <1% damage, <0.5% FM, yellow/white', gr2:'<2% damage, <1% FM', moisture:'≤14%' },
+  'Moong (Whole)': { gr1:'Bold >4mm, <1% damage, <0.25% FM, bright green shiny', gr2:'<2% damage, <0.5% FM', moisture:'≤12%' },
+  'Toor Dal':      { gr1:'Round >5mm, <1% damage, <0.25% FM, yellow/cream', gr2:'<2% damage, <0.5% FM', moisture:'≤12%' },
+  'Chana Dal':     { gr1:'Bold >6mm, <1% damage, <0.25% FM, uniform yellow', gr2:'<2% damage, <0.5% FM', moisture:'≤12%' },
+  'Chana':         { gr1:'Kabuli >8mm Desi >6mm, <2% damage, <0.5% FM', gr2:'<3% damage, <1% FM', moisture:'≤12%' },
+  'Soybean':       { gr1:'Uniform >6mm no split, <1% damage, <0.5% FM', gr2:'<2% damage, <1% FM', moisture:'≤12%' },
+  'Groundnut':     { gr1:'Bold kernels >12mm, <1% damage, <0.5% FM', gr2:'<2% damage, <1% FM', moisture:'≤8%' },
+  'Tomato':        { gr1:'65-85mm dia >90% red, <2% damage, no FM', gr2:'50-65mm dia >75% red', moisture:'—' },
+  'Onion':         { gr1:'45-60mm dia dry outer skin, <2% damage, no FM', gr2:'35-45mm dia', moisture:'≤80%' },
+  'Potato':        { gr1:'>45mm dia no greening, <2% damage, no FM', gr2:'35-45mm dia', moisture:'≤85%' },
+  'Chilli':        { gr1:'Uniform 6-8cm >90% red ASTA, <2% damage, <0.5% FM', gr2:'<3% damage, <1% FM', moisture:'≤10%' },
+  'Turmeric':      { gr1:'Bold fingers >40mm bright yellow, <1% damage, <0.5% FM', gr2:'<2% damage, <1% FM', moisture:'≤8%' },
+  'Mango':         { gr1:'>65mm dia uniform colour, <1% damage', gr2:'55-65mm dia', moisture:'—' },
+  'Tiger Prawn':   { gr1:'21-30 count/kg >15g each, uniform pink-grey, no damage', gr2:'31-40 count/kg', moisture:'—' },
+  'Cow Milk':      { gr1:'FAT ≥3.5% SNF ≥8.5% white uniform no sediment', gr2:'FAT ≥3.0% SNF ≥8.0%', moisture:'—' },
+  'Ghee (Cow)':    { gr1:'Granular structure golden yellow clear no sediment', gr2:'Semi-granular', moisture:'≤0.3%' },
+};
+
 // ═══════════════════════════════════════════════════════════════
 //  STATIC FALLBACK PRICES — always valid even if APIs fail
 //  Based on March 2026 benchmarks
@@ -540,14 +566,38 @@ async function handleIdentify(req, res) {
       role: 'user',
       content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
-        { type: 'text', text: `Identify this produce. Sector hint: ${sector||'agri'}.\nRespond ONLY with JSON: {"produce":"name","confidence":85,"description":"brief description","sector":"agri|dairy|fish"}` },
+        { type: 'text', text: `You are DeepGazerAI, an expert agricultural produce identification system.
+
+Identify this produce image precisely.
+Sector hint: ${sector||'agri'}
+
+Respond ONLY with valid JSON (no markdown, no extra text):
+{
+  "produce": "exact produce name matching: Wheat / Rice / Paddy / Maize / Moong (Whole) / Moong Dal / Toor Dal / Chana Dal / Soybean / Groundnut / Tomato / Onion / Potato / Chilli / Turmeric / Ginger / Mango / Banana / Grapes / Tiger Prawn / Rohu / Pomfret / Cow Milk / Buffalo Milk / Paneer / Ghee (Cow) / or closest match",
+  "sector": "agri|dairy|fish",
+  "tag": "grain|pulse|oilseed|veggie|fruit|spice|liquid|seafood",
+  "confidence": 85,
+  "description": "1 sentence: colour, texture, visible quality",
+  "size_spec": "typical size range e.g. 4-6mm diameter / 60-80mm length",
+  "agmark_grade_hint": "A|B|C based on visible quality",
+  "reference_objects_detected": ["list any ISO/IEC/BIS objects visible: SIM card / ruler / battery / A4 paper / ID card / none"]
+}` },
       ],
-    }], 200);
+    }], 400);
 
     const text = result.content?.[0]?.text || '';
-    const m = text.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error('No JSON');
-    sendJSON(res, 200, JSON.parse(m[0]));
+    const clean = text.replace(/\`\`\`json|\`\`\`/g,'').trim();
+    const m = clean.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('No JSON in response');
+    const identified = JSON.parse(m[0]);
+
+    // Log if reference objects detected (patent evidence)
+    if(identified.reference_objects_detected?.length &&
+       !identified.reference_objects_detected.includes('none')) {
+      console.log('[IDENTIFY] Reference objects detected:', identified.reference_objects_detected.join(', '));
+    }
+
+    sendJSON(res, 200, identified);
   } catch (e) {
     sendJSON(res, 500, { error: e.message });
   }
@@ -566,6 +616,18 @@ async function handleAnalyze(req, res) {
     const priceContext = livePrice
       ? `Live prices for ${produce}: Domestic ₹${livePrice.raw?.domestic}/qtl, Dubai ₹${livePrice.raw?.dubai}/qtl, EU ₹${livePrice.raw?.eu}/qtl, USA ₹${livePrice.raw?.usda}/qtl. Best route: ${livePrice.bestRoute} (+${livePrice.premiumPct}% premium). Exchange rates: USD/INR=${priceCache.exchange.USD_INR}, EUR/INR=${priceCache.exchange.EUR_INR}.`
       : `Use your knowledge of current Indian market prices for ${produce}.`;
+
+    // AGMARK thresholds for this commodity
+    const agmarkSpec = AGMARK_SRV[produce];
+    const agmarkContext = agmarkSpec
+      ? `AGMARK Grade Standards for ${produce}:
+Grade 1 (visual): ${agmarkSpec.gr1}
+Grade 2 (visual): ${agmarkSpec.gr2}
+Moisture spec: ${agmarkSpec.moisture}
+Evaluate each visible parameter against these thresholds.
+For each parameter state: measured value, spec threshold, PASS/FAIL/BORDERLINE.
+Also provide size_measurements with avg_unit_size_mm measured from image.`
+      : `Use your knowledge of AGMARK grading standards for ${produce}.`;
 
     const langPrompt = language && language !== 'English'
       ? `IMPORTANT: Write aiRemark, aiRemarkNative, marketInsight, expertTip in ${language}. Also provide "aiRemarkNative" field with 2-3 sentences in ${language} for the farmer.`
@@ -593,6 +655,9 @@ ${priceContext}
 ${langPrompt}
 
 Analyse the image carefully if provided. Generate a precise grading report.
+IMPORTANT — Size measurement: Estimate the real-world size of individual units in mm from the image.
+If a reference object is visible (SIM card, ruler, battery, ID card), use it for precise calibration.
+Otherwise provide visual estimate. Always populate size_measurements field.
 Respond ONLY with valid JSON (no markdown):
 {
   "produce": "${produce}",
@@ -616,6 +681,15 @@ Respond ONLY with valid JSON (no markdown):
     "B": {"label": "Good",    "pct": 65, "priceRange": "₹X–Y"},
     "C": {"label": "Fair",    "pct": 12, "priceRange": "₹X–Y"},
     "D": {"label": "Below",   "pct": 3,  "priceRange": "Processing"}
+  },
+  "size_measurements": {
+    "method": "visual_estimate",
+    "avg_unit_size_mm": "e.g. 4.5mm",
+    "size_range_mm": "e.g. 4.0-5.2mm",
+    "size_uniformity_pct": 75,
+    "agmark_size_spec": "e.g. >4.0mm for Grade 1",
+    "size_grade_result": "PASS|BORDERLINE|FAIL",
+    "note": "DeepGazerAI spatial measurement — add reference object for ±0.3mm accuracy"
   },
   "parameters": [
     {"name": "Visual Appearance", "standard": "AGMARK spec", "found": "Good", "pass": true},

@@ -828,6 +828,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.07);margin:14px 0}
   </div>
   <div class="scroll" style="padding:16px 18px 40px">
     <div id="tab0"></div>
+    <div id="szmPanel" style="display:none;background:rgba(79,195,247,.07);border:1px solid rgba(79,195,247,.2);border-radius:14px;padding:14px;margin:0 0 12px 0"></div>
     <div id="tab1" style="display:none"></div>
     <div id="tab2" style="display:none"></div>
     <div id="tab3" style="display:none"></div>
@@ -840,6 +841,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.07);margin:14px 0}
 ════════════════════════════════════ -->
 <div class="page" id="page-market">
   <div class="ph"><div style="width:44px"></div><span class="ph-title">Market Prices</span><div style="width:44px"></div></div>
+  <div id="marketLastUpdated" style="font-size:10px;color:rgba(255,255,255,.3);text-align:center;padding:4px 0 8px;letter-spacing:.5px"></div>
   <div style="display:flex;gap:7px;padding:0 18px 12px;overflow-x:auto;flex-shrink:0">
     <button class="chip on" onclick="filterMarket(this,'all')">All</button>
     <button class="chip" onclick="filterMarket(this,'agri')">🌾 Agri</button>
@@ -1427,6 +1429,89 @@ const ROUTE_META = {
   eu:       { flag:'🇪🇺', label:'EU Market (CIF)',       source:'EU AGRI',    color:'#4FC3F7' },
   usda:     { flag:'🇺🇸', label:'USA Wholesale',         source:'USDA AMS',   color:'#F4A261' },
 };
+
+
+
+// ══════════════════════════════════════════════════
+//  AGMARK VISUAL THRESHOLDS — DeepGazerAI Reference
+//  Source: DMI Grading Rules / AGMARK Standards
+//  Visual parameters only — chemical needs lab
+// ══════════════════════════════════════════════════
+const AGMARK_THRESHOLDS = {
+  'Wheat':        { size:'Bold >2.5mm', colour:'Golden amber uniform', damage_max:1, fm_max:0.25, moisture_est:'≤12%', grade1_size:2.5, unit:'mm' },
+  'Rice / Paddy': { size:'Long grain >6mm, unbroken', colour:'White/cream uniform', damage_max:1, fm_max:0.25, moisture_est:'≤14%', grade1_size:6.0, unit:'mm' },
+  'Maize / Corn': { size:'Well-formed kernel >8mm', colour:'Yellow/white uniform', damage_max:1, fm_max:0.5, moisture_est:'≤14%', grade1_size:8.0, unit:'mm' },
+  'Moong (Whole)':{ size:'Bold >4.0mm dia', colour:'Bright green shiny', damage_max:1, fm_max:0.25, moisture_est:'≤12%', grade1_size:4.0, unit:'mm' },
+  'Toor Dal':     { size:'Round uniform >5mm', colour:'Yellow/cream', damage_max:1, fm_max:0.25, moisture_est:'≤12%', grade1_size:5.0, unit:'mm' },
+  'Chana Dal':    { size:'Bold >6mm dia', colour:'Yellow uniform', damage_max:1, fm_max:0.25, moisture_est:'≤12%', grade1_size:6.0, unit:'mm' },
+  'Chana':        { size:'Kabuli >8mm, Desi >6mm', colour:'Light brown uniform', damage_max:2, fm_max:0.5, moisture_est:'≤12%', grade1_size:8.0, unit:'mm' },
+  'Soybean':      { size:'Uniform no split >6mm', colour:'Yellow/cream', damage_max:1, fm_max:0.5, moisture_est:'≤12%', grade1_size:6.0, unit:'mm' },
+  'Groundnut':    { size:'Bold kernels >12mm', colour:'Pink/red uniform', damage_max:1, fm_max:0.5, moisture_est:'≤8%', grade1_size:12.0, unit:'mm' },
+  'Mustard Seeds':{ size:'Uniform dark 1.5-2mm', colour:'Dark brown/black', damage_max:1, fm_max:0.5, moisture_est:'≤8%', grade1_size:1.5, unit:'mm' },
+  'Tomato':       { size:'65-85mm dia for export', colour:'>90% red uniform', damage_max:2, fm_max:0, moisture_est:'—', grade1_size:65, unit:'mm dia' },
+  'Onion':        { size:'45-60mm dia Grade S/M', colour:'Dry outer skin', damage_max:2, fm_max:0, moisture_est:'≤80%', grade1_size:45, unit:'mm dia' },
+  'Potato':       { size:'>45mm dia', colour:'Uniform, no greening', damage_max:2, fm_max:0, moisture_est:'≤85%', grade1_size:45, unit:'mm dia' },
+  'Chilli':       { size:'Uniform 6-8cm length', colour:'>90% red ASTA', damage_max:2, fm_max:0.5, moisture_est:'≤10%', grade1_size:60, unit:'mm length' },
+  'Turmeric':     { size:'Bold fingers >40mm', colour:'Bright yellow uniform', damage_max:1, fm_max:0.5, moisture_est:'≤8%', grade1_size:40, unit:'mm' },
+  'Ginger':       { size:'Firm no shrivelling', colour:'Pale yellow inside', damage_max:2, fm_max:1, moisture_est:'≤80%', grade1_size:0, unit:'visual' },
+  'Mango':        { size:'Alphonso 200-350g, dia>65mm', colour:'Yellow/orange uniform', damage_max:1, fm_max:0, moisture_est:'—', grade1_size:65, unit:'mm dia' },
+  'Banana':       { size:'G9 16-22cm length', colour:'Yellow uniform 80% maturity', damage_max:2, fm_max:0, moisture_est:'—', grade1_size:160, unit:'mm length' },
+  'Grapes':       { size:'>16mm berry dia', colour:'Uniform variety colour', damage_max:2, fm_max:0, moisture_est:'—', grade1_size:16, unit:'mm dia' },
+  'Cow Milk':     { size:'FAT ≥3.5% SNF ≥8.5%', colour:'White uniform no sediment', damage_max:0, fm_max:0, moisture_est:'Visual', grade1_size:0, unit:'composition' },
+  'Buffalo Milk': { size:'FAT ≥6% SNF ≥9%', colour:'White uniform', damage_max:0, fm_max:0, moisture_est:'Visual', grade1_size:0, unit:'composition' },
+  'Paneer':       { size:'Firm block uniform', colour:'White <70% moisture', damage_max:0, fm_max:0, moisture_est:'≤70%', grade1_size:0, unit:'visual' },
+  'Ghee (Cow)':   { size:'Granular structure', colour:'Golden yellow clear', damage_max:0, fm_max:0, moisture_est:'≤0.3%', grade1_size:0, unit:'visual' },
+  'Tiger Prawn':  { size:'21-30 count/kg min 15g each', colour:'Uniform pinkish grey', damage_max:2, fm_max:0, moisture_est:'—', grade1_size:15, unit:'g/piece' },
+  'Turmeric':     { size:'Bold fingers >40mm', colour:'Bright yellow', damage_max:1, fm_max:0.5, moisture_est:'≤8%', grade1_size:40, unit:'mm' },
+};
+
+// Lab-only parameters (cannot be assessed visually)
+const LAB_PARAMS = [
+  'Moisture Content (precise)',
+  'Pesticide Residues (FSSAI limits)',
+  'Microbiological safety',
+  'Adulteration / Purity',
+  'Aflatoxin / Mycotoxin',
+];
+
+// Build parameter assessment from AI report data
+function buildParameterAssessment(report, produce) {
+  const thresh = AGMARK_THRESHOLDS[produce];
+  const params = report.parameters || [];
+  const szm = report.size_measurements;
+
+  const visual = [];
+
+  // Size
+  if(szm && szm.avg_unit_size_mm) {
+    const measured = parseFloat(szm.avg_unit_size_mm);
+    const spec = thresh?.grade1_size || 0;
+    const pass = spec > 0 ? measured >= spec : null;
+    visual.push({
+      name: 'Size (avg)',
+      measured: szm.avg_unit_size_mm,
+      spec: thresh ? thresh.size : 'Per AGMARK spec',
+      result: pass === true ? 'PASS' : pass === false ? 'FAIL' : 'CHECK',
+      source: 'DeepGazerAI spatial',
+    });
+  }
+
+  // From AI parameters array
+  params.forEach(p => {
+    const n = p.name || '';
+    let result = p.pass ? 'PASS' : 'FAIL';
+    if(p.found && p.found.toLowerCase().includes('border')) result = 'BORDER';
+    visual.push({
+      name: n,
+      measured: p.found || '—',
+      spec: p.standard || '—',
+      result,
+      source: 'DeepGazerAI vision',
+    });
+  });
+
+  return { visual, labPending: LAB_PARAMS };
+}
 
 
 // ══════════════════════════════════════════════════
@@ -2462,34 +2547,36 @@ async function triggerAIDetectionFromFile(){
     const imageB64 = S.scan.imageBase64;
     if(!imageB64) throw new Error('no image');
 
+    // Show scanning indicator
+    if(card){
+      document.getElementById('aiDetectedProduce').textContent = 'Identifying…';
+      document.getElementById('aiDetectedConf').textContent = 'DeepGazerAI Vision';
+      document.getElementById('aiDetectedEmoji').textContent = '🔍';
+    }
+
     const response = await Promise.race([
       fetch('/api/identify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
-          messages: [{ role: 'user', content: [
-            { type:'image', source:{type:'base64',media_type:'image/jpeg',data:imageB64} },
-            { type:'text', text:`Identify this agricultural produce. Reply ONLY with JSON:
-{"produce":"<name>","sector":"<agri|dairy|fish>","emoji":"<emoji>","tag":"<grain|pulse|veggie|fruit|spice|oilseed|liquid|shellfish>","confidence":<70-99>}` }
-          ]}]
-        })
+        body: JSON.stringify({ imageBase64: imageB64, sector: S.scan.sector || 'agri' })
       }),
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),5000))
+      new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), 15000))
     ]);
 
     const data = await response.json();
-    const text = data.content?.[0]?.text || '';
-    const m = text.match(/\{[\s\S]*?\}/);
-    if(!m) throw new Error('no json');
-    const r = JSON.parse(m[0]);
-    if(r.sector && r.sector !== S.scan.sector) scanSetSector(r.sector);
-    showAIDetectedCard(r.produce, r.confidence+'%', r.emoji, r.tag, null);
+    if(data.error) throw new Error(data.error);
+
+    // Match to PRODUCE_DB for emoji
+    const dbMatch = PRODUCE_DB.find(p =>
+      p.name.toLowerCase() === (data.produce||'').toLowerCase() ||
+      p.name.toLowerCase().includes((data.produce||'').toLowerCase().split(' ')[0])
+    );
+    const emoji = dbMatch?.emoji || (data.sector==='dairy'?'🥛':data.sector==='fish'?'🐟':'🌾');
+    const tag = dbMatch?.tag || 'grain';
+    if(data.sector && data.sector !== S.scan.sector) scanSetSector(data.sector);
+    showAIDetectedCard(data.produce, (data.confidence||85)+'%', emoji, tag, data.description);
     return;
 
-  } catch(e) {
-    // API unavailable in standalone mode — show picker instead
     showProducePicker();
   }
 }
@@ -3018,6 +3105,8 @@ function buildRemark(produce, grade, d){
 // ══════════════════════════════════════════════════
 function renderReport(){
   const r=S.currentReport;if(!r)return;
+  // Clear size panel from previous report
+  const _szp=document.getElementById('szmPanel');if(_szp)_szp.style.display='none';
   const s=r.sector||'agri';
   const gc={A:'#22C55E',B:'#F4A100',C:'#F97316',D:'#E63946'};
   const std={agri:'AGMARK / FSSAI / EU Reg 543/2011 / Codex Standard',dairy:'FSSAI / BIS IS:1479 / Codex Stan 206-1999',fish:'MPEDA / EIC / EU Reg 854/2004 / HACCP',horti:'NHB / AGMARK / FSSAI / Codex 293',spices:'Spices Board / AGMARK / ISO 3632 / ASTA',flori:'NHB / APEDA / GlobalG.A.P.',api:'FSSAI / BIS IS 4941 / Codex Stan 12',organic:'NPOP / USDA NOP / EU 834/2007',medicinal:'Ayush / FSSAI / WHO-GMP'};
@@ -3117,26 +3206,77 @@ function renderReport(){
     <div style="font-size:10px;color:rgba(255,255,255,.25);text-align:center;margin-top:6px">Cert ID: ${(()=>{try{return generateCertHash(r,r.gps);}catch(e){return 'DG-PENDING';}})()}</div>
   `;
 
-  // TAB 1 — STANDARDS
-  document.getElementById('tab1').innerHTML=`
-    <div class="card" style="margin-bottom:12px">
-      <div style="font-weight:600;font-size:13px;margin-bottom:5px">Governing Standards</div>
-      <div style="color:${(sectorInfo.color||"#52B788")};font-size:13px;line-height:1.7">${std[s]}</div>
-    </div>
-    <h3 style="font-size:12px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:10px">PARAMETER RESULTS</h3>
-    ${(r.parameters||[]).map(p=>`
-      <div class="card row" style="margin-bottom:8px;justify-content:space-between">
-        <div class="f1">
-          <div style="font-weight:600;font-size:13px">${p.name}</div>
-          <div class="caption" style="margin-top:2px">${p.standard}</div>
+  // ── Size measurement panel in Tab 0 ──
+  const szm = r.size_measurements;
+  if(szm && szm.avg_unit_size_mm) {
+    const szmPanel = document.getElementById('szmPanel');
+    if(szmPanel) {
+      const sCol = szm.size_grade_result==='PASS'?'#52B788':szm.size_grade_result==='FAIL'?'var(--red)':'var(--gold)';
+      szmPanel.style.display='block';
+      szmPanel.innerHTML=`
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mint);margin-bottom:8px">📐 DEEPGAZERAI SIZE MEASUREMENT</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+          <div><div style="font-size:10px;color:rgba(255,255,255,.4)">Avg Size</div>
+            <div style="font-size:22px;font-weight:800;color:var(--gold)">${szm.avg_unit_size_mm}</div></div>
+          <div><div style="font-size:10px;color:rgba(255,255,255,.4)">Range</div>
+            <div style="font-size:16px;font-weight:700;color:rgba(255,255,255,.8)">${szm.size_range_mm||'—'}</div></div>
+          <div><div style="font-size:10px;color:rgba(255,255,255,.4)">Uniformity</div>
+            <div style="font-size:16px;font-weight:700;color:var(--mint)">${szm.size_uniformity_pct||'—'}%</div></div>
+          <div><div style="font-size:10px;color:rgba(255,255,255,.4)">Grade Size</div>
+            <div style="font-size:13px;font-weight:700;color:${sCol}">${szm.size_grade_result||'—'}</div></div>
         </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:10px">
-          <div style="color:${p.pass?'#22C55E':'#F97316'};font-weight:600;font-size:12px">${p.found}</div>
-          <span class="badge ${p.pass?'badge-green':'badge-red'}" style="margin-top:3px">${p.pass?'PASS':'CHECK'}</span>
+        <div style="font-size:11px;color:rgba(255,255,255,.5)">${szm.agmark_size_spec||''}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:4px">${szm.note||'Visual estimate — place reference object for ±0.3mm accuracy'}</div>`;
+    }
+  }
+
+  // TAB 1 — STANDARDS + PARAMETER ASSESSMENT
+  const assess = buildParameterAssessment(r, r.produce);
+  const thresh = AGMARK_THRESHOLDS[r.produce];
+  const resColor = {PASS:'#52B788',FAIL:'#E63946',BORDER:'#F4A100',CHECK:'rgba(255,255,255,.5)'};
+  const resIcon  = {PASS:'✅',FAIL:'❌',BORDER:'⚠️',CHECK:'🔍'};
+  document.getElementById('tab1').innerHTML=`
+    <div style="background:rgba(82,183,136,.07);border:1px solid rgba(82,183,136,.2);border-radius:16px;padding:14px;margin-bottom:12px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mint);margin-bottom:6px">📋 GOVERNING STANDARDS</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.8">${std[s]||'AGMARK / FSSAI'}</div>
+      ${thresh?`<div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:5px">Grade 1 size: ${thresh.size}</div>`:''}
+    </div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.4);margin-bottom:8px">📐 VISUAL PARAMETERS — DeepGazerAI</div>
+    ${assess.visual.map(p=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:6px">
+        <div style="font-size:16px;flex-shrink:0">${resIcon[p.result]||'—'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.85)">${p.name}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3)">Spec: ${p.spec}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:13px;font-weight:700;color:${resColor[p.result]||'rgba(255,255,255,.6)'}">${p.measured}</div>
+          <div style="font-size:10px;font-weight:600;color:${resColor[p.result]||'rgba(255,255,255,.4)'}">${p.result}</div>
         </div>
       </div>`).join('')}
-    <div style="margin-top:10px;padding:12px;background:rgba(255,255,255,.03);border-radius:12px;font-size:11px;color:rgba(255,255,255,.3);line-height:1.7">
-      ℹ️ This AI report is indicative. For official certification, contact an AGMARK / FSSAI / MPEDA accredited laboratory.
+    ${thresh?.moisture_est&&thresh.moisture_est!=='—'?`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,209,102,.05);border:1px solid rgba(255,209,102,.15);border-radius:12px;margin-bottom:6px">
+      <div style="font-size:16px">💧</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.8)">Moisture Content</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35)">Spec: ${thresh.moisture_est} (AGMARK)</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;font-weight:700;color:var(--gold)">Visual est.</div>
+        <div style="font-size:10px;color:var(--gold)">LAB CONFIRM</div>
+      </div>
+    </div>`:''}
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.35);margin:14px 0 8px">🔬 CHEMICAL & SAFETY — Lab Required</div>
+    ${LAB_PARAMS.map(lp=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(79,195,247,.04);border:1px solid rgba(79,195,247,.1);border-radius:12px;margin-bottom:5px">
+        <div style="font-size:14px">🔬</div>
+        <div style="flex:1"><div style="font-size:12px;color:rgba(255,255,255,.5)">${lp}</div></div>
+        <div style="font-size:10px;font-weight:700;color:rgba(79,195,247,.6)">LAB ONLY</div>
+      </div>`).join('')}
+    <div style="margin-top:12px;padding:12px;background:rgba(255,255,255,.03);border-radius:12px;font-size:11px;color:rgba(255,255,255,.3);line-height:1.7;text-align:center">
+      ℹ️ DeepGazerAI assesses visual parameters only.<br>
+      Official AGMARK requires accredited lab testing<br>
+      for chemical and safety parameters.
     </div>`;
 
   // TAB 2 — BUYERS
@@ -3318,6 +3458,20 @@ function shareReport(){
     `  ${typeEmojis[i]} ${rt.flag} ${rt.label.padEnd(22)} ${rt.price||'—'}  [${rt.src}]`
   ).join('\n');
 
+  // Build parameter summary for certificate
+  const assess2 = buildParameterAssessment(r, r.produce);
+  const passCount = assess2.visual.filter(p=>p.result==='PASS').length;
+  const failCount = assess2.visual.filter(p=>p.result==='FAIL').length;
+  const borderCount = assess2.visual.filter(p=>p.result==='BORDER').length;
+  const paramText = assess2.visual.map(p=>{
+    const icon = p.result==='PASS'?'✅':p.result==='FAIL'?'❌':'⚠️';
+    return `  ${icon} ${p.name.padEnd(18)} ${p.measured}  [Spec: ${p.spec}]`;
+  }).join('\n');
+  const szm2 = r.size_measurements;
+  const sizeText = szm2?.avg_unit_size_mm
+    ? `  📐 Size (measured)     ${szm2.avg_unit_size_mm}  [${szm2.agmark_size_spec||'per AGMARK'}]\n  📐 Range               ${szm2.size_range_mm||'—'}  Uniformity: ${szm2.size_uniformity_pct||'—'}%`
+    : '';
+
   const zLine = zData?.Z_mm
     ? `📐 ${t('z_dist')}  : ${zData.Z_mm}mm${zData.tilt_deg>3?' | Tilt '+zData.tilt_deg+'°':''}${zData.lidar_active?' | '+t('z_lidar'):''}`
     : '';
@@ -3329,15 +3483,22 @@ function shareReport(){
    DG GRADING CERTIFICATE
    ⚠️  INDICATIVE · NOT OFFICIAL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔖 CERT ID  : ${certHash}
-📦 PRODUCE  : ${r.produce}
-🏷️  GRADE    : ${r.overallGrade} — ${r.gradeLabel||''}
-🎯 CONFIDENCE: ${r.confidence}%
-🏛️  SEGMENT  : ${segLabel}
-📋 STANDARDS: ${segStd}
-🌍 INTL STD : ${segIntl}
-🌐 COUNTRY  : ${country}
+🔖 CERT ID   : ${certHash}
+📦 PRODUCE   : ${r.produce}
+🏷️  GRADE     : ${r.overallGrade} — ${r.gradeLabel||''}
+🎯 CONFIDENCE : ${r.confidence}%
+🏛️  SEGMENT   : ${segLabel}
+📋 STANDARDS  : ${segStd}
+🌐 COUNTRY   : ${country}
 ${zLine}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📐 VISUAL PARAMETERS (AI Measured)
+${sizeText?sizeText+'\n':''}${paramText}
+  ✅ Pass: ${passCount}  ❌ Fail: ${failCount}  ⚠️ Border: ${borderCount}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔬 LAB PARAMETERS (Pending)
+  Moisture (precise) · Pesticide residues
+  Microbiological · Adulteration / Purity
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💰 TOP 5 MARKET ROUTES
 ${top5text}
@@ -3345,9 +3506,9 @@ ${top5text}
 📅 SHELF LIFE : ${r.shelfLife}
 ⚡ ACTION     : ${r.bestAction==='sell_now'?'Sell Now':'Store & Wait'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👤 FARMER   : ${r.farmerName||u.name||'—'}
-📍 GPS      : ${gps}
-📅 DATE     : ${r.date}
+👤 FARMER    : ${r.farmerName||u.name||'—'}
+📍 GPS       : ${gps}
+📅 DATE      : ${r.date}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🤖 AI ANALYSIS (English)
 ${r.aiRemark}
@@ -3380,7 +3541,36 @@ Cert: ${certHash}`;
 // ══════════════════════════════════════════════════
 //  MARKET
 // ══════════════════════════════════════════════════
-function initMarket(){renderMarket('all');}
+async function initMarket(){
+  renderMarket('all');
+  // Fetch live prices from server
+  try{
+    const res = await fetch('/api/prices');
+    const data = await res.json();
+    if(data.commodities){
+      // Update MARKET_DATA with live prices
+      MARKET_DATA.forEach(m=>{
+        const live = data.commodities[m.name];
+        if(live?.raw?.domestic){
+          const oldPrice = parseInt(m.price.replace(/[^\d]/g,''));
+          const newPrice = live.raw.domestic;
+          const change = oldPrice ? ((newPrice-oldPrice)/oldPrice*100).toFixed(1) : 0;
+          m.price = '₹'+newPrice.toLocaleString('en-IN')+'/qtl';
+          m.chg = (change>=0?'+':'')+change+'%';
+          m.up = change>=0;
+        }
+      });
+      renderMarket('all');
+      // Show last updated
+      const el=document.getElementById('marketLastUpdated');
+      if(el&&data.lastUpdated){
+        const d=new Date(data.lastUpdated);
+        el.textContent='Last updated: '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+' IST · '+
+          Object.values(data.sources||{}).filter(s=>s.ok).length+'/4 live sources';
+      }
+    }
+  }catch(e){ console.warn('[MARKET] Live price fetch failed:', e.message); }
+}
 function filterMarket(btn,sector){
   document.querySelectorAll('#page-market .chip').forEach(c=>c.classList.remove('on'));
   btn.classList.add('on');renderMarket(sector);
