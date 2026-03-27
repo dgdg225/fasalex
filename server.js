@@ -476,7 +476,7 @@ function callClaude(messages, maxTokens = 1800) {
       });
     });
     req.on('error', reject);
-    req.setTimeout(25000, () => { req.destroy(); reject(new Error('Claude API timeout')); });
+    req.setTimeout(40000, () => { req.destroy(); reject(new Error('Claude API timeout')); });
     req.write(body);
     req.end();
   });
@@ -654,11 +654,10 @@ Date: ${new Date().toLocaleDateString('en-IN')}
 ${priceContext}
 ${langPrompt}
 
-Analyse the image carefully if provided. Generate a precise grading report.
-IMPORTANT — Size measurement: Estimate the real-world size of individual units in mm from the image.
-If a reference object is visible (SIM card, ruler, battery, ID card), use it for precise calibration.
-Otherwise provide visual estimate. Always populate size_measurements field.
-Respond ONLY with valid JSON (no markdown):
+Analyse the image carefully. Grade against AGMARK standards.
+${agmarkContext}
+Estimate grain/unit SIZE in mm from the image. If SIM card/ruler/battery visible use it for calibration.
+Respond ONLY with compact JSON (no markdown):
 {
   "produce": "${produce}",
   "sector": "${sector}",
@@ -668,35 +667,22 @@ Respond ONLY with valid JSON (no markdown):
   "overallGrade": "A|B|C|D",
   "gradeLabel": "Grade description",
   "confidence": 85,
-  "shelfLife": "X–Y days/months",
-  "estimatedRevenue": "₹X,XXX–Y,YYY",
+  "shelfLife": "X-Y days/months",
+  "estimatedRevenue": "₹X,XXX-Y,YYY",
   "marketRate": "₹X,XXX/qtl APMC",
   "bestAction": "sell_now|store_wait|partial_sell",
-  "expertTip": "Actionable tip for the farmer",
-  "aiRemark": "2-3 sentence quality analysis",
-  "aiRemarkNative": "2-3 sentences in ${language || 'English'} for the farmer",
-  "marketInsight": "1 sentence on current market conditions",
-  "grades": {
-    "A": {"label": "Premium", "pct": 20, "priceRange": "₹X–Y"},
-    "B": {"label": "Good",    "pct": 65, "priceRange": "₹X–Y"},
-    "C": {"label": "Fair",    "pct": 12, "priceRange": "₹X–Y"},
-    "D": {"label": "Below",   "pct": 3,  "priceRange": "Processing"}
-  },
-  "size_measurements": {
-    "method": "visual_estimate",
-    "avg_unit_size_mm": "e.g. 4.5mm",
-    "size_range_mm": "e.g. 4.0-5.2mm",
-    "size_uniformity_pct": 75,
-    "agmark_size_spec": "e.g. >4.0mm for Grade 1",
-    "size_grade_result": "PASS|BORDERLINE|FAIL",
-    "note": "DeepGazerAI spatial measurement — add reference object for ±0.3mm accuracy"
-  },
+  "expertTip": "Tip in 1 sentence",
+  "aiRemark": "2 sentence quality analysis",
+  "aiRemarkNative": "2 sentences in ${language || 'English'}",
+  "marketInsight": "1 sentence market conditions",
+  "size_measurements": {"avg_unit_size_mm": "4.5mm", "size_range_mm": "4.0-5.2mm", "size_uniformity_pct": 75, "agmark_size_spec": ">4.0mm Grade 1", "size_grade_result": "PASS", "method": "visual_estimate"},
+  "grades": {"A": {"label": "Premium", "pct": 20, "priceRange": "₹X-Y"}, "B": {"label": "Good", "pct": 65, "priceRange": "₹X-Y"}, "C": {"label": "Fair", "pct": 12, "priceRange": "₹X-Y"}, "D": {"label": "Below", "pct": 3, "priceRange": "Processing"}},
   "parameters": [
-    {"name": "Visual Appearance", "standard": "AGMARK spec", "found": "Good", "pass": true},
-    {"name": "Moisture Content",  "standard": "≤12%",        "found": "11%",  "pass": true},
-    {"name": "Size / Weight",     "standard": "Bold, uniform","found": "Meets spec", "pass": true},
-    {"name": "Foreign Matter",    "standard": "NIL",          "found": "None", "pass": true},
-    {"name": "Damage / Defects",  "standard": "<2%",          "found": "1.2%", "pass": true}
+    {"name": "Size/Weight", "standard": "per AGMARK spec", "found": "4.5mm avg", "pass": true},
+    {"name": "Colour/Texture", "standard": "Uniform characteristic", "found": "Good uniform", "pass": true},
+    {"name": "Damage/Defects", "standard": "<2%", "found": "1.2%", "pass": true},
+    {"name": "Foreign Matter", "standard": "<0.25%", "found": "None", "pass": true},
+    {"name": "Moisture (visual)", "standard": "≤12% (lab needed)", "found": "Normal sheen", "pass": true}
   ],
   "buyers": [
     {"name": "Local Trader",    "role": "Wholesaler",  "dist": "8 km",  "phone": "+91 98765 43210", "offer": "₹X,XXX/qtl", "rating": "4.7", "verified": true},
