@@ -624,10 +624,36 @@ async function handleAnalyze(req, res) {
 Grade 1 (visual): ${agmarkSpec.gr1}
 Grade 2 (visual): ${agmarkSpec.gr2}
 Moisture spec: ${agmarkSpec.moisture}
-Evaluate each visible parameter against these thresholds.
-For each parameter state: measured value, spec threshold, PASS/FAIL/BORDERLINE.
-Also provide size_measurements with avg_unit_size_mm measured from image.`
-      : `Use your knowledge of AGMARK grading standards for ${produce}.`;
+
+CRITICAL STEP — Reference Object K-Calibration:
+Scan the image for: credit/debit card (85.6x54mm ISO/IEC 7810), SIM packet (25x15mm), ruler, AAA battery (44.5mm), A4 paper (210mm width).
+If found: (1) estimate card/object pixel width as card_px integer, (2) estimate average grain pixel width as grain_px integer.
+Compute: k_value = known_mm / card_px, grain_mm = grain_px * k_value.
+Set ref_object.detected=true and populate all fields accurately.
+If not found: set ref_object.detected=false.
+Also evaluate each AGMARK parameter with measured value, spec, PASS/FAIL/BORDERLINE.`
+      : `Use your AGMARK knowledge for ${produce}. Detect reference objects for K-calibration.`;
+
+    // Post-process: server-side K computation from Claude's pixel measurements
+    function computeKFromReport(report) {
+      const ro = report?.ref_object;
+      if(!ro || !ro.detected || !ro.card_px || !ro.grain_px) return report;
+      const knownDims = {bank_card:85.6, credit_card:85.6, debit_card:85.6, sim_packet:25.0, ruler:10.0, battery_aaa:44.5, a4_paper:210.0};
+      const D_known = ro.known_width_mm || knownDims[ro.type] || 85.6;
+      const K = D_known / ro.card_px;
+      const grain_mm = (ro.grain_px * K).toFixed(2);
+      report.ref_object.k_value = Math.round(K*10000)/10000;
+      report.ref_object.grain_mm_calibrated = grain_mm + 'mm';
+      report.ref_object.method = 'k_calibrated_server';
+      // Update size_measurements with K-calibrated value
+      if(report.size_measurements) {
+        report.size_measurements.avg_unit_size_mm = grain_mm + 'mm';
+        report.size_measurements.method = 'k_calibrated';
+        report.size_measurements.note = 'K-calibrated from '+ro.type+' ('+D_known+'mm known dimension)';
+      }
+      console.log('[K-CAL] '+produce+': K='+K.toFixed(4)+' grain='+grain_mm+'mm from '+ro.type);
+      return report;
+    }
 
     const langPrompt = language && language !== 'English'
       ? `IMPORTANT: Write aiRemark, aiRemarkNative, marketInsight, expertTip in ${language}. Also provide "aiRemarkNative" field with 2-3 sentences in ${language} for the farmer.`
@@ -690,6 +716,7 @@ Respond ONLY with compact JSON (no markdown):
     {"name": "Export Partner",  "role": "Exporter",    "dist": "45 km", "phone": "+91 76543 21098", "offer": "₹X,XXX/qtl", "rating": "4.8", "verified": true}
   ],
   "exportCerts": ["AGMARK", "FSSAI"],
+  "ref_object": {"detected": false, "type": "none", "card_px": 0, "grain_px": 0, "k_value": 0, "grain_mm_calibrated": "visual_est", "known_width_mm": 85.6},
   "gps": {"lat": "${gps?.lat || '21.1458'}", "lon": "${gps?.lon || '79.0882'}"},
   "date": "${new Date().toLocaleDateString('en-IN')}"
 }`
@@ -701,7 +728,9 @@ Respond ONLY with compact JSON (no markdown):
     const m = text.match(/\{[\s\S]*\}/);
     if (!m) throw new Error('No JSON in response');
 
-    const report = JSON.parse(m[0]);
+    let report = JSON.parse(m[0]);
+    // Apply server-side K calibration if reference object detected
+    report = computeKFromReport(report);
 
     // Inject live prices into report if available
     if (livePrice) {
