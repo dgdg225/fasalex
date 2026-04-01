@@ -27,7 +27,7 @@ html,body{height:100%;background:var(--earth);font-family:var(--fb);color:#fff;o
 .scroll::-webkit-scrollbar{display:none}
 
 /* NAV */
-#nav{position:absolute;bottom:0;left:0;right:0;height:64px;z-index:1000;background:rgba(10,26,12,.96);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom);z-index:100}
+#nav{position:absolute;bottom:0;left:0;right:0;height:64px;z-index:9999;background:rgba(10,26,12,.96);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-around;padding-bottom:env(safe-area-inset-bottom)}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 14px;border-radius:12px;border:none;background:none;color:var(--dim);font-family:var(--fb)}
 .nav-item.active{color:var(--gold)}
 .nav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -321,9 +321,9 @@ select option{background:#112214;color:#fff}
           <button class="lp-btn" onclick="setLang('zh',this)">中文</button>
         </div>
         <div class="promise-wrap">
-          <div class="promise-line"><span class="pl-icon">🌱</span><div><div class="pl-text">Know Your Harvest</div><div class="pl-sub">What grade is your produce today</div></div></div>
-          <div class="promise-line"><span class="pl-icon">📊</span><div><div class="pl-text">Know Your Grade</div><div class="pl-sub">AGMARK standards — measured, not guessed</div></div></div>
-          <div class="promise-line"><span class="pl-icon">💰</span><div><div class="pl-text">Know Your Price</div><div class="pl-sub">Local, national and global market rates</div></div></div>
+          <div class="promise-line"><span class="pl-icon">🌱</span><div><div class="pl-text" data-i18n="knowHarvest">Know Your Harvest</div><div class="pl-sub" data-i18n="knowHarvestSub">What grade is your produce today</div></div></div>
+          <div class="promise-line"><span class="pl-icon">📊</span><div><div class="pl-text" data-i18n="knowGrade">Know Your Grade</div><div class="pl-sub" data-i18n="knowGradeSub">AGMARK standards — measured, not guessed</div></div></div>
+          <div class="promise-line"><span class="pl-icon">💰</span><div><div class="pl-text" data-i18n="knowPrice">Know Your Price</div><div class="pl-sub" data-i18n="knowPriceSub">Local, national and global market rates</div></div></div>
         </div>
       </div>
       <div class="w-cta">
@@ -335,22 +335,22 @@ select option{background:#112214;color:#fff}
     <div class="w-slide">
       <div class="s2-bg"></div>
       <div class="s2-body">
-        <div class="w-head">How FasalEx Works</div>
+        <div class="w-head" data-i18n="howItWorks">How FasalEx Works</div>
         <div class="w-sub">Five steps from your field to fair price</div>
-        <div class="step-card"><div class="step-num">1</div><div><div class="step-title">Register Once</div><div class="step-desc">Your name, phone, state, language and role. Saved permanently to your number. Works on any device, anywhere.</div></div></div>
-        <div class="step-card"><div class="step-num">2</div><div><div class="step-title">Scan Your Produce</div><div class="step-desc">Photograph your grain, vegetable or produce. Place any known object beside it — bank card, ruler, SIM packet — for accurate measurement.</div></div></div>
-        <div class="step-card"><div class="step-num">3</div><div><div class="step-title">See AI Analytics</div><div class="step-desc">DeepGazerAI measures grain size, colour, moisture and defects. Grades against AGMARK standards. Result in seconds.</div></div></div>
-        <div class="step-card"><div class="step-num">4</div><div><div class="step-title">Download or Share Report</div><div class="step-desc">Get your DG Certificate with grade, price ranges and market routes. Share via WhatsApp or email to any buyer instantly.</div></div></div>
-        <div class="step-card"><div class="step-num">5</div><div><div class="step-title">Connect to Buyers</div><div class="step-desc">Send to your own known contacts or find buyers in FasalEx. Every certificate you share builds your reputation and buyer network.</div></div></div>
+        <div class="step-card"><div class="step-num">1</div><div><div class="step-title" data-i18n="step1title">Register Once</div><div class="step-desc">Your name, phone, state, language and role. Saved permanently to your number. Works on any device, anywhere.</div></div></div>
+        <div class="step-card"><div class="step-num">2</div><div><div class="step-title" data-i18n="scanProduce" data-i18n="step2title">Scan Your Produce</div><div class="step-desc">Photograph your grain, vegetable or produce. Place any known object beside it — bank card, ruler, SIM packet — for accurate measurement.</div></div></div>
+        <div class="step-card"><div class="step-num">3</div><div><div class="step-title" data-i18n="step3title">See AI Analytics</div><div class="step-desc">DeepGazerAI measures grain size, colour, moisture and defects. Grades against AGMARK standards. Result in seconds.</div></div></div>
+        <div class="step-card"><div class="step-num">4</div><div><div class="step-title" data-i18n="step4title">Download or Share Report</div><div class="step-desc">Get your DG Certificate with grade, price ranges and market routes. Share via WhatsApp or email to any buyer instantly.</div></div></div>
+        <div class="step-card"><div class="step-num">5</div><div><div class="step-title" data-i18n="step5title">Connect to Buyers</div><div class="step-desc">Send to your own known contacts or find buyers in FasalEx. Every certificate you share builds your reputation and buyer network.</div></div></div>
       </div>
-      <div class="w-cta"><button class="w-btn w-btn-gold" onclick="wNextSlide()">Next →</button></div>
+      <div class="w-cta"><button class="w-btn w-btn-gold" onclick="wNextSlide()" data-i18n="next">Next →</button></div>
     </div>
 
     <!-- SLIDE 3 — HOW TO SCAN -->
     <div class="w-slide">
       <div class="s3-bg"></div>
       <div class="s3-body">
-        <div class="w-head">How to Scan</div>
+        <div class="w-head" data-i18n="howToScan">How to Scan</div>
         <div class="w-sub">Place a known reference object beside your produce</div>
         <div class="scan-demo">
           <div class="sd-grain" id="sdg"></div>
@@ -358,7 +358,7 @@ select option{background:#112214;color:#fff}
           <div class="sd-detect">● AI DETECTED</div>
           <div class="sd-k">K = 85.6 / card_px</div>
         </div>
-        <div class="ref-lbl">Any of these objects work as reference</div>
+        <div class="ref-lbl" data-i18n="anyRefObj">Any of these objects work as reference</div>
         <div class="ref-grid">
           <div class="ref-item"><div class="ri-icon">💳</div><div class="ri-name">Bank Card</div><div class="ri-std">ISO/IEC 7810</div><div class="ri-mm">85.6×53.98mm</div></div>
           <div class="ref-item"><div class="ri-icon">📱</div><div class="ri-name">SIM Packet</div><div class="ri-std">ISO/IEC 7810</div><div class="ri-mm">85.6×53.98mm</div></div>
@@ -368,7 +368,7 @@ select option{background:#112214;color:#fff}
           <div class="ref-item"><div class="ri-icon">💊</div><div class="ri-name">Med. Strip</div><div class="ri-std">BIS / ISO</div><div class="ri-mm">Labelled size</div></div>
         </div>
         <div class="scan-tip">
-          <div class="st-title">💡 Tips for best results</div>
+          <div class="st-title" data-i18n="tipsTitle">💡 Tips for best results</div>
           <ul class="st-list">
             <li>Place reference object flat on or beside produce pile</li>
             <li>Good natural light — avoid shadows across grain</li>
@@ -423,19 +423,19 @@ select option{background:#112214;color:#fff}
 <div class="page" id="page-register">
   <div style="padding:52px 18px 0;flex-shrink:0">
     <div style="font-family:var(--ff);font-size:28px;font-weight:700;line-height:1.15">Welcome to<br/><span style="color:var(--mint)">FasalEx</span></div>
-    <div style="font-size:12px;color:var(--dim);margin-top:6px;margin-bottom:20px">One-time setup · saved forever to your number</div>
+    <div style="font-size:12px;color:var(--dim);margin-top:6px;margin-bottom:20px" data-i18n="regSetup">One-time setup · saved forever to your number</div>
   </div>
   <div class="scroll" style="padding:0 18px 120px">
 
     <!-- Name -->
     <div class="field">
-      <label>Full Name *</label>
+      <label data-i18n="fullName">Full Name *</label>
       <input id="r-name" type="text" placeholder="Your name" autocomplete="name"/>
     </div>
 
     <!-- Phone + Email — FIXED: phone in one row -->
     <div class="field">
-      <label>Phone Number *</label>
+      <label data-i18n="yourPhone">Phone Number *</label>
       <div style="display:flex;gap:8px">
         <select id="r-cc" style="width:96px;flex-shrink:0;padding:13px 8px">
           <option value="+91">🇮🇳 +91</option>
@@ -461,7 +461,7 @@ select option{background:#112214;color:#fff}
     <!-- Country + State — FIXED: linked -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div class="field" style="margin:0">
-        <label>Country *</label>
+        <label data-i18n="country">Country *</label>
         <select id="r-country" onchange="onCountryChange()">
           <option value="IN">🇮🇳 India</option>
           <option value="AE">🇦🇪 UAE</option>
@@ -474,14 +474,14 @@ select option{background:#112214;color:#fff}
         </select>
       </div>
       <div class="field" style="margin:0">
-        <label>State / Region</label>
+        <label data-i18n="state">State / Region</label>
         <select id="r-state"></select>
       </div>
     </div>
 
     <!-- Language -->
     <div class="field">
-      <label>Preferred Language</label>
+      <label data-i18n="language">Preferred Language</label>
       <select id="r-lang">
         <option value="en">🇬🇧 English</option>
         <option value="kn">🇮🇳 ಕನ್ನಡ Kannada</option>
@@ -505,7 +505,7 @@ select option{background:#112214;color:#fff}
 
     <!-- Role chips -->
     <div class="field">
-      <label>Role *</label>
+      <label data-i18n="role">Role *</label>
       <div class="role-chips" id="role-chips">
         <button class="role-chip selected" data-role="farmer" onclick="selectRole('farmer',this)">🌾 Farmer/Grower</button>
         <button class="role-chip" data-role="trader" onclick="selectRole('trader',this)">🤝 Trader</button>
@@ -668,18 +668,18 @@ select option{background:#112214;color:#fff}
         <span class="badge badge-sky" id="h-lidar" style="display:none">LiDAR</span>
       </div>
       <div style="font-family:var(--ff);font-size:22px;font-weight:700;margin-bottom:4px">Scan Your Produce</div>
-      <div style="font-size:12px;color:var(--dim);margin-bottom:12px">Photo · Auto-detect · Instant grade · Fair price</div>
-      <button class="btn btn-gold" style="width:auto;padding:12px 22px" onclick="nav('scan')">📷 Scan Now</button>
+      <div style="font-size:12px;color:var(--dim);margin-bottom:12px" data-i18n="scanSub">Photo · Auto-detect · Instant grade · Fair price</div>
+      <button class="btn btn-gold" style="width:auto;padding:12px 22px" onclick="nav('scan')">📷 <span data-i18n="scanNow_t">Scan Now</span></button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:22px;font-weight:700" id="st-scans">0</div><div class="caption">Scans</div></div>
-      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:16px;font-weight:700;color:var(--gold)" id="st-rev">₹0</div><div class="caption">Revenue</div></div>
-      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:22px;font-weight:700;color:var(--mint)" id="st-grade">—</div><div class="caption">Top Grade</div></div>
+      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:22px;font-weight:700" id="st-scans">0</div><div class="caption" data-i18n="scans">Scans</div></div>
+      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:16px;font-weight:700;color:var(--gold)" id="st-rev">₹0</div><div class="caption" data-i18n="revenue">Revenue</div></div>
+      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:22px;font-weight:700;color:var(--mint)" id="st-grade">—</div><div class="caption" data-i18n="topGrade">Top Grade</div></div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div style="font-weight:600;font-size:14px">Today's Prices</div>
-        <span style="font-size:11px;color:var(--mint);cursor:pointer" onclick="nav('market')">All →</span>
+        <div style="font-weight:600;font-size:14px" data-i18n="todayPrices">Today's Prices</div>
+        <span style="font-size:11px;color:var(--mint);cursor:pointer" onclick="nav('market')" data-i18n="allPrices">All →</span>
       </div>
       <div id="home-price-list"></div>
     </div>
@@ -700,8 +700,8 @@ select option{background:#112214;color:#fff}
       <img id="vf-img" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px"/>
       <div id="vf-ph" style="text-align:center;padding:20px">
         <div style="font-size:44px;margin-bottom:8px">📷</div>
-        <div style="font-family:var(--ff);font-size:18px;font-weight:600;margin-bottom:3px">Open Camera</div>
-        <div style="font-size:12px;color:var(--dim)">Tap to capture produce</div>
+        <div style="font-family:var(--ff);font-size:18px;font-weight:600;margin-bottom:3px" data-i18n="openCam">Open Camera</div>
+        <div style="font-size:12px;color:var(--dim)" data-i18n="tapCap">Tap to capture produce</div>
       </div>
       <div id="vf-det" style="display:none;position:absolute;top:10px;left:10px;background:rgba(82,183,136,.9);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700">● AI DETECTED</div>
       <div id="vf-gps" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.6);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:600"></div>
@@ -733,7 +733,7 @@ select option{background:#112214;color:#fff}
     <!-- Loading -->
     <div id="scan-load" style="display:none;text-align:center;padding:30px">
       <div style="width:42px;height:42px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--mint);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 12px"></div>
-      <div style="font-size:13px;color:var(--dim)" id="load-txt">Identifying...</div>
+      <div style="font-size:13px;color:var(--dim)" id="load-txt" data-i18n="identifying">Identifying...</div>
     </div>
   </div>
 </div>
@@ -772,7 +772,7 @@ select option{background:#112214;color:#fff}
 
     <!-- Cert summary -->
     <div class="card-green" style="margin-bottom:14px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mint);margin-bottom:6px">📜 DG CERTIFICATE</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mint);margin-bottom:6px" data-i18n="dgCert">📜 DG CERTIFICATE</div><div id="sh-img-wrap" style="display:none;margin-bottom:10px;border-radius:12px;overflow:hidden;max-height:120px"><img id="sh-img" style="width:100%;height:120px;object-fit:cover" src=""/></div>
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-family:var(--ff);font-size:20px;font-weight:700" id="sh-prod">Moong (Whole)</div>
@@ -785,7 +785,7 @@ select option{background:#112214;color:#fff}
     <!-- ── ASKING PRICE (goes to buyers) ── -->
     <div class="card" style="margin-bottom:12px">
       <div style="font-weight:600;font-size:13px;margin-bottom:4px">💬 Your Asking Price</div>
-      <div style="font-size:11px;color:var(--dim);margin-bottom:10px">Set your price → sent to buyers in packages</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="askingSub">Set your price → sent to buyers in packages</div>
       <div style="display:flex;gap:8px;align-items:center">
         <span style="font-size:18px;font-weight:700;color:var(--gold)">₹</span>
         <input id="asking-price" type="number" placeholder="e.g. 8500" style="flex:1" oninput="updateGap()"/>
@@ -795,7 +795,7 @@ select option{background:#112214;color:#fff}
       <!-- Gap visual -->
       <div id="gap-sec" style="display:none;margin-top:12px">
         <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:4px">
-          <span>Your ask</span><span>Market rate</span>
+          <span data-i18n="yourAsk">Your ask</span><span data-i18n="marketRate">Market rate</span>
         </div>
         <div class="gap-bar">
           <div class="gap-fill" id="gap-fill" style="width:80%"></div>
@@ -809,9 +809,9 @@ select option{background:#112214;color:#fff}
     <div class="card" style="margin-bottom:14px;background:rgba(255,255,255,.03)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <div style="font-weight:600;font-size:13px">📊 Actual Price Received</div>
-        <span style="font-size:10px;color:var(--dim)">Private · not shared</span>
+        <span style="font-size:10px;color:var(--dim)" data-i18n="privateNote">Private · not shared</span>
       </div>
-      <div style="font-size:11px;color:var(--dim);margin-bottom:10px">Enter after sale → improves AI for all farmers</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="actualSub">Enter after sale → improves AI for all farmers</div>
       <div style="display:flex;gap:8px;align-items:center">
         <span style="font-size:18px;font-weight:700;color:var(--sky)">₹</span>
         <input id="actual-price" type="number" placeholder="Optional — what you got" style="flex:1;border-color:rgba(78,205,196,.2)" oninput="saveActual()"/>
@@ -821,7 +821,7 @@ select option{background:#112214;color:#fff}
     </div>
 
     <!-- ── THREE PACKAGES ── -->
-    <div style="font-weight:600;font-size:14px;margin-bottom:10px">Who receives what:</div>
+    <div style="font-weight:600;font-size:14px;margin-bottom:10px" data-i18n="whoReceives">Who receives what:</div>
 
     <!-- Local -->
     <div class="pkg pkg-local sel" id="pk-local" onclick="togglePkg('local',this)">
@@ -829,13 +829,13 @@ select option{background:#112214;color:#fff}
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:22px">🏪</span>
           <div>
-            <div style="font-weight:700;font-size:14px">Local Trader</div>
-            <div style="font-size:11px;color:var(--dim)">APMC & mandi traders</div>
+            <div style="font-weight:700;font-size:14px" data-i18n="localTrader">Local Trader</div>
+            <div style="font-size:11px;color:var(--dim)" data-i18n="localSub">APMC & mandi traders</div>
           </div>
         </div>
         <div style="text-align:right">
           <div style="font-weight:700;font-size:14px;color:var(--mint)" id="pk-loc-price">₹8,800/qtl</div>
-          <div style="font-size:10px;color:var(--dim)">Local ref.</div>
+          <div style="font-size:10px;color:var(--dim)" data-i18n="localRef">Local ref.</div>
         </div>
       </div>
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px" id="pk-loc-desc">
@@ -854,13 +854,13 @@ select option{background:#112214;color:#fff}
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:22px">🏭</span>
           <div>
-            <div style="font-weight:700;font-size:14px">National Processor</div>
-            <div style="font-size:11px;color:var(--dim)">Aggregators · eNAM · Mills</div>
+            <div style="font-weight:700;font-size:14px" data-i18n="national">National Processor</div>
+            <div style="font-size:11px;color:var(--dim)" data-i18n="nationalSub">Aggregators · eNAM · Mills</div>
           </div>
         </div>
         <div style="text-align:right">
           <div style="font-weight:700;font-size:14px;color:var(--gold)" id="pk-nat-price">₹8,800/qtl</div>
-          <div style="font-size:10px;color:var(--dim)">eNAM ref.</div>
+          <div style="font-size:10px;color:var(--dim)" data-i18n="nationalRef">eNAM ref.</div>
         </div>
       </div>
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px">Sends: Grade · AGMARK compliance · Moisture · Grain size · eNAM price</div>
@@ -877,13 +877,13 @@ select option{background:#112214;color:#fff}
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:22px">🌐</span>
           <div>
-            <div style="font-weight:700;font-size:14px">Export / Import</div>
-            <div style="font-size:11px;color:var(--dim)">Dubai · EU · USA buyers</div>
+            <div style="font-weight:700;font-size:14px" data-i18n="exportBuyer">Export / Import</div>
+            <div style="font-size:11px;color:var(--dim)" data-i18n="exportSub">Dubai · EU · USA buyers</div>
           </div>
         </div>
         <div style="text-align:right">
           <div style="font-weight:700;font-size:14px;color:var(--sky)" id="pk-exp-price">₹13,500/qtl</div>
-          <div style="font-size:10px;color:var(--dim)">EU CIF ref.</div>
+          <div style="font-size:10px;color:var(--dim)" data-i18n="exportRef">EU CIF ref.</div>
         </div>
       </div>
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px" id="pk-exp-desc">Sends: Grade · EU/USDA compliance · Size mm · APEDA route · CIF price</div>
@@ -899,7 +899,7 @@ select option{background:#112214;color:#fff}
     <!-- Public cert link — FIXED: copy only, no navigate -->
     <div class="card" style="margin-top:12px;text-align:center">
       <div style="font-weight:600;font-size:13px;margin-bottom:4px">🔗 Public Certificate Link</div>
-      <div class="caption" style="margin-bottom:10px">Any buyer worldwide can find your batch</div>
+      <div class="caption" style="margin-bottom:10px" data-i18n="pubSub">Any buyer worldwide can find your batch</div>
       <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px;font-size:11px;color:var(--mint);font-family:monospace;margin-bottom:10px;word-break:break-all" id="pub-url">fasalex.com/cert/DG-XXXX-XXXX</div>
       <button class="btn btn-mint" onclick="copyLink()">📋 Copy Public Link</button>
     </div>
@@ -912,7 +912,7 @@ select option{background:#112214;color:#fff}
   <div class="ph"><div style="width:40px"></div><span class="ph-title" data-i18n="marketTitle">Market Prices</span><div style="width:40px"></div></div>
   <div class="scroll" style="padding:0 18px 80px">
     <div class="card-gold" style="margin-bottom:12px">
-      <div style="font-weight:600;font-size:13px;margin-bottom:4px">🤖 AI Forecast</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:4px" data-i18n="aiForecast">🤖 AI Forecast</div>
       <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.7">Moong +2–3% next 7 days. Tiger Prawn at seasonal peak — sell now.</div>
     </div>
     <div id="market-price-list"></div>
@@ -930,18 +930,18 @@ select option{background:#112214;color:#fff}
     </div>
     <div class="card" style="margin-bottom:10px">
       <div style="font-weight:600;margin-bottom:12px" data-i18n="editProfile">Edit Profile</div>
-      <div class="field"><label>Name</label><input id="ed-name"/></div>
-      <div class="field"><label>Language</label>
+      <div class="field"><label data-i18n="name">Name</label><input id="ed-name"/></div>
+      <div class="field"><label data-i18n="language">Language</label>
         <select id="ed-lang">
           <option value="en">English</option><option value="kn">Kannada</option>
           <option value="hi">Hindi</option><option value="te">Telugu</option>
         </select>
       </div>
-      <button class="btn btn-mint" onclick="saveProfile()">Save</button>
+      <button class="btn btn-mint" onclick="saveProfile()" data-i18n="save">Save</button>
     </div>
     <div class="card" style="margin-bottom:10px">
-      <div style="font-weight:600;margin-bottom:8px">Your DG Certificates</div>
-      <div id="cert-hist" class="caption">No certificates yet</div>
+      <div style="font-weight:600;margin-bottom:8px" data-i18n="yourCerts">Your DG Certificates</div>
+      <div id="cert-hist" class="caption" data-i18n="noCerts">No certificates yet</div>
     </div>
     <button class="btn btn-ghost" onclick="logout()" style="width:100%" data-i18n="signOut">Sign Out</button>
   </div>
@@ -980,8 +980,8 @@ const S = {
   user: null, currentReport: null, history: [], gps: null,
   hasLiDAR: false, capturedImage: null, _pendingId: null,
 };
-function save(){ try{ localStorage.setItem('fx10', JSON.stringify({user:S.user,history:S.history})); }catch(e){} }
-function load(){ try{ const d=JSON.parse(localStorage.getItem('fx10')||'{}'); if(d.user) S.user=d.user; if(d.history) S.history=d.history; }catch(e){} }
+function save(){try{localStorage.setItem('fx10',JSON.stringify({user:S.user,history:S.history,lang:S.lang}));}catch(e){}}
+function load(){try{const raw=localStorage.getItem('fx10');if(!raw)return;const d=JSON.parse(raw);if(d.user&&d.user.name&&d.user.phone){S.user=d.user;if(!S.user.lang)S.user.lang='en';S.lang=S.user.lang;}if(d.history)S.history=d.history;if(d.lang)S.lang=d.lang;}catch(e){localStorage.removeItem('fx10');}}
 
 // ══════════════════════════════════════════
 // TRANSLATIONS
@@ -1037,6 +1037,61 @@ const T={
     chooseLanguage:'Choose Your Language',verifyPhone:'Verify Your Mobile Number',
     yourName:'Your Name',yourPhone:'Your Phone',yourRole:'Your Role',yourState:'Your State',
     selectSegments:'Select your segments',
+    todayPrices:"Today's Prices",
+    scanProduce:'Scan Your Produce',
+    scanSub:'Photo · Auto-detect · Instant grade · Fair price',
+    scanNow:'📷 Scan Now',
+    aiForecast:'🤖 AI Forecast',
+    howItWorks:'How FasalEx Works',
+    howToScan:'How to Scan',
+    connectTrade:'Connect & Trade Fair',
+    regWelcome:'Welcome to',
+    regSetup:'One-time setup · saved forever to your number',
+    fullName:'Full Name',
+    email:'Email',
+    country:'Country',
+    state:'State / Region',
+    role:'Role',
+    segment:'Primary Segment',
+    produce:'Primary Produce',
+    village:'Village / Taluk',
+    land:'Land (Acres)',
+    continueBtn:'Continue →',
+    aiGrading:'AI GRADING',
+    gpsTagged:'GPS TAGGED',
+    yourAsk:'Your ask',
+    marketRate:'Market rate',
+    certJourney:'📜 Your DG Certificate Journey',
+    buyerNetwork:'📈 Your Buyer Network Grows',
+    nowLabel:'Now:',
+    soonLabel:'Soon:',
+    futureLabel:'Future:',
+    nowBuyers:'Your own known traders & contacts',
+    soonBuyers:'Verified FasalEx buyer directory',
+    futureBuyers:'International export buyers',
+    feedbackTitle:'💬 Help us improve — your feedback matters',
+    anyRefObj:'Any of these objects work as reference',
+    tipsTitle:'💡 Tips for best results',
+    refFlat:'Place reference object flat on or beside produce pile',
+    refLight:'Good natural light — avoid shadows across grain',
+    refHold:'Hold phone directly above, pointing straight down',
+    refDemo:'No object? Demo mode still grades visually',
+    refAny:'Works on any smartphone — no special equipment needed',
+    step1title:'Register Once',
+    step2title:'Scan Your Produce',
+    step3title:'See AI Analytics',
+    step4title:'Download or Share Report',
+    step5title:'Connect to Buyers',
+    knowHarvest:'Know Your Harvest',
+    knowHarvestSub:'What grade is your produce today',
+    knowGrade:'Know Your Grade',
+    knowGradeSub:'AGMARK standards — measured, not guessed',
+    knowPrice:'Know Your Price',
+    knowPriceSub:'Local, national and global market rates',
+    inYourLang:'In your language',
+    marketRef:'Market reference:',
+    askingPricePlaceholder:'e.g. 8500',
+    actualPricePlaceholder:"Optional — what you got",
   },
   kn:{
     home:'ಮನೆ',market:'ಮಾರುಕಟ್ಟೆ',profile:'ಪ್ರೊಫೈಲ್',
@@ -1074,6 +1129,61 @@ const T={
     location:'ಸ್ಥಳ',certNote:'ಇದು AI-ರಚಿತ ಸೂಚಕ ಶ್ರೇಣಿ. ಸರ್ಕಾರಿ ಪ್ರಮಾಣಪತ್ರ ಅಲ್ಲ.',
     chooseLanguage:'ನಿಮ್ಮ ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ',verifyPhone:'ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಪರಿಶೀಲಿಸಿ',
     yourName:'ನಿಮ್ಮ ಹೆಸರು',yourPhone:'ನಿಮ್ಮ ಫೋನ್',yourRole:'ನಿಮ್ಮ ಪಾತ್ರ',yourState:'ನಿಮ್ಮ ರಾಜ್ಯ',selectSegments:'ನಿಮ್ಮ ವಿಭಾಗಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ',
+    todayPrices:'ಇಂದಿನ ಬೆಲೆಗಳು',
+    scanProduce:'ನಿಮ್ಮ ಉತ್ಪನ್ನ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ',
+    scanSub:'ಫೋಟೋ · ಸ್ವಯಂ ಪತ್ತೆ · ತ್ವರಿತ ಶ್ರೇಣಿ · ನ್ಯಾಯ ಬೆಲೆ',
+    scanNow:'📷 ಈಗ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ',
+    aiForecast:'🤖 AI ಮುನ್ಸೂಚನೆ',
+    howItWorks:'FasalEx ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
+    howToScan:'ಹೇಗೆ ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದು',
+    connectTrade:'ಸಂಪರ್ಕಿಸಿ ಮತ್ತು ನ್ಯಾಯವಾಗಿ ವ್ಯಾಪಾರ ಮಾಡಿ',
+    regWelcome:'ಸ್ವಾಗತ',
+    regSetup:'ಒಂದು ಬಾರಿ ನೋಂದಣಿ · ಶಾಶ್ವತವಾಗಿ ಉಳಿಸಲಾಗುತ್ತದೆ',
+    fullName:'ಪೂರ್ಣ ಹೆಸರು',
+    email:'ಇಮೇಲ್',
+    country:'ದೇಶ',
+    state:'ರಾಜ್ಯ',
+    role:'ಪಾತ್ರ',
+    segment:'ಮುಖ್ಯ ವಿಭಾಗ',
+    produce:'ಮುಖ್ಯ ಉತ್ಪನ್ನ',
+    village:'ಗ್ರಾಮ / ತಾಲೂಕು',
+    land:'ಭೂಮಿ (ಎಕರೆ)',
+    continueBtn:'ಮುಂದೆ →',
+    aiGrading:'AI ಶ್ರೇಣೀಕರಣ',
+    gpsTagged:'GPS ಟ್ಯಾಗ್ ಆಗಿದೆ',
+    yourAsk:'ನಿಮ್ಮ ಬೇಡಿಕೆ',
+    marketRate:'ಮಾರುಕಟ್ಟೆ ದರ',
+    certJourney:'📜 ನಿಮ್ಮ DG ಪ್ರಮಾಣಪತ್ರ ಪ್ರಯಾಣ',
+    buyerNetwork:'📈 ನಿಮ್ಮ ಖರೀದಿದಾರರ ಜಾಲ ಬೆಳೆಯುತ್ತಿದೆ',
+    nowLabel:'ಈಗ:',
+    soonLabel:'ಶೀಘ್ರದಲ್ಲಿ:',
+    futureLabel:'ಭವಿಷ್ಯದಲ್ಲಿ:',
+    nowBuyers:'ನಿಮ್ಮ ಸ್ವಂತ ತಿಳಿದಿರುವ ವ್ಯಾಪಾರಿಗಳು',
+    soonBuyers:'ಪರಿಶೀಲಿಸಿದ FasalEx ಖರೀದಿದಾರರ ಡೈರೆಕ್ಟರಿ',
+    futureBuyers:'ಅಂತರರಾಷ್ಟ್ರೀಯ ರಫ್ತು ಖರೀದಿದಾರರು',
+    feedbackTitle:'💬 ಸುಧಾರಣೆಗೆ ಸಹಾಯ ಮಾಡಿ',
+    anyRefObj:'ಯಾವುದಾದರೂ ಈ ವಸ್ತುಗಳು ಉಲ್ಲೇಖವಾಗಿ ಕೆಲಸ ಮಾಡುತ್ತವೆ',
+    tipsTitle:'💡 ಉತ್ತಮ ಫಲಿತಾಂಶಕ್ಕಾಗಿ ಸಲಹೆಗಳು',
+    refFlat:'ಉತ್ಪನ್ನದ ಪಕ್ಕದಲ್ಲಿ ಉಲ್ಲೇಖ ವಸ್ತು ಇರಿಸಿ',
+    refLight:'ಒಳ್ಳೆಯ ನೈಸರ್ಗಿಕ ಬೆಳಕು — ನೆರಳು ತಪ್ಪಿಸಿ',
+    refHold:'ಫೋನ್ ನೇರವಾಗಿ ಮೇಲೆ ಹಿಡಿಯಿರಿ',
+    refDemo:'ವಸ್ತು ಇಲ್ಲವೇ? ಡೆಮೊ ಮೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
+    refAny:'ಯಾವುದೇ ಸ್ಮಾರ್ಟ್‌ಫೋನ್‌ನಲ್ಲಿ ಕಾರ್ಯ ನಿರ್ವಹಿಸುತ್ತದೆ',
+    step1title:'ಒಮ್ಮೆ ನೋಂದಾಯಿಸಿ',
+    step2title:'ನಿಮ್ಮ ಉತ್ಪನ್ನ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ',
+    step3title:'AI ವಿಶ್ಲೇಷಣೆ ನೋಡಿ',
+    step4title:'ವರದಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
+    step5title:'ಖರೀದಿದಾರರನ್ನು ಸಂಪರ್ಕಿಸಿ',
+    knowHarvest:'ನಿಮ್ಮ ಕೊಯ್ಲು ತಿಳಿಯಿರಿ',
+    knowHarvestSub:'ಇಂದು ನಿಮ್ಮ ಉತ್ಪನ್ನದ ಶ್ರೇಣಿ ಏನು',
+    knowGrade:'ನಿಮ್ಮ ಶ್ರೇಣಿ ತಿಳಿಯಿರಿ',
+    knowGradeSub:'AGMARK ಮಾನದಂಡಗಳು — ಅಳೆಯಲಾಗಿದೆ',
+    knowPrice:'ನಿಮ್ಮ ಬೆಲೆ ತಿಳಿಯಿರಿ',
+    knowPriceSub:'ಸ್ಥಳೀಯ, ರಾಷ್ಟ್ರೀಯ ಮತ್ತು ಜಾಗತಿಕ ದರಗಳು',
+    inYourLang:'ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ',
+    marketRef:'ಮಾರುಕಟ್ಟೆ ಉಲ್ಲೇಖ:',
+    askingPricePlaceholder:'ಉದಾ. 8500',
+    actualPricePlaceholder:'ಐಚ್ಛಿಕ — ನೀವು ಪಡೆದದ್ದು',
   },
   hi:{
     home:'होम',market:'बाज़ार',profile:'प्रोफ़ाइल',
@@ -1111,6 +1221,61 @@ const T={
     location:'स्थान',certNote:'यह AI-निर्मित संकेतक ग्रेड है। सरकारी प्रमाणपत्र नहीं।',
     chooseLanguage:'अपनी भाषा चुनें',verifyPhone:'अपना मोबाइल नंबर सत्यापित करें',
     yourName:'आपका नाम',yourPhone:'आपका फ़ोन',yourRole:'आपकी भूमिका',yourState:'आपका राज्य',selectSegments:'अपने क्षेत्र चुनें',
+    todayPrices:'आज के भाव',
+    scanProduce:'अपनी फसल स्कैन करें',
+    scanSub:'फ़ोटो · स्वतः पहचान · तुरंत ग्रेड · उचित मूल्य',
+    scanNow:'📷 अभी स्कैन करें',
+    aiForecast:'🤖 AI पूर्वानुमान',
+    howItWorks:'FasalEx कैसे काम करता है',
+    howToScan:'स्कैन कैसे करें',
+    connectTrade:'जुड़ें और निष्पक्ष व्यापार करें',
+    regWelcome:'स्वागत है',
+    regSetup:'एक बार सेटअप · हमेशा के लिए सहेजा गया',
+    fullName:'पूरा नाम',
+    email:'ईमेल',
+    country:'देश',
+    state:'राज्य',
+    role:'भूमिका',
+    segment:'मुख्य श्रेणी',
+    produce:'मुख्य उपज',
+    village:'गांव / तालुक',
+    land:'भूमि (एकड़)',
+    continueBtn:'आगे →',
+    aiGrading:'AI ग्रेडिंग',
+    gpsTagged:'GPS टैग्ड',
+    yourAsk:'आपकी माँग',
+    marketRate:'बाज़ार दर',
+    certJourney:'📜 आपका DG प्रमाणपत्र सफर',
+    buyerNetwork:'📈 आपका खरीदार नेटवर्क बढ़ रहा है',
+    nowLabel:'अभी:',
+    soonLabel:'जल्द:',
+    futureLabel:'भविष्य:',
+    nowBuyers:'आपके खुद के जाने-पहचाने व्यापारी',
+    soonBuyers:'FasalEx खरीदार डायरेक्टरी',
+    futureBuyers:'अंतरराष्ट्रीय निर्यात खरीदार',
+    feedbackTitle:'💬 सुधार में मदद करें',
+    anyRefObj:'इनमें से कोई भी वस्तु संदर्भ के रूप में काम करती है',
+    tipsTitle:'💡 बेहतर परिणाम के लिए सुझाव',
+    refFlat:'उपज के पास संदर्भ वस्तु रखें',
+    refLight:'अच्छी प्राकृतिक रोशनी — छाया से बचें',
+    refHold:'फोन सीधे ऊपर से पकड़ें',
+    refDemo:'वस्तु नहीं? डेमो मोड काम करता है',
+    refAny:'किसी भी स्मार्टफोन पर काम करता है',
+    step1title:'एक बार पंजीकरण करें',
+    step2title:'फसल स्कैन करें',
+    step3title:'AI विश्लेषण देखें',
+    step4title:'रिपोर्ट डाउनलोड करें',
+    step5title:'खरीदारों से जुड़ें',
+    knowHarvest:'अपनी फसल जानें',
+    knowHarvestSub:'आज आपकी उपज का ग्रेड क्या है',
+    knowGrade:'अपना ग्रेड जानें',
+    knowGradeSub:'AGMARK मानक — मापा गया, अनुमान नहीं',
+    knowPrice:'अपना मूल्य जानें',
+    knowPriceSub:'स्थानीय, राष्ट्रीय और वैश्विक दरें',
+    inYourLang:'आपकी भाषा में',
+    marketRef:'बाज़ार संदर्भ:',
+    askingPricePlaceholder:'जैसे 8500',
+    actualPricePlaceholder:'वैकल्पिक — आपको मिला',
   },
   te:{
     home:'హోమ్',market:'మార్కెట్',profile:'ప్రొఫైల్',
@@ -2196,6 +2361,13 @@ function renderShare(){
   const gc={A:'#22C55E',B:'#F4A100',C:'#F97316',D:'#E63946'};
   const g=r.overallGrade, c=gc[g]||'#888';
   document.getElementById('sh-prod').textContent=r.produce;
+  // Show captured image in share page
+  const shImg=document.getElementById('sh-img');
+  const shImgWrap=document.getElementById('sh-img-wrap');
+  if(S.capturedImage&&shImg&&shImgWrap){
+    shImg.src=S.capturedImage;
+    shImgWrap.style.display='block';
+  }
   document.getElementById('sh-cert').textContent='Cert: '+r.certId;
   const gc2=document.getElementById('sh-gc');
   gc2.textContent=g; gc2.style.color=c; gc2.style.borderColor=c+'44'; gc2.style.background=c+'12'; gc2.style.border='2px solid '+c+'44';
@@ -2358,17 +2530,12 @@ function wGoSlide(n){
   _wCur=Math.max(0,Math.min(3,n));
   document.getElementById('w-slides').style.transform=`translateX(-${_wCur*25}%)`;
   [0,1,2,3].forEach(i=>document.getElementById('wd'+i)?.classList.toggle('active',i===_wCur));
-  document.getElementById('w-skip-btn').style.display=_wCur>=3?'none':'block';
+  // Always show skip button on all slides
+  document.getElementById('w-skip-btn').style.display='block';
 }
 function wNextSlide(){ wGoSlide(_wCur+1); }
-function wFinish(){
-  nav('register');
-  document.getElementById('page-welcome').classList.remove('active');
-}
-function wSkipReg(){
-  S.user={name:'Farmer',lang:'en',role:'farmer',segments:['agri'],phone:'+91 0000000000'};
-  nav('scan');
-}
+function wFinish(){save();nav('register');document.getElementById('page-welcome').classList.remove('active');}
+function wSkipReg(){S.user={name:'Farmer',lang:S.lang||'en',role:'farmer',segments:['agri'],phone:'+91 0000000000'};nav('scan');save();}
 
 // Generate welcome grain dots
 function initWelcomeGrains(){
@@ -2390,8 +2557,28 @@ function initWelcomeGrains(){
 // ══════════════════════════════════════════
 
 const RTL_LANGS=['ar','ur'];
-function setLang(code,btn){S.lang=code;document.querySelectorAll('.lp-btn').forEach(b=>b.classList.remove('sel'));if(btn)btn.classList.add('sel');document.body.dir=RTL_LANGS.includes(code)?'rtl':'ltr';applyLang();save();}
-function applyLang(){const lang=S.lang||'en';document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');const v=t(k);if(v&&v!==k)el.textContent=v;});const ed=document.getElementById('ed-lang');if(ed)ed.value=lang;document.querySelectorAll('.lp-btn').forEach(b=>{b.classList.toggle('sel',b.getAttribute('onclick')===`setLang('${lang}',this)`);});}
+function setLang(code,btn){S.lang=code;if(S.user)S.user.lang=code;document.querySelectorAll('.lp-btn').forEach(b=>b.classList.remove('sel'));if(btn)btn.classList.add('sel');document.body.dir=RTL_LANGS.includes(code)?'rtl':'ltr';applyLang();save();}
+function applyLang(){
+  const lang=S.lang||'en';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    const v=t(k);
+    if(v&&v!==k) el.textContent=v;
+  });
+  const ed=document.getElementById('ed-lang');
+  if(ed) ed.value=lang;
+  document.querySelectorAll('.lp-btn').forEach(b=>{
+    b.classList.toggle('sel',b.getAttribute('onclick')===`setLang('${lang}',this)`);
+  });
+  // Update scan page dynamic text
+  const lt=document.getElementById('load-txt');
+  if(lt) lt.textContent=t('identifying');
+  // Update btn text nodes that can't use data-i18n easily
+  const scanBtn=document.querySelector('.btn-gold[onclick*="scan"]');
+  if(scanBtn) scanBtn.textContent=t('scanNow');
+  // Re-render price lists with translated labels
+  renderPriceLists();
+}
 const PH=[['Moong','₹8,800','+0.4%',true],['Wheat','₹2,180','+1.2%',true],['Rice A','₹3,640','+2.8%',true],['Onion','₹890','+0.7%',true],['Tomato','₹1,420','-5.3%',false]];
 const PM=[['Moong','₹8,800','+0.4%',true],['Wheat','₹2,180','+1.2%',true],['Rice A','₹3,640','+2.8%',true],['Chana','₹5,200','-0.8%',false],['Toor Dal','₹7,600','+1.5%',true],['Onion','₹890','+0.7%',true],['Tomato','₹1,420','-5.3%',false],['Buffalo Milk','₹66/L','+0.3%',true],['Tiger Prawn','₹620/kg','+3.1%',true]];
 function renderPriceLists(){const hp=document.getElementById('home-price-list');if(hp)hp.innerHTML=PH.map(([n,p,c,u])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;align-items:center;gap:8px"><span>🌾</span><span style="font-size:13px;font-weight:500">${n}</span></div><div style="text-align:right"><div style="font-weight:700;font-size:13px">${p}/qtl</div><div style="font-size:10px;color:${u?'#22C55E':'var(--red)'}">${u?'▲':'▼'} ${c}</div></div></div>`).join('');const mp=document.getElementById('market-price-list');if(mp)mp.innerHTML=PM.map(([n,p,c,u])=>`<div class="card" style="margin-bottom:8px;display:flex;align-items:center"><span style="font-size:20px;margin-right:12px">🌾</span><div style="flex:1"><div style="font-weight:600;font-size:13px">${n}</div><div class="caption">APMC</div></div><div style="text-align:right"><div style="font-weight:700;font-size:13px">${p}</div><div style="font-size:10px;color:${u?'#22C55E':'var(--red)'}">${u?'▲':'▼'} ${c}</div></div></div>`).join('');}
@@ -2400,7 +2587,7 @@ function buildLangSelect(){const sel=document.getElementById('ed-lang');if(!sel)
 window.addEventListener('DOMContentLoaded',()=>{
   renderPriceLists();
   buildLangSelect();
-  if(S.lang) applyLang();
+  if(S.lang){applyLang();}
   load();
   detectDevice();
   onCountryChange();
