@@ -150,7 +150,7 @@ select option{background:#112214;color:#fff}
 .w-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .3s}
 .w-dot.active{width:24px;border-radius:4px;background:var(--mint)}
 .w-skip{position:absolute;top:48px;right:20px;z-index:10;background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;font-family:var(--fb);padding:4px 8px}
-.w-cta{position:absolute;bottom:0;left:0;right:0;padding:14px 22px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--earth) 60%,transparent);display:flex;flex-direction:column;gap:8px}
+.w-cta{position:absolute;bottom:0;left:0;right:0;padding:14px 22px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--earth) 60%,transparent);display:flex;flex-direction:column;gap:8px;z-index:20}
 .w-btn{width:100%;padding:15px;border:none;cursor:pointer;font-family:var(--ff);font-size:16px;font-weight:600;border-radius:16px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .w-btn:active{transform:scale(.97)}
 .w-btn-gold{background:linear-gradient(135deg,var(--gold),var(--amber));color:#0A1A0C;box-shadow:0 4px 18px rgba(233,196,106,.28)}
@@ -158,7 +158,7 @@ select option{background:#112214;color:#fff}
 
 /* Slide 1 */
 .s1-bg{position:absolute;inset:0;background:radial-gradient(ellipse 120% 80% at 50% 110%,rgba(45,106,79,.45) 0%,transparent 70%),var(--earth)}
-.s1-body{position:relative;z-index:2;flex:1;overflow-y:auto;padding:76px 24px 130px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.s1-body{position:relative;z-index:2;flex:1;overflow-y:auto;padding:76px 24px 160px;display:flex;flex-direction:column;align-items:center;text-align:center}
 .s1-body::-webkit-scrollbar{display:none}
 .w-grain-bg{position:absolute;bottom:0;left:0;right:0;height:180px;display:grid;grid-template-columns:repeat(16,1fr);gap:3px;padding:8px;opacity:.1;pointer-events:none;mask-image:linear-gradient(to top,rgba(0,0,0,.8),transparent)}
 .wgb{height:13px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:var(--mint)}
@@ -277,7 +277,7 @@ select option{background:#112214;color:#fff}
     <div class="w-dot" id="wd2"></div>
     <div class="w-dot" id="wd3"></div>
   </div>
-  <button class="w-skip" id="w-skip-btn" onclick="wSkipReg()">Skip</button>
+  <button class="w-skip" id="w-skip-btn" onclick="wSkipReg()" data-i18n="skip">Skip</button>
 
   <div class="w-slides" id="w-slides">
 
@@ -356,7 +356,7 @@ select option{background:#112214;color:#fff}
         <div class="scan-demo">
           <div class="sd-grain" id="sdg"></div>
           <div class="sd-card"><div class="sd-bank">AXIS BANK</div><div class="sd-chip"></div><div class="sd-num">4505 0400 0700 7345</div></div>
-          <div class="sd-detect">● AI DETECTED</div>
+          <div class="sd-detect" data-i18n="aiDetected">● AI DETECTED</div>
           <div class="sd-k">K = 85.6 / card_px</div>
         </div>
         <div class="ref-lbl" data-i18n="anyRefObj">Any of these objects work as reference</div>
@@ -386,10 +386,10 @@ select option{background:#112214;color:#fff}
     <div class="w-slide">
       <div class="s4-bg"></div>
       <div class="s4-body">
-        <div class="w-head">Connect &amp; Trade Fair</div>
+        <div class="w-head" data-i18n="connectTrade">Connect &amp; Trade Fair</div>
         <div class="w-sub" data-i18n="certTool">Your certificate is your negotiation tool</div>
         <div class="share-flow">
-          <div class="sf-lbl">📜 Your DG Certificate Journey</div>
+          <div class="sf-lbl" data-i18n="certJourney">📜 Your DG Certificate Journey</div>
           <div class="sf-step"><span class="sf-icon">📷</span><span class="sf-text"><strong data-i18n="j1title">Scan produce</strong> <span data-i18n="j1desc">— Grade + size + market prices in seconds</span></span></div>
           <div class="sf-step"><span class="sf-icon">📲</span><span class="sf-text"><strong data-i18n="j2title">WhatsApp</strong> <span data-i18n="j2desc">to trader — grade + asking price + APMC reference</span></span></div>
           <div class="sf-step"><span class="sf-icon">📧</span><span class="sf-text"><strong data-i18n="j3title">Email</strong> <span data-i18n="j3desc">to processors — AGMARK compliance + grain size + eNAM</span></span></div>
@@ -397,10 +397,10 @@ select option{background:#112214;color:#fff}
           <div class="sf-step"><span class="sf-icon">🤝</span><span class="sf-text"><strong data-i18n="j5title">Negotiate with knowledge</strong> <span data-i18n="j5desc">— trader cannot lowball a certified grade</span></span></div>
         </div>
         <div class="pyramid">
-          <div class="py-title">📈 Your Buyer Network Grows</div>
-          <div class="py-level l1"><span>👤</span><span><strong>Now:</strong> Your own known traders &amp; contacts</span></div>
-          <div class="py-level l2"><span>👥</span><span><strong>Soon:</strong> Verified FasalEx buyer directory</span></div>
-          <div class="py-level l3"><span>🌐</span><span><strong>Future:</strong> International export buyers</span></div>
+          <div class="py-title" data-i18n="buyerNetwork">📈 Your Buyer Network Grows</div>
+          <div class="py-level l1"><span>👤</span><span><strong data-i18n="nowLabel">Now:</strong> Your own known traders &amp; contacts</span></div>
+          <div class="py-level l2"><span>👥</span><span><strong data-i18n="soonLabel">Soon:</strong> Verified FasalEx buyer directory</span></div>
+          <div class="py-level l3"><span>🌐</span><span><strong data-i18n="futureLabel">Future:</strong> International export buyers</span></div>
           <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:7px;line-height:1.6" data-i18n="networkGrows">Every certificate you share builds your reputation. The network grows with every scan.</div>
         </div>
         <div class="fb-card">
@@ -423,7 +423,7 @@ select option{background:#112214;color:#fff}
 <!-- ══ REGISTRATION ════════════════════ -->
 <div class="page" id="page-register">
   <div style="padding:52px 18px 0;flex-shrink:0">
-    <div style="font-family:var(--ff);font-size:28px;font-weight:700;line-height:1.15">Welcome to<br/><span style="color:var(--mint)">FasalEx</span></div>
+    <div style="font-family:var(--ff);font-size:28px;font-weight:700;line-height:1.15" data-i18n="welcomeTo">Welcome to<br/><span style="color:var(--mint)">FasalEx</span></div>
     <div style="font-size:12px;color:var(--dim);margin-top:6px;margin-bottom:20px" data-i18n="regSetup" data-i18n="setupNote">One-time setup · saved forever to your number</div>
   </div>
   <div class="scroll" style="padding:0 18px 120px">
@@ -508,7 +508,7 @@ select option{background:#112214;color:#fff}
     <div class="field">
       <label data-i18n="role">Role *</label>
       <div class="role-chips" id="role-chips">
-        <button class="role-chip selected" data-role="farmer" onclick="selectRole('farmer',this)">🌾 Farmer/Grower</button>
+        <button class="role-chip selected" data-role="farmer" onclick="selectRole('farmer',this)" data-i18n="roleFarmer">🌾 Farmer/Grower</button>
         <button class="role-chip" data-role="trader" onclick="selectRole('trader',this)">🤝 Trader</button>
         <button class="role-chip" data-role="exporter" onclick="selectRole('exporter',this)">🌐 Exporter/Importer</button>
         <button class="role-chip" data-role="processor" onclick="selectRole('processor',this)">🏭 Processor/Miller</button>
@@ -624,12 +624,12 @@ select option{background:#112214;color:#fff}
     <!-- Send OTP -->
     <button class="btn btn-gold" onclick="sendOTP()" id="otp-btn">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-      Send OTP →
+      <span data-i18n="sendOtp">Send OTP →</span>
     </button>
 
     <!-- OTP section -->
     <div id="otp-sec" style="display:none;margin-top:18px">
-      <div style="text-align:center;font-size:13px;color:var(--dim);margin-bottom:4px" id="otp-label">Enter 6-digit OTP</div>
+      <div style="text-align:center;font-size:13px;color:var(--dim);margin-bottom:4px" id="otp-label" data-i18n="enterOtp">Enter 6-digit OTP</div>
       <div class="otp-wrap">
         <input class="otp-box" type="number" maxlength="1" oninput="otpNext(this,0)"/>
         <input class="otp-box" type="number" maxlength="1" oninput="otpNext(this,1)"/>
@@ -638,16 +638,16 @@ select option{background:#112214;color:#fff}
         <input class="otp-box" type="number" maxlength="1" oninput="otpNext(this,4)"/>
         <input class="otp-box" type="number" maxlength="1" oninput="otpNext(this,5)"/>
       </div>
-      <button class="btn btn-gold" onclick="verifyOTP()">✓ Verify & Start Using FasalEx 🚀</button>
+      <button class="btn btn-gold" onclick="verifyOTP()" data-i18n="verifyBtn">✓ Verify & Start Using FasalEx 🚀</button>
       <div style="text-align:center;margin-top:10px">
-        <button onclick="sendOTP()" style="background:none;border:none;color:var(--mint);font-size:12px;cursor:pointer;font-family:var(--fb)">Resend OTP</button>
+        <button onclick="sendOTP()" style="background:none;border:none;color:var(--mint);font-size:12px;cursor:pointer;font-family:var(--fb)" data-i18n="resendOtp">Resend OTP</button>
       </div>
     </div>
 
   </div>
   <!-- Skip footer -->
   <div style="position:absolute;bottom:0;left:0;right:0;padding:10px 18px 24px;background:linear-gradient(to top,var(--earth) 60%,transparent);text-align:center">
-    <button onclick="skipReg()" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;font-family:var(--fb);text-decoration:underline">Skip for now → Scan Produce</button>
+    <button onclick="skipReg()" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;font-family:var(--fb);text-decoration:underline" data-i18n="skipNow">Skip for now → Scan Produce</button>
   </div>
 </div>
 
@@ -711,11 +711,11 @@ select option{background:#112214;color:#fff}
     <input type="file" id="cam-in" accept="image/*" capture="environment" style="display:none" onchange="onImg(event)"/>
     <input type="file" id="gal-in" accept="image/*" style="display:none" onchange="onImg(event)"/>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-      <button class="btn btn-ghost" style="padding:13px" onclick="document.getElementById('gal-in').click()">🖼️ Gallery</button>
-      <button class="btn btn-ghost" style="padding:13px" onclick="demoScan()">🤖 Demo</button>
+      <button class="btn btn-ghost" style="padding:13px" onclick="document.getElementById('gal-in').click()" data-i18n="gallery">🖼️ Gallery</button>
+      <button class="btn btn-ghost" style="padding:13px" onclick="demoScan()" data-i18n="demo">🤖 Demo</button>
     </div>
     <div id="dev-cap" style="margin-top:10px;display:flex;gap:6px;justify-content:center"></div>
-    <div id="scan-info" style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:12px;font-size:11px;color:var(--dim);text-align:center">📍 GPS auto-stamped · 🔒 AI encrypted · ✨ Better light = better grade</div>
+    <div id="scan-info" style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:12px;font-size:11px;color:var(--dim);text-align:center" data-i18n="betterLight">📍 GPS auto-stamped · 🔒 AI encrypted · ✨ Better light = better grade</div>
     <!-- Detect result -->
     <div id="det-res" style="display:none;margin-top:12px" class="card-green">
       <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mint);margin-bottom:4px">🤖 AI AUTO-DETECTED</div>
@@ -727,7 +727,7 @@ select option{background:#112214;color:#fff}
         <div style="font-size:36px" id="det-emoji">🫘</div>
       </div>
       <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="btn btn-gold f1" style="padding:12px" onclick="confirmGrade()">✓ Confirm & Grade →</button>
+        <button class="btn btn-gold f1" style="padding:12px" onclick="confirmGrade()" data-i18n="confirmGradeBtn">✓ Confirm & Grade →</button>
         <button class="btn btn-ghost" style="padding:12px;width:auto" onclick="editProd()">✏️</button>
       </div>
     </div>
@@ -785,7 +785,7 @@ select option{background:#112214;color:#fff}
 
     <!-- ── ASKING PRICE (goes to buyers) ── -->
     <div class="card" style="margin-bottom:12px">
-      <div style="font-weight:600;font-size:13px;margin-bottom:4px">💬 Your Asking Price</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:4px" data-i18n="askingPrice">💬 Your Asking Price</div>
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="askingSub">Set your price → sent to buyers in packages</div>
       <div style="display:flex;gap:8px;align-items:center">
         <span style="font-size:18px;font-weight:700;color:var(--gold)">₹</span>
@@ -809,7 +809,7 @@ select option{background:#112214;color:#fff}
     <!-- ── ACTUAL PRICE RECEIVED (feedback) ── -->
     <div class="card" style="margin-bottom:14px;background:rgba(255,255,255,.03)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <div style="font-weight:600;font-size:13px">📊 Actual Price Received</div>
+        <div style="font-weight:600;font-size:13px" data-i18n="actualPrice">📊 Actual Price Received</div>
         <span style="font-size:10px;color:var(--dim)" data-i18n="privateNote">Private · not shared</span>
       </div>
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="actualSub">Enter after sale → improves AI for all farmers</div>
@@ -982,7 +982,32 @@ const S = {
   hasLiDAR: false, capturedImage: null, _pendingId: null,
 };
 function save(){try{if(S.lang&&S.user)S.user.lang=S.lang;localStorage.setItem('fx10',JSON.stringify({user:S.user,history:S.history,lang:S.lang}));}catch(e){}}
-function load(){try{const raw=localStorage.getItem('fx10');if(!raw)return;const d=JSON.parse(raw);if(d.user&&d.user.name&&d.user.phone){S.user=d.user;if(!S.user.lang)S.user.lang='en';S.lang=S.user.lang;}if(d.history)S.history=d.history;if(d.lang)S.lang=d.lang;}catch(e){localStorage.removeItem('fx10');}}
+function load(){
+  const APP_VER='v14';
+  try{
+    // Auto-clear old incompatible versions — farmers never need to clear manually
+    const storedVer=localStorage.getItem('fx_ver');
+    if(storedVer&&storedVer!==APP_VER){
+      localStorage.removeItem('fx10');
+      localStorage.setItem('fx_ver',APP_VER);
+      return;
+    }
+    localStorage.setItem('fx_ver',APP_VER);
+    const raw=localStorage.getItem('fx10');
+    if(!raw) return;
+    const d=JSON.parse(raw);
+    if(d.user&&d.user.name&&d.user.phone){
+      S.user=d.user;
+      if(!S.user.lang) S.user.lang='en';
+      S.lang=S.user.lang;
+    }
+    if(d.history) S.history=d.history;
+    if(d.lang&&!S.lang) S.lang=d.lang;
+  }catch(e){
+    localStorage.removeItem('fx10');
+    localStorage.removeItem('fx_ver');
+  }
+}
 
 // ══════════════════════════════════════════
 // TRANSLATIONS
@@ -1185,7 +1210,32 @@ const T={
     marketRef:'ಮಾರುಕಟ್ಟೆ ಉಲ್ಲೇಖ:',
     askingPricePlaceholder:'ಉದಾ. 8500',
     actualPricePlaceholder:'ಐಚ್ಛಿಕ — ನೀವು ಪಡೆದದ್ದು',
-  },
+
+    step1desc:'ನಿಮ್ಮ ಹೆಸರು, ಫೋನ್, ರಾಜ್ಯ, ಭಾಷೆ ಮತ್ತು ಪಾತ್ರ. ನಿಮ್ಮ ನಂಬರ್‌ಗೆ ಶಾಶ್ವತವಾಗಿ ಉಳಿಸಲಾಗುತ್ತದೆ.',
+    step2desc:'ಧಾನ್ಯ, ತರಕಾರಿ ಫೋಟೋ ತೆಗೆಯಿರಿ. ನಿಖರ ಅಳತೆಗಾಗಿ ತಿಳಿದ ವಸ್ತು ಇರಿಸಿ.',
+    step3desc:'DeepGazerAI ಧಾನ್ಯ ಗಾತ್ರ, ಬಣ್ಣ, ತೇವಾಂಶ ಅಳೆಯುತ್ತದೆ. AGMARK ಮಾನದಂಡ. ಸೆಕೆಂಡುಗಳಲ್ಲಿ.',
+    step4desc:'ಶ್ರೇಣಿ, ಬೆಲೆ, ಮಾರ್ಗಗಳೊಂದಿಗೆ DG ಪ್ರಮಾಣಪತ್ರ ಪಡೆಯಿರಿ.',
+    step5desc:'ನಿಮ್ಮ ಸಂಪರ್ಕಗಳಿಗೆ ಕಳುಹಿಸಿ ಅಥವಾ FasalEx ನಲ್ಲಿ ಖರೀದಿದಾರರನ್ನು ಹುಡುಕಿ.',
+    tip1:'ಉಲ್ಲೇಖ ವಸ್ತು ಉತ್ಪನ್ನದ ಪಕ್ಕದಲ್ಲಿ ಇಡಿ',tip2:'ಒಳ್ಳೆಯ ನೈಸರ್ಗಿಕ ಬೆಳಕು',
+    tip3:'ಫೋನ್ ನೇರವಾಗಿ ಮೇಲೆ ಹಿಡಿಯಿರಿ',tip4:'ವಸ್ತು ಇಲ್ಲವೇ? ಡೆಮೊ ಮೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
+    tip5:'ಯಾವುದೇ ಸ್ಮಾರ್ಟ್‌ಫೋನ್‌ನಲ್ಲಿ ಕಾರ್ಯ ನಿರ್ವಹಿಸುತ್ತದೆ',
+    j1title:'ಉತ್ಪನ್ನ ಸ್ಕ್ಯಾನ್',j1desc:'ಶ್ರೇಣಿ + ಗಾತ್ರ + ಬೆಲೆ ಸೆಕೆಂಡುಗಳಲ್ಲಿ',
+    j2title:'WhatsApp',j2desc:'ವ್ಯಾಪಾರಿಗೆ — ಶ್ರೇಣಿ + ಕೇಳುವ ಬೆಲೆ + APMC',
+    j3title:'ಇಮೇಲ್',j3desc:'ಸಂಸ್ಕಾರಕರಿಗೆ — AGMARK + ಧಾನ್ಯ ಗಾತ್ರ',
+    j4title:'ಸಾರ್ವಜನಿಕ ಲಿಂಕ್',j4desc:'ಖರೀದಿದಾರರು ನಿಮ್ಮ ಬ್ಯಾಚ್ ಹುಡುಕುತ್ತಾರೆ',
+    j5title:'ಜ್ಞಾನದಿಂದ ಮಾತುಕತೆ',j5desc:'ವ್ಯಾಪಾರಿ ಶ್ರೇಣಿ ಕಡಿಮೆ ಮಾಡಲಾಗದು',
+    dgCertTitle:'DG ಗ್ರೇಡಿಂಗ್ ಪ್ರಮಾಣಪತ್ರ',indicativeNote:'⚠️ ಸೂಚಕ · ಅಧಿಕೃತವಲ್ಲ',
+    produceLabel:'ಉತ್ಪನ್ನ',gradeLabel2:'ಶ್ರೇಣಿ',confidenceLabel:'ವಿಶ್ವಾಸ',
+    gradeNoteA:'ಪ್ರೀಮಿಯಂ ರಫ್ತು ಶ್ರೇಣಿ. ತಕ್ಷಣ ಮಾರಾಟಕ್ಕೆ ಸಿದ್ಧ.',
+    gradeNoteB:'ಉತ್ತಮ ದೇಶೀಯ ಗುಣಮಟ್ಟ. ವಿಂಗಡಣೆ ಮಾಡಿ A ಪಡೆಯಿರಿ.',
+    gradeNoteC:'ಸ್ಟ್ಯಾಂಡರ್ಡ್ ಮಾರುಕಟ್ಟೆ ಶ್ರೇಣಿ.',
+    gradeNoteAExp:'ರಫ್ತು ಗುಣಮಟ್ಟ. ಸಂಪೂರ್ಣ AGMARK ಅನುಸರಣೆ.',
+    gradeNoteBExp:'ದೇಶೀಯ ಗುಣಮಟ್ಟ. ವಿಂಗಡಣೆ ರಫ್ತಿಗೆ ಅಗತ್ಯ.',
+    localApmcLabel:'ಸ್ಥಳೀಯ APMC',enamRefLabel:'eNAM ಉಲ್ಲೇಖ',
+    askingLabel:'ಕೇಳುವ ಬೆಲೆ',agmarkComp:'AGMARK ಅನುಸರಣೆ',
+    grainSizeLabel:'ಧಾನ್ಯ ಗಾತ್ರ',gpsLabel:'GPS',dateLabel:'ದಿನಾಂಕ',
+    contactLabel:'ಸಂಪರ್ಕ',certId:'ಪ್ರಮಾಣ ಸಂಖ್ಯೆ',lotLabel:'ಬ್ಯಾಚ್',
+    apedaEligible:'APEDA ಮಾರ್ಗ: ಅರ್ಹ',apedaSubject:'APEDA ಮಾರ್ಗ: ವಿಂಗಡಣೆ ಅಗತ್ಯ',  },
   hi:{
     home:'होम',market:'बाज़ार',profile:'प्रोफ़ाइल',
     scanProduce:'अपनी फसल स्कैन करें',scanSub:'फ़ोटो · स्वतः पहचान · तुरंत ग्रेड · उचित मूल्य',
@@ -2140,7 +2190,7 @@ function renderReport(){
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
-      <div style="text-align:center"><div class="caption">SHELF</div><div style="font-weight:700;font-size:11px;margin-top:2px">${r.shelfLife}</div></div>
+      <div style="text-align:center"><div class="caption" data-i18n="shelf">SHELF</div><div style="font-weight:700;font-size:11px;margin-top:2px">${r.shelfLife}</div></div>
       <div style="text-align:center;border-left:1px solid rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.06)"><div class="caption">REVENUE</div><div style="font-weight:700;font-size:11px;margin-top:2px;color:var(--gold)">${r.estimatedRevenue}</div></div>
       <div style="text-align:center"><div class="caption">MARKET</div><div style="font-weight:700;font-size:11px;margin-top:2px;color:var(--mint)">${r.marketRate}</div></div>
     </div>
@@ -2320,7 +2370,7 @@ function renderReport(){
     <div class="div"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div class="card" style="text-align:center"><div class="caption">LOCAL APMC</div><div style="font-weight:700;color:var(--mint);margin-top:4px">${r.marketRate}</div></div>
-      <div class="card" style="text-align:center"><div class="caption">SHELF LIFE</div><div style="font-weight:700;color:var(--gold);margin-top:4px">${r.shelfLife}</div></div>
+      <div class="card" style="text-align:center"><div class="caption" data-i18n="shelf">SHELF LIFE</div><div style="font-weight:700;color:var(--gold);margin-top:4px">${r.shelfLife}</div></div>
     </div>
     <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:12px;text-align:center">Source: AGMARKNET · FAO GIEWS · USDA AMS · EU AGRI · World Bank</div>`;
   }catch(e){ document.getElementById('rt3').innerHTML=`<div class="card" style="text-align:center;padding:30px;color:var(--dim)">Loading...</div>`; }
@@ -2556,6 +2606,7 @@ function wGoSlide(n){
   [0,1,2,3].forEach(i=>document.getElementById('wd'+i)?.classList.toggle('active',i===_wCur));
   // Always show skip button on all slides
   document.getElementById('w-skip-btn').style.display='block';
+  if(typeof applyLang==='function') applyLang();
 }
 function wNextSlide(){ wGoSlide(_wCur+1); }
 function wFinish(){save();nav('register');document.getElementById('page-welcome').classList.remove('active');}
