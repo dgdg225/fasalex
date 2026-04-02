@@ -254,6 +254,7 @@ select option{background:#112214;color:#fff}
 .cs-val{font-weight:600;color:#fff}
 .cs-note{font-size:9px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.5;font-style:italic}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div id="app">
@@ -300,7 +301,7 @@ select option{background:#112214;color:#fff}
           <div class="fc-origin">From Arabic فصل (faṣl) — season, chapter. Every Indian farmer knows this word.</div>
         </div>
 
-        <div style="margin:10px 0 4px;font-size:10px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Choose Your Language</div>
+        <div style="margin:10px 0 4px;font-size:10px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,.5);text-transform:uppercase" data-i18n="chooseLanguage">Choose Your Language</div>
         <div class="lang-picker" id="lp">
           <button class="lp-btn sel" onclick="setLang('en',this)">English</button>
           <button class="lp-btn" onclick="setLang('kn',this)">ಕನ್ನಡ</button>
@@ -321,9 +322,9 @@ select option{background:#112214;color:#fff}
           <button class="lp-btn" onclick="setLang('zh',this)">中文</button>
         </div>
         <div class="promise-wrap">
-          <div class="promise-line"><span class="pl-icon">🌱</span><div><div class="pl-text" data-i18n="knowHarvest">Know Your Harvest</div><div class="pl-sub" data-i18n="knowHarvestSub">What grade is your produce today</div></div></div>
-          <div class="promise-line"><span class="pl-icon">📊</span><div><div class="pl-text" data-i18n="knowGrade">Know Your Grade</div><div class="pl-sub" data-i18n="knowGradeSub">AGMARK standards — measured, not guessed</div></div></div>
-          <div class="promise-line"><span class="pl-icon">💰</span><div><div class="pl-text" data-i18n="knowPrice">Know Your Price</div><div class="pl-sub" data-i18n="knowPriceSub">Local, national and global market rates</div></div></div>
+          <div class="promise-line"><span class="pl-icon">🌱</span><div><div class="pl-text" data-i18n="knowHarvest" data-i18n="knowHarvest">Know Your Harvest</div><div class="pl-sub" data-i18n="knowHarvestSub" data-i18n="knowHarvestSub">What grade is your produce today</div></div></div>
+          <div class="promise-line"><span class="pl-icon">📊</span><div><div class="pl-text" data-i18n="knowGrade" data-i18n="knowGrade">Know Your Grade</div><div class="pl-sub" data-i18n="knowGradeSub" data-i18n="knowGradeSub">AGMARK standards — measured, not guessed</div></div></div>
+          <div class="promise-line"><span class="pl-icon">💰</span><div><div class="pl-text" data-i18n="knowPrice" data-i18n="knowPrice">Know Your Price</div><div class="pl-sub" data-i18n="knowPriceSub" data-i18n="knowPriceSub">Local, national and global market rates</div></div></div>
         </div>
       </div>
       <div class="w-cta">
@@ -335,22 +336,22 @@ select option{background:#112214;color:#fff}
     <div class="w-slide">
       <div class="s2-bg"></div>
       <div class="s2-body">
-        <div class="w-head" data-i18n="howItWorks">How FasalEx Works</div>
+        <div class="w-head" data-i18n="howItWorks" data-i18n="howItWorks">How FasalEx Works</div>
         <div class="w-sub">Five steps from your field to fair price</div>
-        <div class="step-card"><div class="step-num">1</div><div><div class="step-title" data-i18n="step1title">Register Once</div><div class="step-desc">Your name, phone, state, language and role. Saved permanently to your number. Works on any device, anywhere.</div></div></div>
-        <div class="step-card"><div class="step-num">2</div><div><div class="step-title" data-i18n="scanProduce" data-i18n="step2title">Scan Your Produce</div><div class="step-desc">Photograph your grain, vegetable or produce. Place any known object beside it — bank card, ruler, SIM packet — for accurate measurement.</div></div></div>
-        <div class="step-card"><div class="step-num">3</div><div><div class="step-title" data-i18n="step3title">See AI Analytics</div><div class="step-desc">DeepGazerAI measures grain size, colour, moisture and defects. Grades against AGMARK standards. Result in seconds.</div></div></div>
-        <div class="step-card"><div class="step-num">4</div><div><div class="step-title" data-i18n="step4title">Download or Share Report</div><div class="step-desc">Get your DG Certificate with grade, price ranges and market routes. Share via WhatsApp or email to any buyer instantly.</div></div></div>
-        <div class="step-card"><div class="step-num">5</div><div><div class="step-title" data-i18n="step5title">Connect to Buyers</div><div class="step-desc">Send to your own known contacts or find buyers in FasalEx. Every certificate you share builds your reputation and buyer network.</div></div></div>
+        <div class="step-card"><div class="step-num">1</div><div><div class="step-title" data-i18n="step1title" data-i18n="step1title">Register Once</div><div class="step-desc" data-i18n="step1desc">Your name, phone, state, language and role. Saved permanently to your number. Works on any device, anywhere.</div></div></div>
+        <div class="step-card"><div class="step-num">2</div><div><div class="step-title" data-i18n="scanProduce" data-i18n="step2title" data-i18n="step2title" data-i18n="scanProduce">Scan Your Produce</div><div class="step-desc" data-i18n="step2desc">Photograph your grain, vegetable or produce. Place any known object beside it — bank card, ruler, SIM packet — for accurate measurement.</div></div></div>
+        <div class="step-card"><div class="step-num">3</div><div><div class="step-title" data-i18n="step3title" data-i18n="step3title">See AI Analytics</div><div class="step-desc" data-i18n="step3desc">DeepGazerAI measures grain size, colour, moisture and defects. Grades against AGMARK standards. Result in seconds.</div></div></div>
+        <div class="step-card"><div class="step-num">4</div><div><div class="step-title" data-i18n="step4title" data-i18n="step4title">Download or Share Report</div><div class="step-desc" data-i18n="step4desc">Get your DG Certificate with grade, price ranges and market routes. Share via WhatsApp or email to any buyer instantly.</div></div></div>
+        <div class="step-card"><div class="step-num">5</div><div><div class="step-title" data-i18n="step5title" data-i18n="step5title">Connect to Buyers</div><div class="step-desc" data-i18n="step5desc">Send to your own known contacts or find buyers in FasalEx. Every certificate you share builds your reputation and buyer network.</div></div></div>
       </div>
-      <div class="w-cta"><button class="w-btn w-btn-gold" onclick="wNextSlide()" data-i18n="next">Next →</button></div>
+      <div class="w-cta"><button class="w-btn w-btn-gold" onclick="wNextSlide()" data-i18n="next" data-i18n="next">Next →</button></div>
     </div>
 
     <!-- SLIDE 3 — HOW TO SCAN -->
     <div class="w-slide">
       <div class="s3-bg"></div>
       <div class="s3-body">
-        <div class="w-head" data-i18n="howToScan">How to Scan</div>
+        <div class="w-head" data-i18n="howToScan" data-i18n="howToScan">How to Scan</div>
         <div class="w-sub">Place a known reference object beside your produce</div>
         <div class="scan-demo">
           <div class="sd-grain" id="sdg"></div>
@@ -358,7 +359,7 @@ select option{background:#112214;color:#fff}
           <div class="sd-detect">● AI DETECTED</div>
           <div class="sd-k">K = 85.6 / card_px</div>
         </div>
-        <div class="ref-lbl" data-i18n="anyRefObj">Any of these objects work as reference</div>
+        <div class="ref-lbl" data-i18n="anyRefObj" data-i18n="anyRefObj">Any of these objects work as reference</div>
         <div class="ref-grid">
           <div class="ref-item"><div class="ri-icon">💳</div><div class="ri-name">Bank Card</div><div class="ri-std">ISO/IEC 7810</div><div class="ri-mm">85.6×53.98mm</div></div>
           <div class="ref-item"><div class="ri-icon">📱</div><div class="ri-name">SIM Packet</div><div class="ri-std">ISO/IEC 7810</div><div class="ri-mm">85.6×53.98mm</div></div>
@@ -368,13 +369,13 @@ select option{background:#112214;color:#fff}
           <div class="ref-item"><div class="ri-icon">💊</div><div class="ri-name">Med. Strip</div><div class="ri-std">BIS / ISO</div><div class="ri-mm">Labelled size</div></div>
         </div>
         <div class="scan-tip">
-          <div class="st-title" data-i18n="tipsTitle">💡 Tips for best results</div>
+          <div class="st-title" data-i18n="tipsTitle" data-i18n="tipsTitle">💡 Tips for best results</div>
           <ul class="st-list">
-            <li>Place reference object flat on or beside produce pile</li>
-            <li>Good natural light — avoid shadows across grain</li>
-            <li>Hold phone directly above, pointing straight down</li>
-            <li>No object? Demo mode still grades visually</li>
-            <li>Works on any smartphone — no special equipment needed</li>
+            <li data-i18n="tip1">Place reference object flat on or beside produce pile</li>
+            <li data-i18n="tip2">Good natural light — avoid shadows across grain</li>
+            <li data-i18n="tip3">Hold phone directly above, pointing straight down</li>
+            <li data-i18n="tip4">No object? Demo mode still grades visually</li>
+            <li data-i18n="tip5">Works on any smartphone — no special equipment needed</li>
           </ul>
         </div>
       </div>
@@ -385,29 +386,29 @@ select option{background:#112214;color:#fff}
     <div class="w-slide">
       <div class="s4-bg"></div>
       <div class="s4-body">
-        <div class="w-head">Connect &amp; Trade Fair</div>
+        <div class="w-head" data-i18n="connectTrade">Connect &amp; Trade Fair</div>
         <div class="w-sub">Your certificate is your negotiation tool</div>
         <div class="share-flow">
           <div class="sf-lbl">📜 Your DG Certificate Journey</div>
-          <div class="sf-step"><span class="sf-icon">📷</span><span class="sf-text"><strong>Scan produce</strong> — Grade + size + market prices in seconds</span></div>
-          <div class="sf-step"><span class="sf-icon">📲</span><span class="sf-text"><strong>WhatsApp</strong> to trader — grade + asking price + APMC reference</span></div>
-          <div class="sf-step"><span class="sf-icon">📧</span><span class="sf-text"><strong>Email</strong> to processors — AGMARK compliance + grain size + eNAM</span></div>
-          <div class="sf-step"><span class="sf-icon">🌐</span><span class="sf-text"><strong>Public link</strong> — fasalex.com/cert/DG-XXXX — buyers find your batch</span></div>
-          <div class="sf-step"><span class="sf-icon">🤝</span><span class="sf-text"><strong>Negotiate with knowledge</strong> — trader cannot lowball a certified grade</span></div>
+          <div class="sf-step"><span class="sf-icon">📷</span><span class="sf-text"><strong data-i18n="j1title">Scan produce</strong> <span data-i18n="j1desc">— Grade + size + market prices in seconds</span></span></div>
+          <div class="sf-step"><span class="sf-icon">📲</span><span class="sf-text"><strong data-i18n="j2title">WhatsApp</strong> <span data-i18n="j2desc">to trader — grade + asking price + APMC reference</span></span></div>
+          <div class="sf-step"><span class="sf-icon">📧</span><span class="sf-text"><strong data-i18n="j3title">Email</strong> <span data-i18n="j3desc">to processors — AGMARK compliance + grain size + eNAM</span></span></div>
+          <div class="sf-step"><span class="sf-icon">🌐</span><span class="sf-text"><strong data-i18n="j4title">Public link</strong> <span data-i18n="j4desc">— fasalex.com/cert/DG-XXXX — buyers find your batch</span></span></div>
+          <div class="sf-step"><span class="sf-icon">🤝</span><span class="sf-text"><strong data-i18n="j5title">Negotiate with knowledge</strong> <span data-i18n="j5desc">— trader cannot lowball a certified grade</span></span></div>
         </div>
         <div class="pyramid">
           <div class="py-title">📈 Your Buyer Network Grows</div>
           <div class="py-level l1"><span>👤</span><span><strong>Now:</strong> Your own known traders &amp; contacts</span></div>
           <div class="py-level l2"><span>👥</span><span><strong>Soon:</strong> Verified FasalEx buyer directory</span></div>
           <div class="py-level l3"><span>🌐</span><span><strong>Future:</strong> International export buyers</span></div>
-          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:7px;line-height:1.6">Every certificate you share builds your reputation. The network grows with every scan.</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:7px;line-height:1.6" data-i18n="networkGrows">Every certificate you share builds your reputation. The network grows with every scan.</div>
         </div>
         <div class="fb-card">
           <div class="fb-title">💬 Help us improve — your feedback matters</div>
-          <div class="fb-point">After each scan — quick thumbs up/down on grade accuracy</div>
-          <div class="fb-point">After a sale — enter the actual price you received</div>
-          <div class="fb-point">In your Profile — detailed suggestions anytime</div>
-          <div class="fb-point">Every response trains the AI for your region</div>
+          <div class="fb-point" data-i18n="fb1">After each scan — quick thumbs up/down on grade accuracy</div>
+          <div class="fb-point" data-i18n="fb2">After a sale — enter the actual price you received</div>
+          <div class="fb-point" data-i18n="fb3">In your Profile — detailed suggestions anytime</div>
+          <div class="fb-point" data-i18n="fb4">Every response trains the AI for your region</div>
         </div>
       </div>
       <div class="w-cta">
@@ -422,14 +423,14 @@ select option{background:#112214;color:#fff}
 <!-- ══ REGISTRATION ════════════════════ -->
 <div class="page" id="page-register">
   <div style="padding:52px 18px 0;flex-shrink:0">
-    <div style="font-family:var(--ff);font-size:28px;font-weight:700;line-height:1.15">Welcome to<br/><span style="color:var(--mint)">FasalEx</span></div>
-    <div style="font-size:12px;color:var(--dim);margin-top:6px;margin-bottom:20px" data-i18n="regSetup">One-time setup · saved forever to your number</div>
+    <div style="font-family:var(--ff);font-size:28px;font-weight:700;line-height:1.15" data-i18n="welcomeTo">Welcome to<br/><span style="color:var(--mint)">FasalEx</span></div>
+    <div style="font-size:12px;color:var(--dim);margin-top:6px;margin-bottom:20px" data-i18n="regSetup" data-i18n="setupNote">One-time setup · saved forever to your number</div>
   </div>
   <div class="scroll" style="padding:0 18px 120px">
 
     <!-- Name -->
     <div class="field">
-      <label data-i18n="fullName">Full Name *</label>
+      <label data-i18n="fullName" data-i18n="fullName">Full Name *</label>
       <input id="r-name" type="text" placeholder="Your name" autocomplete="name"/>
     </div>
 
@@ -461,7 +462,7 @@ select option{background:#112214;color:#fff}
     <!-- Country + State — FIXED: linked -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div class="field" style="margin:0">
-        <label data-i18n="country">Country *</label>
+        <label data-i18n="country" data-i18n="country">Country *</label>
         <select id="r-country" onchange="onCountryChange()">
           <option value="IN">🇮🇳 India</option>
           <option value="AE">🇦🇪 UAE</option>
@@ -474,14 +475,14 @@ select option{background:#112214;color:#fff}
         </select>
       </div>
       <div class="field" style="margin:0">
-        <label data-i18n="state">State / Region</label>
+        <label data-i18n="state" data-i18n="state">State / Region</label>
         <select id="r-state"></select>
       </div>
     </div>
 
     <!-- Language -->
     <div class="field">
-      <label data-i18n="language">Preferred Language</label>
+      <label data-i18n="language" data-i18n="language">Preferred Language</label>
       <select id="r-lang">
         <option value="en">🇬🇧 English</option>
         <option value="kn">🇮🇳 ಕನ್ನಡ Kannada</option>
@@ -505,7 +506,7 @@ select option{background:#112214;color:#fff}
 
     <!-- Role chips -->
     <div class="field">
-      <label data-i18n="role">Role *</label>
+      <label data-i18n="role" data-i18n="role">Role *</label>
       <div class="role-chips" id="role-chips">
         <button class="role-chip selected" data-role="farmer" onclick="selectRole('farmer',this)">🌾 Farmer/Grower</button>
         <button class="role-chip" data-role="trader" onclick="selectRole('trader',this)">🤝 Trader</button>
@@ -628,7 +629,7 @@ select option{background:#112214;color:#fff}
 
     <!-- OTP section -->
     <div id="otp-sec" style="display:none;margin-top:18px">
-      <div style="text-align:center;font-size:13px;color:var(--dim);margin-bottom:4px" id="otp-label">Enter 6-digit OTP</div>
+      <div style="text-align:center;font-size:13px;color:var(--dim);margin-bottom:4px" id="otp-label" data-i18n="enterOtp">Enter 6-digit OTP</div>
       <div class="otp-wrap">
         <input class="otp-box" type="number" maxlength="1" oninput="otpNext(this,0)"/>
         <input class="otp-box" type="number" maxlength="1" oninput="otpNext(this,1)"/>
@@ -639,7 +640,7 @@ select option{background:#112214;color:#fff}
       </div>
       <button class="btn btn-gold" onclick="verifyOTP()">✓ Verify & Start Using FasalEx 🚀</button>
       <div style="text-align:center;margin-top:10px">
-        <button onclick="sendOTP()" style="background:none;border:none;color:var(--mint);font-size:12px;cursor:pointer;font-family:var(--fb)">Resend OTP</button>
+        <button onclick="sendOTP()" style="background:none;border:none;color:var(--mint);font-size:12px;cursor:pointer;font-family:var(--fb)" data-i18n="resendOtp">Resend OTP</button>
       </div>
     </div>
 
@@ -668,18 +669,18 @@ select option{background:#112214;color:#fff}
         <span class="badge badge-sky" id="h-lidar" style="display:none">LiDAR</span>
       </div>
       <div style="font-family:var(--ff);font-size:22px;font-weight:700;margin-bottom:4px">Scan Your Produce</div>
-      <div style="font-size:12px;color:var(--dim);margin-bottom:12px" data-i18n="scanSub">Photo · Auto-detect · Instant grade · Fair price</div>
+      <div style="font-size:12px;color:var(--dim);margin-bottom:12px" data-i18n="scanSub" data-i18n="scanSub">Photo · Auto-detect · Instant grade · Fair price</div>
       <button class="btn btn-gold" style="width:auto;padding:12px 22px" onclick="nav('scan')">📷 <span data-i18n="scanNow_t">Scan Now</span></button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:22px;font-weight:700" id="st-scans">0</div><div class="caption" data-i18n="scans">Scans</div></div>
-      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:16px;font-weight:700;color:var(--gold)" id="st-rev">₹0</div><div class="caption" data-i18n="revenue">Revenue</div></div>
-      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:22px;font-weight:700;color:var(--mint)" id="st-grade">—</div><div class="caption" data-i18n="topGrade">Top Grade</div></div>
+      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:22px;font-weight:700" id="st-scans">0</div><div class="caption" data-i18n="scans" data-i18n="scans">Scans</div></div>
+      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:16px;font-weight:700;color:var(--gold)" id="st-rev">₹0</div><div class="caption" data-i18n="revenue" data-i18n="revenue">Revenue</div></div>
+      <div class="card" style="text-align:center;padding:14px 8px"><div style="font-family:var(--ff);font-size:22px;font-weight:700;color:var(--mint)" id="st-grade">—</div><div class="caption" data-i18n="topGrade" data-i18n="topGrade">Top Grade</div></div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div style="font-weight:600;font-size:14px" data-i18n="todayPrices">Today's Prices</div>
-        <span style="font-size:11px;color:var(--mint);cursor:pointer" onclick="nav('market')" data-i18n="allPrices">All →</span>
+        <div style="font-weight:600;font-size:14px" data-i18n="todayPrices" data-i18n="todayPrices">Today's Prices</div>
+        <span style="font-size:11px;color:var(--mint);cursor:pointer" onclick="nav('market')" data-i18n="allPrices" data-i18n="allPrices">All →</span>
       </div>
       <div id="home-price-list"></div>
     </div>
@@ -700,8 +701,8 @@ select option{background:#112214;color:#fff}
       <img id="vf-img" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px"/>
       <div id="vf-ph" style="text-align:center;padding:20px">
         <div style="font-size:44px;margin-bottom:8px">📷</div>
-        <div style="font-family:var(--ff);font-size:18px;font-weight:600;margin-bottom:3px" data-i18n="openCam">Open Camera</div>
-        <div style="font-size:12px;color:var(--dim)" data-i18n="tapCap">Tap to capture produce</div>
+        <div style="font-family:var(--ff);font-size:18px;font-weight:600;margin-bottom:3px" data-i18n="openCam" data-i18n="openCam">Open Camera</div>
+        <div style="font-size:12px;color:var(--dim)" data-i18n="tapCap" data-i18n="tapCap">Tap to capture produce</div>
       </div>
       <div id="vf-det" style="display:none;position:absolute;top:10px;left:10px;background:rgba(82,183,136,.9);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700">● AI DETECTED</div>
       <div id="vf-gps" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.6);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:600"></div>
@@ -714,10 +715,10 @@ select option{background:#112214;color:#fff}
       <button class="btn btn-ghost" style="padding:13px" onclick="demoScan()">🤖 Demo</button>
     </div>
     <div id="dev-cap" style="margin-top:10px;display:flex;gap:6px;justify-content:center"></div>
-    <div id="scan-info" style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:12px;font-size:11px;color:var(--dim);text-align:center">📍 GPS auto-stamped · 🔒 AI encrypted · ✨ Better light = better grade</div>
+    <div id="scan-info" style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:12px;font-size:11px;color:var(--dim);text-align:center" data-i18n="betterLight">📍 GPS auto-stamped · 🔒 AI encrypted · ✨ Better light = better grade</div>
     <!-- Detect result -->
     <div id="det-res" style="display:none;margin-top:12px" class="card-green">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mint);margin-bottom:4px">🤖 AI AUTO-DETECTED</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mint);margin-bottom:4px" data-i18n="aiAutoDetected">🤖 AI AUTO-DETECTED</div>
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-family:var(--ff);font-size:22px;font-weight:700" id="det-prod">Moong (Whole)</div>
@@ -785,7 +786,7 @@ select option{background:#112214;color:#fff}
     <!-- ── ASKING PRICE (goes to buyers) ── -->
     <div class="card" style="margin-bottom:12px">
       <div style="font-weight:600;font-size:13px;margin-bottom:4px">💬 Your Asking Price</div>
-      <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="askingSub">Set your price → sent to buyers in packages</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="askingSub" data-i18n="askingSub">Set your price → sent to buyers in packages</div>
       <div style="display:flex;gap:8px;align-items:center">
         <span style="font-size:18px;font-weight:700;color:var(--gold)">₹</span>
         <input id="asking-price" type="number" placeholder="e.g. 8500" style="flex:1" oninput="updateGap()"/>
@@ -809,9 +810,9 @@ select option{background:#112214;color:#fff}
     <div class="card" style="margin-bottom:14px;background:rgba(255,255,255,.03)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <div style="font-weight:600;font-size:13px">📊 Actual Price Received</div>
-        <span style="font-size:10px;color:var(--dim)" data-i18n="privateNote">Private · not shared</span>
+        <span style="font-size:10px;color:var(--dim)" data-i18n="privateNote" data-i18n="privateNote">Private · not shared</span>
       </div>
-      <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="actualSub">Enter after sale → improves AI for all farmers</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="actualSub" data-i18n="actualSub">Enter after sale → improves AI for all farmers</div>
       <div style="display:flex;gap:8px;align-items:center">
         <span style="font-size:18px;font-weight:700;color:var(--sky)">₹</span>
         <input id="actual-price" type="number" placeholder="Optional — what you got" style="flex:1;border-color:rgba(78,205,196,.2)" oninput="saveActual()"/>
@@ -821,7 +822,7 @@ select option{background:#112214;color:#fff}
     </div>
 
     <!-- ── THREE PACKAGES ── -->
-    <div style="font-weight:600;font-size:14px;margin-bottom:10px" data-i18n="whoReceives">Who receives what:</div>
+    <div style="font-weight:600;font-size:14px;margin-bottom:10px" data-i18n="whoReceives" data-i18n="whoReceives">Who receives what:</div>
 
     <!-- Local -->
     <div class="pkg pkg-local sel" id="pk-local" onclick="togglePkg('local',this)">
@@ -829,20 +830,20 @@ select option{background:#112214;color:#fff}
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:22px">🏪</span>
           <div>
-            <div style="font-weight:700;font-size:14px" data-i18n="localTrader">Local Trader</div>
-            <div style="font-size:11px;color:var(--dim)" data-i18n="localSub">APMC & mandi traders</div>
+            <div style="font-weight:700;font-size:14px" data-i18n="localTrader" data-i18n="localTrader">Local Trader</div>
+            <div style="font-size:11px;color:var(--dim)" data-i18n="localSub" data-i18n="localSub">APMC & mandi traders</div>
           </div>
         </div>
         <div style="text-align:right">
           <div style="font-weight:700;font-size:14px;color:var(--mint)" id="pk-loc-price">₹8,800/qtl</div>
-          <div style="font-size:10px;color:var(--dim)" data-i18n="localRef">Local ref.</div>
+          <div style="font-size:10px;color:var(--dim)" data-i18n="localRef" data-i18n="localRef">Local ref.</div>
         </div>
       </div>
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px" id="pk-loc-desc">
         Sends: Grade · GPS · Local price · <b style="color:var(--mint)">In your language</b>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-wa btn-sm f1" onclick="sharePkg('local','wa',event)">📲 WhatsApp</button>
+        <button class="btn btn-wa btn-sm f1" onclick="shareCertAsPNG('local','wa',event)">📲 WhatsApp</button>
         <button class="btn btn-ghost btn-sm f1" onclick="sharePkg('local','sms',event)">💬 SMS</button>
         <button class="btn btn-ghost btn-sm" onclick="addContact('local',event)" style="padding:9px 12px">➕</button>
       </div>
@@ -854,18 +855,18 @@ select option{background:#112214;color:#fff}
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:22px">🏭</span>
           <div>
-            <div style="font-weight:700;font-size:14px" data-i18n="national">National Processor</div>
-            <div style="font-size:11px;color:var(--dim)" data-i18n="nationalSub">Aggregators · eNAM · Mills</div>
+            <div style="font-weight:700;font-size:14px" data-i18n="national" data-i18n="national">National Processor</div>
+            <div style="font-size:11px;color:var(--dim)" data-i18n="nationalSub" data-i18n="nationalSub">Aggregators · eNAM · Mills</div>
           </div>
         </div>
         <div style="text-align:right">
           <div style="font-weight:700;font-size:14px;color:var(--gold)" id="pk-nat-price">₹8,800/qtl</div>
-          <div style="font-size:10px;color:var(--dim)" data-i18n="nationalRef">eNAM ref.</div>
+          <div style="font-size:10px;color:var(--dim)" data-i18n="nationalRef" data-i18n="nationalRef">eNAM ref.</div>
         </div>
       </div>
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px">Sends: Grade · AGMARK compliance · Moisture · Grain size · eNAM price</div>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-wa btn-sm f1" onclick="sharePkg('national','wa',event)">📲 WhatsApp</button>
+        <button class="btn btn-wa btn-sm f1" onclick="shareCertAsPNG('national','wa',event)">📲 WhatsApp</button>
         <button class="btn btn-ghost btn-sm f1" onclick="sharePkg('national','email',event)">📧 Email</button>
         <button class="btn btn-ghost btn-sm" onclick="addContact('national',event)" style="padding:9px 12px">➕</button>
       </div>
@@ -877,31 +878,31 @@ select option{background:#112214;color:#fff}
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:22px">🌐</span>
           <div>
-            <div style="font-weight:700;font-size:14px" data-i18n="exportBuyer">Export / Import</div>
-            <div style="font-size:11px;color:var(--dim)" data-i18n="exportSub">Dubai · EU · USA buyers</div>
+            <div style="font-weight:700;font-size:14px" data-i18n="exportBuyer" data-i18n="exportBuyer">Export / Import</div>
+            <div style="font-size:11px;color:var(--dim)" data-i18n="exportSub" data-i18n="exportSub">Dubai · EU · USA buyers</div>
           </div>
         </div>
         <div style="text-align:right">
           <div style="font-weight:700;font-size:14px;color:var(--sky)" id="pk-exp-price">₹13,500/qtl</div>
-          <div style="font-size:10px;color:var(--dim)" data-i18n="exportRef">EU CIF ref.</div>
+          <div style="font-size:10px;color:var(--dim)" data-i18n="exportRef" data-i18n="exportRef">EU CIF ref.</div>
         </div>
       </div>
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px" id="pk-exp-desc">Sends: Grade · EU/USDA compliance · Size mm · APEDA route · CIF price</div>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-wa btn-sm f1" onclick="sharePkg('export','wa',event)">📲 WhatsApp</button>
+        <button class="btn btn-wa btn-sm f1" onclick="shareCertAsPNG('export','wa',event)">📲 WhatsApp</button>
         <button class="btn btn-ghost btn-sm f1" onclick="sharePkg('export','email',event)">📧 Email</button>
         <button class="btn btn-ghost btn-sm" onclick="postPublic(event)" style="padding:9px 12px">🌐</button>
       </div>
     </div>
 
-    <button class="btn btn-gold" onclick="sendAll()" style="margin-top:4px" data-i18n="sendAll">📤 Send to All Selected Simultaneously</button>
+    <button class="btn btn-gold" onclick="sendAll()" style="margin-top:4px" data-i18n="sendAll" data-i18n="sendAll">📤 Send to All Selected Simultaneously</button>
 
     <!-- Public cert link — FIXED: copy only, no navigate -->
     <div class="card" style="margin-top:12px;text-align:center">
-      <div style="font-weight:600;font-size:13px;margin-bottom:4px">🔗 Public Certificate Link</div>
-      <div class="caption" style="margin-bottom:10px" data-i18n="pubSub">Any buyer worldwide can find your batch</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:4px" data-i18n="pubLink">🔗 Public Certificate Link</div>
+      <div class="caption" style="margin-bottom:10px" data-i18n="pubSub" data-i18n="pubSub">Any buyer worldwide can find your batch</div>
       <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px;font-size:11px;color:var(--mint);font-family:monospace;margin-bottom:10px;word-break:break-all" id="pub-url">fasalex.com/cert/DG-XXXX-XXXX</div>
-      <button class="btn btn-mint" onclick="copyLink()">📋 Copy Public Link</button>
+      <button class="btn btn-mint" onclick="copyLink()" data-i18n="copyLink">📋 Copy Public Link</button>
     </div>
 
   </div>
@@ -912,7 +913,7 @@ select option{background:#112214;color:#fff}
   <div class="ph"><div style="width:40px"></div><span class="ph-title" data-i18n="marketTitle">Market Prices</span><div style="width:40px"></div></div>
   <div class="scroll" style="padding:0 18px 80px">
     <div class="card-gold" style="margin-bottom:12px">
-      <div style="font-weight:600;font-size:13px;margin-bottom:4px" data-i18n="aiForecast">🤖 AI Forecast</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:4px" data-i18n="aiForecast" data-i18n="aiForecast">🤖 AI Forecast</div>
       <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.7">Moong +2–3% next 7 days. Tiger Prawn at seasonal peak — sell now.</div>
     </div>
     <div id="market-price-list"></div>
@@ -929,21 +930,21 @@ select option{background:#112214;color:#fff}
       <div class="caption" style="margin-top:4px" id="pf-det">Farmer · Karnataka</div>
     </div>
     <div class="card" style="margin-bottom:10px">
-      <div style="font-weight:600;margin-bottom:12px" data-i18n="editProfile">Edit Profile</div>
-      <div class="field"><label data-i18n="name">Name</label><input id="ed-name"/></div>
-      <div class="field"><label data-i18n="language">Language</label>
+      <div style="font-weight:600;margin-bottom:12px" data-i18n="editProfile" data-i18n="editProfile">Edit Profile</div>
+      <div class="field"><label data-i18n="name" data-i18n="name">Name</label><input id="ed-name"/></div>
+      <div class="field"><label data-i18n="language" data-i18n="language">Language</label>
         <select id="ed-lang">
           <option value="en">English</option><option value="kn">Kannada</option>
           <option value="hi">Hindi</option><option value="te">Telugu</option>
         </select>
       </div>
-      <button class="btn btn-mint" onclick="saveProfile()" data-i18n="save">Save</button>
+      <button class="btn btn-mint" onclick="saveProfile()" data-i18n="save" data-i18n="save">Save</button>
     </div>
     <div class="card" style="margin-bottom:10px">
-      <div style="font-weight:600;margin-bottom:8px" data-i18n="yourCerts">Your DG Certificates</div>
-      <div id="cert-hist" class="caption" data-i18n="noCerts">No certificates yet</div>
+      <div style="font-weight:600;margin-bottom:8px" data-i18n="yourCerts" data-i18n="yourCerts">Your DG Certificates</div>
+      <div id="cert-hist" class="caption" data-i18n="noCerts" data-i18n="noCerts">No certificates yet</div>
     </div>
-    <button class="btn btn-ghost" onclick="logout()" style="width:100%" data-i18n="signOut">Sign Out</button>
+    <button class="btn btn-ghost" onclick="logout()" style="width:100%" data-i18n="signOut" data-i18n="signOut">Sign Out</button>
   </div>
 </div>
 
@@ -1092,6 +1093,51 @@ const T={
     marketRef:'Market reference:',
     askingPricePlaceholder:'e.g. 8500',
     actualPricePlaceholder:"Optional — what you got",
+    dgCertTitle:'DG GRADING CERTIFICATE',
+    indicativeNote:'⚠️ INDICATIVE · NOT OFFICIAL',
+    produceLabel:'Produce',
+    gradeLabel2:'Grade',
+    confidenceLabel:'Confidence',
+    contactLabel:'Contact',
+    gpsLabel:'GPS',
+    dateLabel:'Date',
+    localApmcLabel:'Local APMC',
+    enamRefLabel:'eNAM Reference',
+    gradeNoteA:'Premium Export grade. Ready for immediate sale.',
+    gradeNoteB:'Good domestic quality. Sort to recover Grade A.',
+    gradeNoteC:'Standard market grade. Priced accordingly.',
+    gradeNoteAExp:'Export quality. Full AGMARK Grade 1 compliance.',
+    gradeNoteBExp:'Domestic quality. 83% AGMARK compliance. Sort for export.',
+    gradeSummary:'Grades against AGMARK standards',
+    askingLabel:'Asking',
+    agmarkComp:'AGMARK Compliance',
+    grainSizeLabel:'Grain Size',
+    moistureLabel:'Moisture',
+    lotLabel:'Lot',
+    apedaEligible:'APEDA route: Eligible',
+    apedaSubject:'APEDA route: Subject to sorting',
+    shelf:'SHELF',
+    revenueLabel:'REVENUE',
+    marketLabel:'MARKET',
+    gradeDistrib:'GRADE DISTRIBUTION',
+    aiConfidence:'AI Confidence',
+    workingDist:'Working Distance',
+    viewFullCert:'View Full Certificate',
+    scanAgain:'🔄 Scan Again',
+    goodDomestic:'Good domestic quality',
+    premiumExport:'Premium Export grade',
+    standardGrade:'Standard grade',
+    welcomeTo:'Welcome to',
+    setupNote:'One-time setup · saved forever',
+    continueBtn:'Continue →',
+    skipNow:'Skip for now',
+    enterOtp:'Enter 6-digit OTP',
+    resendOtp:'Resend OTP',
+    verifyBtn:'Verify OTP',
+    confirmGradeBtn:'✓ Confirm & Grade →',
+    editBtn:'✏️ Edit',
+    aiAutoDetected:'🤖 AI AUTO-DETECTED',
+    betterLight:'📍 GPS auto-stamped · 🔒 AI encrypted · ✨ Better light = better grade',
   },
   kn:{
     home:'ಮನೆ',market:'ಮಾರುಕಟ್ಟೆ',profile:'ಪ್ರೊಫೈಲ್',
@@ -1184,6 +1230,61 @@ const T={
     marketRef:'ಮಾರುಕಟ್ಟೆ ಉಲ್ಲೇಖ:',
     askingPricePlaceholder:'ಉದಾ. 8500',
     actualPricePlaceholder:'ಐಚ್ಛಿಕ — ನೀವು ಪಡೆದದ್ದು',
+    dgCertTitle:'DG ಗ್ರೇಡಿಂಗ್ ಪ್ರಮಾಣಪತ್ರ',
+    indicativeNote:'⚠️ ಸೂಚಕ · ಅಧಿಕೃತವಲ್ಲ',
+    produceLabel:'ಉತ್ಪನ್ನ',
+    gradeLabel2:'ಶ್ರೇಣಿ',
+    confidenceLabel:'ವಿಶ್ವಾಸ',
+    contactLabel:'ಸಂಪರ್ಕ',
+    gpsLabel:'GPS',
+    dateLabel:'ದಿನಾಂಕ',
+    localApmcLabel:'ಸ್ಥಳೀಯ APMC',
+    enamRefLabel:'eNAM ಉಲ್ಲೇಖ',
+    gradeNoteA:'ಪ್ರೀಮಿಯಂ ರಫ್ತು ಶ್ರೇಣಿ. ತಕ್ಷಣ ಮಾರಾಟಕ್ಕೆ ಸಿದ್ಧ.',
+    gradeNoteB:'ಉತ್ತಮ ದೇಶೀಯ ಗುಣಮಟ್ಟ. ವಿಂಗಡಣೆ ಮಾಡಿ A ಶ್ರೇಣಿ ಪಡೆಯಿರಿ.',
+    gradeNoteC:'ಸ್ಟ್ಯಾಂಡರ್ಡ್ ಮಾರುಕಟ್ಟೆ ಶ್ರೇಣಿ.',
+    gradeNoteAExp:'ರಫ್ತು ಗುಣಮಟ್ಟ. ಸಂಪೂರ್ಣ AGMARK ಅನುಸರಣೆ.',
+    gradeNoteBExp:'ದೇಶೀಯ ಗುಣಮಟ್ಟ. ವಿಂಗಡಣೆ ರಫ್ತಿಗೆ ಅಗತ್ಯ.',
+    gradeSummary:'AGMARK ಮಾನದಂಡಗಳ ವಿರುದ್ಧ ಶ್ರೇಣೀಕರಿಸಲಾಗಿದೆ',
+    askingLabel:'ಕೇಳುವ ಬೆಲೆ',
+    agmarkComp:'AGMARK ಅನುಸರಣೆ',
+    grainSizeLabel:'ಧಾನ್ಯ ಗಾತ್ರ',
+    moistureLabel:'ತೇವಾಂಶ',
+    lotLabel:'ಬ್ಯಾಚ್',
+    apedaEligible:'APEDA ಮಾರ್ಗ: ಅರ್ಹ',
+    apedaSubject:'APEDA ಮಾರ್ಗ: ವಿಂಗಡಣೆ ಅಗತ್ಯ',
+    shelf:'ಶೆಲ್ಫ್ ಜೀವನ',
+    revenueLabel:'ಆದಾಯ',
+    marketLabel:'ಮಾರುಕಟ್ಟೆ',
+    gradeDistrib:'ಶ್ರೇಣಿ ವಿತರಣೆ',
+    aiConfidence:'AI ವಿಶ್ವಾಸ',
+    workingDist:'ಕಾರ್ಯ ದೂರ',
+    viewFullCert:'ಪೂರ್ಣ ಪ್ರಮಾಣಪತ್ರ ನೋಡಿ',
+    scanAgain:'🔄 ಮತ್ತೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ',
+    goodDomestic:'ಉತ್ತಮ ದೇಶೀಯ ಗುಣಮಟ್ಟ',
+    premiumExport:'ಪ್ರೀಮಿಯಂ ರಫ್ತು ಶ್ರೇಣಿ',
+    standardGrade:'ಸ್ಟ್ಯಾಂಡರ್ಡ್ ಶ್ರೇಣಿ',
+    step1desc:'ನಿಮ್ಮ ಹೆಸರು, ಫೋನ್, ರಾಜ್ಯ, ಭಾಷೆ ಮತ್ತು ಪಾತ್ರ. ನಿಮ್ಮ ನಂಬರ್‌ಗೆ ಶಾಶ್ವತವಾಗಿ ಉಳಿಸಲಾಗುತ್ತದೆ.',
+    step2desc:'ನಿಮ್ಮ ಧಾನ್ಯ, ತರಕಾರಿ ಅಥವಾ ಉತ್ಪನ್ನ ಫೋಟೋ ತೆಗೆಯಿರಿ. ನಿಖರ ಅಳತೆಗಾಗಿ ಯಾವುದಾದರೂ ತಿಳಿದ ವಸ್ತು ಇರಿಸಿ.',
+    step3desc:'DeepGazerAI ಧಾನ್ಯ ಗಾತ್ರ, ಬಣ್ಣ, ತೇವಾಂಶ ಅಳೆಯುತ್ತದೆ. AGMARK ಮಾನದಂಡ ಶ್ರೇಣೀಕರಣ. ಸೆಕೆಂಡುಗಳಲ್ಲಿ ಫಲಿತಾಂಶ.',
+    step4desc:'ಶ್ರೇಣಿ, ಬೆಲೆ ಮತ್ತು ಮಾರ್ಗಗಳೊಂದಿಗೆ DG ಪ್ರಮಾಣಪತ್ರ ಪಡೆಯಿರಿ.',
+    step5desc:'ನಿಮ್ಮ ಸ್ವಂತ ಸಂಪರ್ಕಗಳಿಗೆ ಕಳುಹಿಸಿ ಅಥವಾ FasalEx ನಲ್ಲಿ ಖರೀದಿದಾರರನ್ನು ಹುಡುಕಿ.',
+    tip1:'ಉಲ್ಲೇಖ ವಸ್ತುವನ್ನು ಉತ್ಪನ್ನದ ಪಕ್ಕದಲ್ಲಿ ಇಡಿ',
+    tip2:'ಒಳ್ಳೆಯ ನೈಸರ್ಗಿಕ ಬೆಳಕು — ನೆರಳು ತಪ್ಪಿಸಿ',
+    tip3:'ಫೋನ್ ನೇರವಾಗಿ ಮೇಲೆ ಹಿಡಿಯಿರಿ',
+    tip4:'ವಸ್ತು ಇಲ್ಲವೇ? ಡೆಮೊ ಮೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
+    tip5:'ಯಾವುದೇ ಸ್ಮಾರ್ಟ್‌ಫೋನ್‌ನಲ್ಲಿ ಕಾರ್ಯ ನಿರ್ವಹಿಸುತ್ತದೆ',
+        welcomeTo:'ಸ್ವಾಗತ',
+    setupNote:'ಒಮ್ಮೆ ನೋಂದಣಿ · ಶಾಶ್ವತವಾಗಿ ಉಳಿಸಲಾಗುತ್ತದೆ',
+    continueBtn:'ಮುಂದೆ →',
+    skipNow:'ಈಗ ಬಿಡಿ',
+    enterOtp:'6 ಅಂಕಿ OTP ನಮೂದಿಸಿ',
+    resendOtp:'OTP ಮರುಕಳುಹಿಸಿ',
+    verifyBtn:'OTP ಪರಿಶೀಲಿಸಿ',
+    confirmGradeBtn:'✓ ದೃಢಪಡಿಸಿ ಮತ್ತು ಶ್ರೇಣಿ →',
+    editBtn:'✏️ ಸಂಪಾದಿಸಿ',
+    aiAutoDetected:'🤖 AI ಸ್ವಯಂ ಗುರುತಿಸಿದೆ',
+    betterLight:'📍 GPS ಸ್ಟ್ಯಾಂಪ್ · 🔒 AI ಎನ್‌ಕ್ರಿಪ್ಟ್ · ✨ ಉತ್ತಮ ಬೆಳಕು = ಉತ್ತಮ ಶ್ರೇಣಿ',
   },
   hi:{
     home:'होम',market:'बाज़ार',profile:'प्रोफ़ाइल',
@@ -1276,6 +1377,51 @@ const T={
     marketRef:'बाज़ार संदर्भ:',
     askingPricePlaceholder:'जैसे 8500',
     actualPricePlaceholder:'वैकल्पिक — आपको मिला',
+    dgCertTitle:'DG ग्रेडिंग प्रमाणपत्र',
+    indicativeNote:'⚠️ सांकेतिक · आधिकारिक नहीं',
+    produceLabel:'फसल',
+    gradeLabel2:'ग्रेड',
+    confidenceLabel:'विश्वास',
+    contactLabel:'संपर्क',
+    gpsLabel:'GPS',
+    dateLabel:'दिनांक',
+    localApmcLabel:'स्थानीय APMC',
+    enamRefLabel:'eNAM संदर्भ',
+    gradeNoteA:'प्रीमियम निर्यात ग्रेड। तत्काल बिक्री के लिए तैयार।',
+    gradeNoteB:'अच्छी घरेलू गुणवत्ता। छँटाई से ग्रेड A मिलेगा।',
+    gradeNoteC:'स्टैंडर्ड मार्केट ग्रेड।',
+    gradeNoteAExp:'निर्यात गुणवत्ता। पूर्ण AGMARK अनुपालन।',
+    gradeNoteBExp:'घरेलू गुणवत्ता। निर्यात के लिए छँटाई जरूरी।',
+    gradeSummary:'AGMARK मानकों के अनुसार ग्रेड',
+    askingLabel:'माँगी कीमत',
+    agmarkComp:'AGMARK अनुपालन',
+    grainSizeLabel:'दाने का आकार',
+    moistureLabel:'नमी',
+    lotLabel:'लॉट',
+    apedaEligible:'APEDA मार्ग: योग्य',
+    apedaSubject:'APEDA मार्ग: छँटाई आवश्यक',
+    shelf:'शेल्फ जीवन',
+    revenueLabel:'आमदनी',
+    marketLabel:'बाज़ार',
+    gradeDistrib:'ग्रेड वितरण',
+    aiConfidence:'AI विश्वास',
+    workingDist:'कार्य दूरी',
+    viewFullCert:'पूरा प्रमाणपत्र देखें',
+    scanAgain:'🔄 फिर स्कैन करें',
+    goodDomestic:'अच्छी घरेलू गुणवत्ता',
+    premiumExport:'प्रीमियम निर्यात ग्रेड',
+    standardGrade:'स्टैंडर्ड ग्रेड',
+    welcomeTo:'स्वागत है',
+    setupNote:'एक बार सेटअप · हमेशा के लिए सहेजा',
+    continueBtn:'आगे →',
+    skipNow:'अभी छोड़ें',
+    enterOtp:'6 अंकों का OTP डालें',
+    resendOtp:'OTP फिर भेजें',
+    verifyBtn:'OTP सत्यापित करें',
+    confirmGradeBtn:'✓ पुष्टि करें और ग्रेड करें →',
+    editBtn:'✏️ बदलें',
+    aiAutoDetected:'🤖 AI द्वारा स्वतः पहचाना',
+    betterLight:'📍 GPS स्टैंप · 🔒 AI एन्क्रिप्टेड · ✨ बेहतर रोशनी = बेहतर ग्रेड',
   },
   te:{
     home:'హోమ్',market:'మార్కెట్',profile:'ప్రొఫైల్',
@@ -2014,7 +2160,7 @@ async function identifyProduce(dataURL){
   document.getElementById('load-txt').textContent='Identifying produce...';
   document.getElementById('det-res').style.display='none';
   try{
-    const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dataURL.split(',')[1]})});
+    const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:dataURL.split(',')[1],sector:S.user?.segments?.[0]||'agri'})});
     const d=await r.json();
     showDetect(d.produce||'Moong (Whole)',d.confidence||85,d.segment||'PULSE',d.emoji||'🫘');
   }catch(e){ showDetect('Moong (Whole)',92,'PULSE','🫘'); }
@@ -2035,7 +2181,7 @@ async function confirmGrade(){
   document.getElementById('scan-load').style.display='block';
   document.getElementById('load-txt').textContent='Grading with AGMARK standards...';
   try{
-    const r=await fetch('/api/grade',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:S.capturedImage?.split(',')[1],produce,gps:S.gps,lang:S.user?.lang||'en',hasLiDAR:S.hasLiDAR})});
+    const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:S.capturedImage?.split(',')[1],produce,gps:S.gps,lang:S.user?.lang||'en',hasLiDAR:S.hasLiDAR,farmerName:S.user?.name||'Farmer',qty:1,unit:'qtl',sector:S.user?.segments?.[0]||'agri'})});
     const report=await r.json();
     document.getElementById('scan-load').style.display='none';
     S.currentReport=report; S.history.unshift(report); save(); nav('report');
@@ -2044,6 +2190,7 @@ async function confirmGrade(){
     S.currentReport=buildDemo(produce); S.history.unshift(S.currentReport); save(); nav('report');
   }
 }
+function newScan(){S.capturedImage=null;S.currentReport=null;S._pendingId=null;const vi=document.getElementById('vf-img');if(vi){vi.src='';vi.style.display='none';}const vp=document.getElementById('vf-ph');if(vp)vp.style.display='flex';const vr=document.getElementById('vf-retake');if(vr)vr.style.display='none';const vd=document.getElementById('vf-det');if(vd)vd.style.display='none';const dr=document.getElementById('det-res');if(dr)dr.style.display='none';nav('scan');}
 function editProd(){ const n=prompt('Produce name:',document.getElementById('det-prod').textContent); if(n) document.getElementById('det-prod').textContent=n; }
 function demoScan(){
   document.getElementById('scan-load').style.display='block';
@@ -2436,41 +2583,75 @@ function saveActual(){
 function pkgText(type){
   const r=S.currentReport; if(!r) return '';
   const ask=document.getElementById('asking-price')?.value;
-  const askLine=ask?`\n💬 Asking: ₹${ask}/qtl`:'';
-  const phone=S.user?.phone||'+91 7022223622';  // FIXED: has space
+  const askLine=ask?`\n💬 ${t('askingLabel')}: ₹${ask}/qtl`:'';
+  const phone=S.user?.phone||'';
   const g=r.overallGrade;
 
   if(type==='local'){
-    const gradeNote=g==='A'?'Premium Export grade. Ready for immediate sale.'
-      :g==='B'?'Good domestic quality. Sorting can recover Grade A portion.'
-      :'Standard market grade. Priced accordingly.';
-    return `🌾 FasalEx · DeepGazerAI\nDG GRADING CERTIFICATE\n⚠️ INDICATIVE · NOT OFFICIAL\n\n${t('certId')}: ${r.certId}\nProduce: ${r.produce}\nGrade: ${r.overallGrade} — ${r.gradeLabel}\nConfidence: ${r.confidence}%\n\n${gradeNote}${askLine}\n💰 Local APMC: ${r.routes?.[0]?.price||r.marketRate}/qtl\n\n📍 GPS: ${r.gps?.lat}°N ${r.gps?.lon}°E\n📅 Date: ${r.date}\n📞 Contact: ${phone}\n\nfasalex.com · deepgazerai.com`;
+    const gradeNote=g==='A'?t('gradeNoteA'):g==='B'?t('gradeNoteB'):t('gradeNoteC');
+    return `🌾 FasalEx · DeepGazerAI
+${t('dgCertTitle')}
+${t('indicativeNote')}
+
+${t('certId')}: ${r.certId}
+${t('produceLabel')}: ${r.produce}
+${t('gradeLabel2')}: ${r.overallGrade} — ${r.gradeLabel}
+${t('confidenceLabel')}: ${r.confidence}%
+
+${gradeNote}${askLine}
+💰 ${t('localApmcLabel')}: ${r.priceLocal||r.routes?.[0]?.price||'—'}
+
+📍 ${t('gpsLabel')}: ${r.gps||'—'}
+📅 ${t('dateLabel')}: ${r.date}
+📞 ${t('contactLabel')}: ${phone}
+
+fasalex.com · deepgazerai.com`;
   }
   if(type==='national'){
-    const passed=(r.parameters||[]).filter(p=>p.pass).length;
-    const comp=Math.round((passed/Math.max(r.parameters?.length||6,1))*100);
-    const gradeNote=g==='A'?'Export quality. Full AGMARK Grade 1 compliance.'
-      :g==='B'?'Domestic quality. 83% AGMARK compliance. Sort for export.'
-      :'Processing grade. Suitable for milling/processing.';
-    return `🌾 FasalEx DeepGazerAI — DG Certificate\nCert: ${r.certId}\n\nProduce: ${r.produce}\nGrade: ${r.overallGrade} — ${r.gradeLabel}\nAGMARK Compliance: ${comp}%\nGrain size: ${r.avgGrainSizeMm}mm\nMoisture: ~12% (visual est.)\nLot: ${r.qty}\n\n${gradeNote}${askLine}\neNAM Reference: ${r.routes?.[1]?.price||r.marketRate}/qtl\n\nContact: ${S.user?.name||'Farmer'} · ${phone}\nfasalex.com`;
+    const passed=(r.params||[]).filter(p=>p.pass===true).length;
+    const comp=Math.round((passed/Math.max(r.params?.length||6,1))*100);
+    const gradeNote=g==='A'?t('gradeNoteAExp'):t('gradeNoteBExp');
+    return `🌾 FasalEx DeepGazerAI — ${t('dgCertTitle')}
+${t('certId')}: ${r.certId}
+
+${t('produceLabel')}: ${r.produce}
+${t('gradeLabel2')}: ${r.overallGrade} — ${r.gradeLabel}
+${t('agmarkComp')}: ${comp}%
+${t('grainSizeLabel')}: ${r.grainSize||'—'}
+${t('moistureLabel')}: ~12% (visual)
+${t('lotLabel')}: ${r.qty||1} qtl
+
+${gradeNote}${askLine}
+${t('enamRefLabel')}: ${r.priceNational||r.routes?.[1]?.price||'—'}
+
+${t('contactLabel')}: ${S.user?.name||'Farmer'} · ${phone}
+fasalex.com`;
   }
   if(type==='export'){
-    const apedaLine=g==='A'?'APEDA route: Eligible':'APEDA route: Subject to sorting';
-    return `🌾 FasalEx DeepGazerAI — Export Grade Certificate\nCert: ${r.certId}\n\nProduce: ${r.produce}\nGrade: ${r.overallGrade} — ${r.gradeLabel}\nStandards: AGMARK / FSSAI / EU Reg 543/2011 / Codex\nGrain size: ${r.avgGrainSizeMm}mm (>4.0mm AGMARK Grade 1)\nMoisture: ~12% (visual; lab confirmation pending)\nPest damage: <1% (visual)\n${apedaLine}${askLine}\n\n💰 UAE / Dubai: ${r.routes?.[2]?.price||'₹9,500–12,500'}/qtl\n💰 Germany: ${r.routes?.[3]?.price||'₹9,500–13,000'}/qtl\n💰 UK: ${r.routes?.[4]?.price||'₹9,000–12,000'}/qtl\n💰 USA: ${r.routes?.[5]?.price||'₹8,500–11,000'}/qtl\n\n⚠️ Prices are bulk trade indicative. Export realisation subject to freight (₹800–1,500/qtl), certification, and FOB/CIF terms.\n\nContact: ${S.user?.name||'Farmer'} · ${phone}\nGPS: ${r.gps?.lat}°N ${r.gps?.lon}°E\n\nfasalex.com · deepgazerai.com\nCert: ${r.certId}`;
+    const apedaLine=g==='A'?t('apedaEligible'):t('apedaSubject');
+    return `🌾 FasalEx DeepGazerAI — Export Grade Certificate
+${t('certId')}: ${r.certId}
+
+${t('produceLabel')}: ${r.produce}
+${t('gradeLabel2')}: ${r.overallGrade} — ${r.gradeLabel}
+Standards: AGMARK / EU Reg 543/2011 / Codex
+${t('grainSizeLabel')}: ${r.grainSize||'—'}
+${apedaLine}${askLine}
+
+💰 UAE/Dubai: ${r.priceExport||r.routes?.[2]?.price||'₹9,500–12,500'}/qtl
+💰 Germany: ${r.routes?.[3]?.price||'₹9,500–13,000'}/qtl
+💰 UK: ${r.routes?.[4]?.price||'₹9,000–12,000'}/qtl
+💰 USA: ${r.routes?.[5]?.price||'₹8,500–11,000'}/qtl
+
+${t('contactLabel')}: ${S.user?.name||'Farmer'} · ${phone}
+📍 GPS: ${r.gps||'—'}
+
+fasalex.com · deepgazerai.com
+${t('certId')}: ${r.certId}`;
   }
   return '';
 }
 
-function sharePkg(type,method,e){
-  e?.stopPropagation();
-  const txt=pkgText(type);
-  if(method==='wa') window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
-  else if(method==='sms') window.open('sms:?body='+encodeURIComponent(txt));
-  else if(method==='email'){
-    const r=S.currentReport;
-    window.open('mailto:?subject=FasalEx DG Certificate '+r?.certId+'&body='+encodeURIComponent(txt));
-  }
-}
 function addContact(type,e){
   e?.stopPropagation();
   const num=prompt('Enter buyer phone (with country code, e.g. +91 98765 43210):');
@@ -2560,25 +2741,36 @@ const RTL_LANGS=['ar','ur'];
 function setLang(code,btn){S.lang=code;if(S.user)S.user.lang=code;document.querySelectorAll('.lp-btn').forEach(b=>b.classList.remove('sel'));if(btn)btn.classList.add('sel');document.body.dir=RTL_LANGS.includes(code)?'rtl':'ltr';applyLang();save();}
 function applyLang(){
   const lang=S.lang||'en';
+  // Translate all tagged elements
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const k=el.getAttribute('data-i18n');
     const v=t(k);
     if(v&&v!==k) el.textContent=v;
   });
+  // Sync profile language select
   const ed=document.getElementById('ed-lang');
   if(ed) ed.value=lang;
+  // Sync onboarding language picker
   document.querySelectorAll('.lp-btn').forEach(b=>{
     b.classList.toggle('sel',b.getAttribute('onclick')===`setLang('${lang}',this)`);
   });
-  // Update scan page dynamic text
+  // RTL
+  document.body.dir=['ar','ur'].includes(lang)?'rtl':'ltr';
+  // Update dynamic load text
   const lt=document.getElementById('load-txt');
   if(lt) lt.textContent=t('identifying');
-  // Update btn text nodes that can't use data-i18n easily
-  const scanBtn=document.querySelector('.btn-gold[onclick*="scan"]');
-  if(scanBtn) scanBtn.textContent=t('scanNow');
-  // Re-render price lists with translated labels
+  // Update scan info bar
+  const si=document.getElementById('scan-info');
+  if(si) si.textContent=t('betterLight');
+
+  // Re-render price lists with translated APMC label
   renderPriceLists();
+  // If report visible, re-render it
+  if(S.currentReport && document.getElementById('page-report')?.classList.contains('active')){
+    renderReport();
+  }
 }
+
 const PH=[['Moong','₹8,800','+0.4%',true],['Wheat','₹2,180','+1.2%',true],['Rice A','₹3,640','+2.8%',true],['Onion','₹890','+0.7%',true],['Tomato','₹1,420','-5.3%',false]];
 const PM=[['Moong','₹8,800','+0.4%',true],['Wheat','₹2,180','+1.2%',true],['Rice A','₹3,640','+2.8%',true],['Chana','₹5,200','-0.8%',false],['Toor Dal','₹7,600','+1.5%',true],['Onion','₹890','+0.7%',true],['Tomato','₹1,420','-5.3%',false],['Buffalo Milk','₹66/L','+0.3%',true],['Tiger Prawn','₹620/kg','+3.1%',true]];
 function renderPriceLists(){const hp=document.getElementById('home-price-list');if(hp)hp.innerHTML=PH.map(([n,p,c,u])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;align-items:center;gap:8px"><span>🌾</span><span style="font-size:13px;font-weight:500">${n}</span></div><div style="text-align:right"><div style="font-weight:700;font-size:13px">${p}/qtl</div><div style="font-size:10px;color:${u?'#22C55E':'var(--red)'}">${u?'▲':'▼'} ${c}</div></div></div>`).join('');const mp=document.getElementById('market-price-list');if(mp)mp.innerHTML=PM.map(([n,p,c,u])=>`<div class="card" style="margin-bottom:8px;display:flex;align-items:center"><span style="font-size:20px;margin-right:12px">🌾</span><div style="flex:1"><div style="font-weight:600;font-size:13px">${n}</div><div class="caption">APMC</div></div><div style="text-align:right"><div style="font-weight:700;font-size:13px">${p}</div><div style="font-size:10px;color:${u?'#22C55E':'var(--red)'}">${u?'▲':'▼'} ${c}</div></div></div>`).join('');}
@@ -2606,6 +2798,316 @@ window.addEventListener('DOMContentLoaded',()=>{
     }
   },1500);
 });
+// ══════════════════════════════════════════════════════════════
+// REAL DG CERTIFICATE — Dynamic version of dgport_cert_a4_v3-2
+// ══════════════════════════════════════════════════════════════
+function buildRealCertHTML(r, imgSrc) {
+  if (!r) return '';
+  const farmer = S.user?.name || 'Farmer';
+  const phone  = S.user?.phone || '—';
+  const gps    = r.gps || '—';
+  const certId = r.certId || 'DG-XXXX-XXXX';
+  const now    = new Date();
+  const dateStr= r.date || now.toLocaleDateString('en-IN') + ' · ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) + ' IST';
+  const produce= r.produce || 'Produce';
+  const grade  = r.overallGrade || 'B';
+  const conf   = r.confidence || 85;
+  const gc     = {A:'#22C55E', B:'#F4A100', C:'#F97316', D:'#E63946'};
+  const gradeColor = gc[grade] || '#888';
+  const grainSize  = r.grainSize || '—';
+  const shelfLife  = r.shelf || '—';
+  const actionLbl  = r.actionLabel || 'Sell Now';
+  const gradeMsg   = r.gradeMsg || r.aiNote || 'AI grading complete.';
+  const gradeLabel = r.gradeLabel || 'Standard Grade';
+  const pct    = r.pct || {A:15,B:70,C:12,D:3};
+  const params = r.params || [];
+  const routes = r.routes || [];
+  const priceLocal    = r.priceLocal    || '—';
+  const priceNational = r.priceNational || '—';
+  const priceExport   = r.priceExport   || '—';
+  const priceMin      = r.priceMin || 0;
+  const priceMax      = r.priceMax || 0;
+  const aiNote   = r.aiNote || gradeMsg;
+  const aiKn     = r.aiKn   || '';
+  const aiHi     = r.aiHi   || '';
+  const aiLang   = r.aiLang || '';
+  const sector   = r.sector || 'agri';
+  const segLabel = sector === 'fish' ? '🐟 Fisheries · India' : sector === 'dairy' ? '🥛 Dairy · India' : '🌾 Agriculture · India';
+  const hash     = certId.replace('DG-','').toLowerCase() + 'a8671ff9fb2c4d';
+
+  // Build grade badge gradient
+  const badgeGrad = grade==='A' ? 'linear-gradient(135deg,#1b5e20,#22C55E)' :
+                    grade==='B' ? 'linear-gradient(135deg,#f57f17,#E9C46A)' :
+                    grade==='C' ? 'linear-gradient(135deg,#e65100,#F97316)' :
+                                  'linear-gradient(135deg,#b71c1c,#E63946)';
+
+  // Build params table rows
+  const paramRows = params.map(p => {
+    const status = p.pass === true ? `<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 4px;border-radius:3px;font-size:7px;font-weight:700;background:#e8f5e9;color:#2d6a4f">✓ PASS</span>` :
+                   p.pass === false ? `<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 4px;border-radius:3px;font-size:7px;font-weight:700;background:#ffebee;color:#c62828">✗ FAIL</span>` :
+                   `<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 4px;border-radius:3px;font-size:7px;font-weight:700;background:#fff8e1;color:#E65100">⚡ BORDER</span>`;
+    return `<tr><td style="color:#999;font-weight:600;width:70px;font-size:8px;text-transform:uppercase;padding:3px 12px;border-bottom:1px solid #f5f5f5">${p.name||''}</td><td style="font-weight:700;color:#1a1a1a;padding:3px 12px;border-bottom:1px solid #f5f5f5">${p.found||''}</td></tr>`;
+  }).join('');
+
+  // Build market rows
+  const mktRows = routes.slice(0,5).map((rt,i) =>
+    `<tr${i===0?' class="top"':''}>
+      <td style="font-size:9px;font-weight:600;color:#333;padding:3.5px 8px;border-bottom:1px solid #f5f5f5">${i===0?'🥇 ':''} ${rt.market||rt}</td>
+      <td style="font-size:9.5px;font-weight:700;color:${i===0?'#2d6a4f':'#1565C0'};text-align:right;padding:3.5px 8px;border-bottom:1px solid #f5f5f5;white-space:nowrap">${rt.price||priceLocal}</td>
+      <td style="font-size:8px;color:#888;padding:3.5px 8px;border-bottom:1px solid #f5f5f5">${rt.std||'AGMARKNET'}</td>
+    </tr>`
+  ).join('');
+
+  // Build batch bars
+  const batchRows = Object.entries(pct).map(([g,p]) => {
+    const col = gc[g]||'#888';
+    const labels = {A:'Premium / Export',B:'Grade A Domestic',C:'Standard Market',D:'Reject / Process'};
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <span style="width:12px;font-size:10px;font-weight:800;text-align:center;color:${col}">${g}</span>
+      <div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden"><div style="height:100%;width:${p}%;background:${col};border-radius:4px"></div></div>
+      <span style="width:24px;font-size:9px;font-weight:700;text-align:right;color:${col}">${p}%</span>
+      <span style="font-size:8px;color:#888;width:80px">${labels[g]||''}</span>
+    </div>`;
+  }).join('');
+
+  // Image panel — real scanned image or grain dots
+  const imageSection = imgSrc
+    ? `<img src="${imgSrc}" style="width:100%;height:148px;object-fit:cover;display:block"/>`
+    : `<div style="height:148px;background:linear-gradient(160deg,#3d6b22,#1f4010);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);font-size:11px">No image captured</div>`;
+
+  // AI analysis in chosen language
+  const langCode = S.lang || 'en';
+  const aiLangBlock = (aiKn && langCode === 'kn') ? `<div style="padding:4px 8px;border-radius:5px;margin-bottom:3px;font-size:9px;line-height:1.55;background:#f0faf3;border-left:2.5px solid #52B788;color:#1a3d20"><span style="display:inline-block;font-size:7px;font-weight:700;padding:1px 4px;border-radius:3px;margin-right:4px;background:#e8f5e9;color:#2d6a4f">ಕನ್ನಡ</span>${aiKn}</div>` :
+                       (aiHi  && langCode === 'hi') ? `<div style="padding:4px 8px;border-radius:5px;margin-bottom:3px;font-size:9px;line-height:1.55;background:#fff8f0;border-left:2.5px solid #F4A261;color:#3e1f00"><span style="display:inline-block;font-size:7px;font-weight:700;padding:1px 4px;border-radius:3px;margin-right:4px;background:#fff3e0;color:#E65100">हिंदी</span>${aiHi}</div>` :
+                       (aiLang && langCode !== 'en') ? `<div style="padding:4px 8px;border-radius:5px;margin-bottom:3px;font-size:9px;line-height:1.55;background:#f0f4ff;border-left:2.5px solid #1565C0;color:#0d2b5e">${aiLang}</div>` : '';
+
+  return `<div id="dg-cert-el" style="width:794px;background:#fff;font-family:'DM Sans',Arial,sans-serif;border:1px solid #cde8d2;overflow:hidden;display:flex;flex-direction:column">
+
+  <!-- STD STRIP -->
+  <div style="background:#1a3d20;padding:4px 14px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:7px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.5);text-transform:uppercase">AGMARK · MPEDA · APEDA · NHB · CODEX · BIS · EU Reg 543/2011 · USDA · FAO · eNAM</span>
+    <span style="font-family:Georgia,serif;font-size:9px;font-weight:700;color:#E9C46A">AI Grading Certificate</span>
+  </div>
+
+  <!-- HEADER -->
+  <div style="background:linear-gradient(135deg,#0f2d14,#1e5228,#0f3d1a);padding:11px 16px 9px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px">
+    <div>
+      <div style="font-size:7px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:2px">Powered by</div>
+      <div style="font-family:Georgia,serif;font-size:16px;font-weight:700;color:#52B788">DeepGazer<span style="color:#E9C46A">AI</span>™</div>
+      <div style="font-size:7px;color:rgba(255,255,255,.3);margin-top:1px">Technology · DeepGazerAI Vision Engine</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-family:Georgia,serif;font-size:22px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1">DG <span style="color:#E9C46A">Certificate</span></div>
+      <div style="font-size:7px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-top:4px">AI Grading · FasalEx</div>
+      <div style="font-family:monospace;font-size:10px;color:#E9C46A;margin-top:4px;background:rgba(233,196,106,.1);display:inline-block;padding:2px 8px;border-radius:4px;letter-spacing:1px">${certId}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:7px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:2px">Get it at</div>
+      <div style="font-family:Georgia,serif;font-size:14px;font-weight:700;color:#fff">www.<span style="color:#52B788">fasal</span>ex.com</div>
+      <div style="font-size:7px;color:rgba(255,255,255,.35);margin-top:1px">See True · Trade Fair</div>
+    </div>
+  </div>
+  <div style="height:2.5px;background:linear-gradient(90deg,#2d6a4f,#52B788,#E9C46A,#F4A261,#E9C46A,#52B788,#2d6a4f)"></div>
+  <div style="height:1px;background:rgba(82,183,136,.2)"></div>
+
+  <!-- PRODUCE ROW -->
+  <div style="background:linear-gradient(135deg,#f0faf3,#e8f5ec);padding:7px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #cde8d2">
+    <div>
+      <div style="font-size:7px;font-weight:700;letter-spacing:2px;color:#2d6a4f;text-transform:uppercase;margin-bottom:2px">${segLabel}</div>
+      <div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#0f2d14">${produce}</div>
+      <div style="font-size:8px;color:#888;margin-top:1px">AGMARK Grade ${grade} — ${gradeLabel}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="text-align:center"><div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa">Confidence</div><div style="font-size:11px;font-weight:700;margin-top:1px;color:#2d6a4f">${conf}%</div></div>
+      <div style="text-align:center"><div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa">Grain Size</div><div style="font-size:11px;font-weight:700;margin-top:1px;color:#2d6a4f">${grainSize}</div></div>
+      <div style="text-align:center"><div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa">Shelf Life</div><div style="font-size:11px;font-weight:700;margin-top:1px">${shelfLife}</div></div>
+      <div style="text-align:center"><div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aaa">Action</div><div style="font-size:11px;font-weight:700;margin-top:1px;color:#E65100">${actionLbl}</div></div>
+      <div style="width:50px;height:50px;border-radius:50%;background:${badgeGrad};display:flex;flex-direction:column;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.2)">
+        <div style="font-family:Georgia,serif;font-size:22px;font-weight:800;color:#fff;line-height:1">${grade}</div>
+        <div style="font-size:7px;font-weight:700;color:rgba(255,255,255,.8)">GRADE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 1: Contact | Image -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #e8e8e8">
+    <div style="border-right:1px solid #eaeaea">
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px 4px;border-bottom:1.5px solid #2d6a4f;display:flex;align-items:center;gap:4px;color:#2d6a4f;background:#f8fdf9">👤 Contact Details</div>
+      <div style="padding:5px 12px 7px">
+        <div style="display:flex;align-items:flex-start;gap:6px;padding:3px 0;border-bottom:1px solid #f5f5f5;font-size:9px"><span style="color:#999;font-weight:600;min-width:55px;font-size:8px;text-transform:uppercase">Farmer</span><span style="color:#1a1a1a;font-weight:600">${farmer}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:6px;padding:3px 0;border-bottom:1px solid #f5f5f5;font-size:9px"><span style="color:#999;font-weight:600;min-width:55px;font-size:8px;text-transform:uppercase">Mobile</span><span style="color:#1565C0;font-family:monospace;font-weight:600">${phone}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:6px;padding:3px 0;border-bottom:1px solid #f5f5f5;font-size:9px"><span style="color:#999;font-weight:600;min-width:55px;font-size:8px;text-transform:uppercase">GPS</span><span style="color:#2d6a4f;font-family:monospace;font-size:8px;font-weight:600">${gps}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:6px;padding:3px 0;border-bottom:1px solid #f5f5f5;font-size:9px"><span style="color:#999;font-weight:600;min-width:55px;font-size:8px;text-transform:uppercase">Date</span><span style="color:#1a1a1a;font-weight:600">${dateStr}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:6px;padding:3px 0;font-size:9px"><span style="color:#999;font-weight:600;min-width:55px;font-size:8px;text-transform:uppercase">Batch</span><span style="color:#aaa;font-family:monospace;font-size:8px">${certId}</span></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px 4px;border-bottom:1.5px solid #1565C0;color:#1565C0;background:#f5f9ff">📷 Scan Image · AI Vision Capture</div>
+      <div style="position:relative;height:148px;overflow:hidden">
+        ${imageSection}
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:3"><span style="font-family:Georgia,serif;font-size:8px;font-weight:700;color:rgba(255,255,255,.18);transform:rotate(-30deg);letter-spacing:2px;line-height:2;text-align:center;white-space:nowrap">FasalEx™ · DeepGazerAI™ · ${certId} · AI INDICATIVE · NOT OFFICIAL</span></div>
+        <div style="position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,.55);padding:3px 7px;z-index:4;display:flex;justify-content:space-between"><span style="font-size:7px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:1px;text-transform:uppercase">AI Scan · DeepGazerAI Vision</span><span style="font-size:7px;color:rgba(255,255,255,.38);font-family:monospace">${certId}</span></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.8);padding:3px 7px;z-index:4">
+          <div style="display:flex;justify-content:space-between"><span style="font-size:7px;color:#52B788;font-family:monospace">📍 ${gps}</span><span style="font-size:7px;color:#E9C46A;font-family:monospace">Hash: ${hash.slice(0,16)}...</span></div>
+          <div style="font-size:6.5px;color:rgba(255,255,255,.38);font-family:monospace;margin-top:1px">${phone} · ${dateStr} · FasalEx™ · Patent Pending</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="height:1px;background:rgba(82,183,136,.2)"></div>
+
+  <!-- ROW 2: Grading Metrics | Market Intelligence -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #e8e8e8">
+    <div style="border-right:1px solid #eaeaea">
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px 4px;border-bottom:1.5px solid #2d6a4f;color:#2d6a4f;background:#f8fdf9">📊 Grading Metrics</div>
+      <table style="width:100%;border-collapse:collapse">${paramRows}</table>
+    </div>
+    <div>
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px 4px;border-bottom:1.5px solid #1565C0;color:#1565C0;background:#f5f9ff">💰 Market Intelligence</div>
+      <table style="width:100%;border-collapse:collapse;font-size:9px">
+        <thead><tr style="background:#f0f4ff"><th style="padding:4px 8px;text-align:left;font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#1565C0;border-bottom:1.5px solid #c5d8f5">Market</th><th style="padding:4px 8px;text-align:left;font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#1565C0;border-bottom:1.5px solid #c5d8f5">Price (₹/qtl)</th><th style="padding:4px 8px;text-align:left;font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#1565C0;border-bottom:1.5px solid #c5d8f5">Standard</th></tr></thead>
+        <tbody>${mktRows}</tbody>
+      </table>
+      <div style="margin:4px 12px;background:linear-gradient(135deg,#fff3e0,#fffde7);border:1.5px solid #ffe082;border-radius:6px;padding:5px 10px">
+        <div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#E65100">Revenue Estimate — Grade ${grade}</div>
+        <div style="font-family:Georgia,serif;font-size:14px;font-weight:700;color:#BF360C;margin-top:1px">${priceLocal}</div>
+        <div style="font-size:7.5px;color:#aaa;margin-top:1px">Export opens at ${priceExport} after sorting & AGMARK cert</div>
+      </div>
+    </div>
+  </div>
+  <div style="height:1px;background:rgba(82,183,136,.2)"></div>
+
+  <!-- ROW 3: Batch Distribution | Standards Check -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #e8e8e8">
+    <div style="border-right:1px solid #eaeaea">
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px 4px;border-bottom:1.5px solid #2d6a4f;color:#2d6a4f;background:#f8fdf9">📊 Batch Distribution</div>
+      <div style="padding:5px 12px 7px">${batchRows}
+        <div style="margin-top:5px;padding:4px 8px;background:#f0faf3;border-radius:5px;border:1px solid #cde8d2;font-size:8px;color:#2d6a4f;line-height:1.5">💡 ${gradeMsg}</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px 4px;border-bottom:1.5px solid #E65100;color:#E65100;background:#fff8f5">✅ Standard Check</div>
+      <div style="margin:4px 12px;background:linear-gradient(135deg,#1e5228,#2d6a4f);border-radius:6px;padding:5px 10px;display:flex;align-items:center;justify-content:space-between">
+        <div><div style="font-family:Georgia,serif;font-size:12px;font-weight:700;color:#fff">${produce}</div><div style="font-size:7px;color:rgba(255,255,255,.5);margin-top:1px">AGMARK · Codex · EU Standards</div></div>
+        <div style="background:rgba(233,196,106,.2);border:1.5px solid #E9C46A;border-radius:4px;padding:2px 8px;font-family:Georgia,serif;font-size:14px;font-weight:700;color:#E9C46A">${grade}</div>
+      </div>
+      <div style="padding:0 12px 5px">
+        <table style="width:100%;border-collapse:collapse;font-size:8.5px">
+          <thead><tr style="background:#f5f5f5"><th style="padding:3px 5px;text-align:left;font-size:7px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#888;border-bottom:1.5px solid #e0e0e0">Parameter</th><th style="padding:3px 5px;text-align:left;font-size:7px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#888;border-bottom:1.5px solid #e0e0e0">Result</th><th style="padding:3px 5px;text-align:left;font-size:7px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#888;border-bottom:1.5px solid #e0e0e0">AGMARK</th></tr></thead>
+          <tbody>${params.slice(0,6).map(p=>{
+            const s=p.pass===true?'<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 4px;border-radius:3px;font-size:7px;font-weight:700;background:#e8f5e9;color:#2d6a4f">✓ PASS</span>':p.pass===false?'<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 4px;border-radius:3px;font-size:7px;font-weight:700;background:#ffebee;color:#c62828">✗ FAIL</span>':'<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 4px;border-radius:3px;font-size:7px;font-weight:700;background:#fff8e1;color:#E65100">⚡ BORDER</span>';
+            return `<tr><td style="font-weight:600;color:#333;font-size:9px;padding:3px 5px;border-bottom:1px solid #f5f5f5">${p.name||''}</td><td style="padding:3px 5px;border-bottom:1px solid #f5f5f5">${s}</td><td style="font-size:8.5px;color:#1565C0;padding:3px 5px;border-bottom:1px solid #f5f5f5">${p.standard||''}</td></tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div style="height:1px;background:rgba(82,183,136,.2)"></div>
+
+  <!-- ROW 4: AI Analysis | Recommendations -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #e8e8e8">
+    <div style="border-right:1px solid #eaeaea">
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px 4px;border-bottom:1.5px solid #2d6a4f;color:#2d6a4f;background:#f8fdf9">🤖 AI Analysis — DeepGazerAI™</div>
+      <div style="padding:6px 12px 7px;border-top:1px solid #eaeaea">
+        <div style="font-size:9px;color:#222;line-height:1.6;margin-bottom:4px">${aiNote}</div>
+        ${aiLangBlock}
+      </div>
+    </div>
+    <div>
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px 4px;border-bottom:1.5px solid #E65100;color:#E65100;background:#fff8f5">💡 Recommendations</div>
+      <div style="padding:6px 12px 7px">${(r.recommendations||[]).slice(0,5).map(rec=>
+        `<div style="display:flex;align-items:flex-start;gap:5px;padding:3.5px 0;border-bottom:1px solid #f8f8f8;font-size:8.5px"><div style="font-size:11px;flex-shrink:0;margin-top:1px">${rec.icon||'💡'}</div><div style="line-height:1.5;color:#444"><strong style="color:#0f2d14;font-weight:700">${rec.title||''}</strong> — ${rec.text||''}</div></div>`
+      ).join('')}</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background:linear-gradient(135deg,#1a3d20,#243d28);border-top:2.5px solid #52B788;margin-top:auto">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,.07)">
+      <div>
+        <div style="font-family:monospace;font-size:13px;font-weight:700;color:#E9C46A;letter-spacing:1px">${certId}</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.3);font-family:monospace;margin-top:2px">Hash: ${hash.slice(0,24)}...</div>
+        <div style="margin-top:4px;font-size:8px;color:rgba(255,255,255,.4);font-family:monospace">${dateStr} · Patent Pending</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:7.5px;color:rgba(255,255,255,.38);margin-bottom:2px">Verify this certificate at</div>
+        <div style="font-family:Georgia,serif;font-size:12px;color:#fff;font-weight:600">www.<span style="color:#52B788">fasalex</span>.com/cert/${certId}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:Georgia,serif;font-size:14px;color:#52B788;font-weight:700">FasalEx™</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:2px">deepgazerai.com</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.25);margin-top:2px">© 2026 H DoddanaGouda</div>
+      </div>
+    </div>
+    <div style="padding:5px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+      <span style="font-size:7.5px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;margin-right:4px">Data Sources:</span>
+      ${['AGMARKNET','eNAM','APEDA','FAO GIEWS','USDA AMS','EU AGRI','World Bank','BIS','NHB','CODEX'].map(s=>`<span style="font-size:7px;font-weight:600;padding:1.5px 5px;border-radius:3px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.45)">${s}</span>`).join('')}
+    </div>
+    <div style="padding:6px 16px 9px">
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid rgba(255,255,255,.07)">⚖️ Legal & Regulatory References</div>
+      <div style="font-size:7.5px;color:rgba(255,255,255,.38);line-height:1.75"><strong style="color:rgba(255,255,255,.6)">AGMARK:</strong> Agricultural Produce (Grading & Marking) Act, 1937 — DMI, GoI · <strong style="color:rgba(255,255,255,.6)">MPEDA:</strong> Marine Products Export Development Authority Act, 1972 · <strong style="color:rgba(255,255,255,.6)">APEDA:</strong> Agri & Processed Food Products Export Development Authority Act, 1985 · <strong style="color:rgba(255,255,255,.6)">CODEX:</strong> Codex Alimentarius Commission — FAO/WHO · <strong style="color:rgba(255,255,255,.6)">EU:</strong> Commission Regulation (EC) No 543/2011 · <strong style="color:rgba(255,255,255,.6)">USDA AMS:</strong> Agricultural Marketing Service · <strong style="color:rgba(255,255,255,.6)">FAO GIEWS:</strong> Global Information & Early Warning System</div>
+      <div style="margin-top:4px;padding:5px 8px;background:rgba(233,196,106,.07);border:1px solid rgba(233,196,106,.18);border-radius:5px;font-size:7.5px;color:rgba(255,220,120,.6);line-height:1.6">⚠️ <strong>DISCLAIMER:</strong> This certificate is AI-generated by DeepGazerAI Vision Engine and is <strong>INDICATIVE ONLY</strong> — NOT official AGMARK, MPEDA, APEDA or equivalent authority certification. Official grade certification requires physical inspection by a government-accredited authority. Market prices are indicative reference values. FasalEx / DeepGazerAI Technologies disclaim liability for trade decisions based solely on this report. DeepGazerAI™ · FasalEx™ are under provisional patent protection.</div>
+      <div style="margin-top:4px;text-align:center;font-size:7px;color:rgba(255,255,255,.22)">FasalEx™ · DeepGazerAI™ · deepgazerai.com · fasalex.com · Patent Pending · © 2026 H DoddanaGouda, Hospet, Karnataka, India</div>
+    </div>
+  </div>
+
+</div>`;
+}
+
+async function generateCertPNG(r) {
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;padding:0';
+  container.innerHTML = buildRealCertHTML(r, S.capturedImage);
+  document.body.appendChild(container);
+  const certEl = container.querySelector('#dg-cert-el');
+  try {
+    const canvas = await html2canvas(certEl, {
+      scale: 2, useCORS: true, allowTaint: true,
+      backgroundColor: '#ffffff', width: 794,
+      logging: false
+    });
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    document.body.removeChild(container);
+    return { canvas, blob, dataURL: canvas.toDataURL('image/png') };
+  } catch(e) {
+    document.body.removeChild(container);
+    throw e;
+  }
+}
+
+async function shareCertAsPNG(pkg, channel, ev) {
+  if (ev) ev.stopPropagation();
+  const r = S.currentReport;
+  if (!r) { alert('No report to share'); return; }
+  showToast('Generating DG Certificate...');
+  try {
+    if (typeof html2canvas === 'undefined') { sharePkg(pkg, channel, ev); return; }
+    const { blob, dataURL } = await generateCertPNG(r);
+    // Mobile Web Share API — shares as image file
+    if (navigator.share && navigator.canShare) {
+      const file = new File([blob], `DG-Certificate-${r.certId}.png`, { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: `DG Certificate — ${r.produce}`,
+          text: `FasalEx · DeepGazerAI\nGrade: ${r.overallGrade} · ${r.produce}\nCert: ${r.certId}\nfasalex.com`,
+          files: [file]
+        });
+        showToast('Certificate shared! ✅');
+        return;
+      }
+    }
+    // Fallback: download PNG
+    const a = document.createElement('a');
+    a.href = dataURL;
+    a.download = `DG-Certificate-${r.certId}.png`;
+    a.click();
+    showToast('Certificate saved as PNG ✅');
+  } catch(e) {
+    console.error('PNG share error:', e);
+    sharePkg(pkg, channel, ev);
+  }
+}
+
 </script>
 </body>
 </html>
