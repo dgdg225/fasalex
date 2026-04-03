@@ -919,13 +919,18 @@ let _browser = null;
 async function getBrowser() {
   if (_browser) return _browser;
   try {
-    const chromium = require('@sparticuz/chromium');
-    const puppeteer = require('puppeteer-core');
+    const puppeteer = require('puppeteer');
     _browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: 'new',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process',
+      ],
     });
     console.log('[CERT] Puppeteer browser launched');
     _browser.on('disconnected', () => { _browser = null; });
@@ -1282,7 +1287,7 @@ async function handleCertificate(req, res) {
     const page = await browser.newPage();
     await page.setViewport({ width: 794, height: 1123 });
     await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
-    await page.waitForTimeout(500); // let fonts render
+    await new Promise(r => setTimeout(r, 500)); // let fonts render
 
     let output;
     if (format === 'pdf') {
