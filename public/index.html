@@ -1846,7 +1846,7 @@ const T={
     yourName:'您的姓名',yourPhone:'您的电话',yourRole:'您的角色',yourState:'您的州',selectSegments:'选择您的细分领域',
   },
 };
-function t(k){ return (T[S.user?.lang||'en']||T.en)[k]||(T.en[k]||k); }
+function t(k){ const l=S.lang||S.user?.lang||'en'; return (T[l]||T.en)[k]||(T.en[k]||k); }
 
 // ══════════════════════════════════════════
 // COUNTRY / STATE DATA
@@ -2066,7 +2066,7 @@ async function identifyProduce(dataURL){
   try{
     const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:dataURL.split(',')[1],sector:S.user?.segments?.[0]||'agri'})});
     const d=await r.json();
-    showDetect(d.produce||'Moong (Whole)',d.confidence||85,d.segment||'PULSE',d.emoji||'🫘');
+    showDetect(d.produce||'Unknown',d.confidence||85,(d.tag||d.sector||'agri').toUpperCase(),d.tag==='pulse'?'🫘':d.tag==='grain'?'🌾':d.tag==='veggie'?'🥦':d.tag==='fruit'?'🍎':d.tag==='seafood'?'🐟':'🌾');
   }catch(e){ showDetect('Moong (Whole)',92,'PULSE','🫘'); }
 }
 function showDetect(prod,conf,seg,em){
@@ -2079,6 +2079,60 @@ function showDetect(prod,conf,seg,em){
   document.getElementById('det-res').style.display='block';
   S._pendingId={produce:prod,confidence:conf};
 }
+
+function normalizeReport(r){
+  if(!r||r._norm) return r;
+  r._norm=true;
+  // certId
+  if(!r.certId) r.certId='DG-'+Math.random().toString(16).slice(2,6).toUpperCase()+'-'+Math.random().toString(16).slice(2,6).toUpperCase();
+  // grain size
+  if(!r.grainSize&&r.size_measurements?.avg_unit_size_mm) r.grainSize=r.size_measurements.avg_unit_size_mm;
+  if(!r.avgGrainSizeMm&&r.grainSize) r.avgGrainSizeMm=parseFloat(r.grainSize)||0;
+  // zAxis
+  if(!r.zAxisMm&&r.ref_object?.grain_mm_calibrated){r.zAxisMm=r.ref_object.grain_mm_calibrated;r.zMethod=r.ref_object.method||'visual';}
+  // grade pct
+  if(!r.pct&&r.grades) r.pct={A:r.grades.A?.pct||0,B:r.grades.B?.pct||0,C:r.grades.C?.pct||0,D:r.grades.D?.pct||0};
+  // prices
+  const lp=r._livePrices;
+  if(lp){
+    r.priceLocal=r.priceLocal||lp.domestic||r.marketRate||'--';
+    r.priceNational=r.priceNational||lp.domestic||r.marketRate||'--';
+    r.priceExport=r.priceExport||lp.dubai||'--';
+    const mn=function(s){return parseInt((s||'0').replace(/[^0-9]/g,''))||0;};
+    r.priceMin=r.priceMin||mn(lp.domestic);
+    r.priceMax=r.priceMax||mn(lp.dubai);
+  } else if(r.marketRate&&!r.priceLocal){
+    r.priceLocal=r.marketRate; r.priceNational=r.marketRate; r.priceExport='--';
+    const nums=r.marketRate.match(/[0-9][0-9,]*/g);
+    if(nums){r.priceMin=parseInt(nums[0].replace(/,/g,''))||0;r.priceMax=parseInt((nums[1]||nums[0]).replace(/,/g,''))||0;}
+  }
+  if(!r.priceLocal&&r.estimatedRevenue) r.priceLocal=r.estimatedRevenue;
+  // routes
+  if(!r.routes||!r.routes.length){
+    if(lp) r.routes=[{market:'Local APMC',price:lp.domestic||r.marketRate,std:'AGMARKNET'},{market:'eNAM',price:lp.domestic,std:'eNAM'},{market:'UAE/Dubai',price:lp.dubai||'--',std:'APEDA'},{market:'Germany',price:lp.eu||'--',std:'EU Reg 543/2011'},{market:'USA',price:lp.usda||'--',std:'USDA AMS'}];
+    else if(r.marketRate) r.routes=[{market:'Local APMC',price:r.marketRate,std:'AGMARKNET'},{market:'eNAM',price:r.marketRate,std:'eNAM'}];
+  }
+  // aliases
+  r.gradeMsg=r.gradeMsg||r.aiRemark||r.expertTip||'';
+  r.aiNote=r.aiNote||r.aiRemark||'';
+  r.gradeMsgNote=r.gradeMsgNote||r.aiRemark||'';
+  r.actionLabel=r.actionLabel||(r.bestAction==='sell_now'?t('sellNow'):r.bestAction==='store_wait'?t('store'):t('process'));
+  r.shelf=r.shelf||r.shelfLife||'--';
+  r.params=r.params||r.parameters||[];
+  r.farmer=r.farmer||r.farmerName||S.user?.name||'--';
+  // gps normalize
+  if(r.gps&&typeof r.gps==='object'){
+    r.gps=r.gps.lat&&r.gps.lon?r.gps.lat+'N '+r.gps.lon+'E':(S.gps?S.gps.lat+'N '+S.gps.lon+'E':'--');
+  }
+  // AI native lang
+  r.aiLang=r.aiRemarkNative||'';
+  const lang=S.lang||'en';
+  if(lang==='kn') r.aiKn=r.aiRemarkNative||r.aiRemark||'';
+  else if(lang==='hi') r.aiHi=r.aiRemarkNative||r.aiRemark||'';
+  r.recommendations=r.recommendations||(r.expertTip?[{icon:'...',title:'Expert Tip',text:r.expertTip}]:[]);
+  return r;
+}
+
 async function confirmGrade(){
   const produce=document.getElementById('det-prod').textContent;
   document.getElementById('det-res').style.display='none';
@@ -2088,10 +2142,10 @@ async function confirmGrade(){
     const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:S.capturedImage?.split(',')[1],produce,gps:S.gps,lang:S.user?.lang||'en',hasLiDAR:S.hasLiDAR,farmerName:S.user?.name||'Farmer',qty:1,unit:'qtl',sector:S.user?.segments?.[0]||'agri'})});
     const report=await r.json();
     document.getElementById('scan-load').style.display='none';
-    S.currentReport=report; S.history.unshift(report); save(); nav('report');
+    S.currentReport=normalizeReport(report); S.history.unshift(S.currentReport); save(); nav('report');
   }catch(e){
     document.getElementById('scan-load').style.display='none';
-    S.currentReport=buildDemo(produce); S.history.unshift(S.currentReport); save(); nav('report');
+    S.currentReport=normalizeReport(buildDemo(produce)); S.history.unshift(S.currentReport); save(); nav('report');
   }
 }
 function newScan(){S.capturedImage=null;S.currentReport=null;S._pendingId=null;const vi=document.getElementById('vf-img');if(vi){vi.src='';vi.style.display='none';}const vp=document.getElementById('vf-ph');if(vp)vp.style.display='flex';['vf-retake','vf-det','det-res','scan-load'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});nav('scan');}
@@ -2686,6 +2740,14 @@ window.addEventListener('DOMContentLoaded',()=>{
 // // REAL DG CERTIFICATE — Dynamic version of dgport_cert_a4_v3-2
 // ══════════════════════════════════════════════════════════════
 
+
+
+async function generateCertPNG(r){
+  const canvas = await drawDGCertificate(r, S.capturedImage||null);
+  const dataURL = canvas.toDataURL('image/png');
+  const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
+  return {blob, dataURL};
+}
 
 async function shareCertAsPNG(pkg, channel, ev) {
   if (ev) ev.stopPropagation();
@@ -3448,6 +3510,14 @@ async function loadCertFonts() {
 }
 
 // ── MAIN EXPORT FUNCTIONS ────────────────────────────────────────
+
+
+async function generateCertPNG(r){
+  const canvas = await drawDGCertificate(r, S.capturedImage||null);
+  const dataURL = canvas.toDataURL('image/png');
+  const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
+  return {blob, dataURL};
+}
 
 async function shareCertAsPNG(pkg, channel, ev) {
   if (ev) ev.stopPropagation();
