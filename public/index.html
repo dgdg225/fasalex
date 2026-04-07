@@ -300,7 +300,7 @@ select option{background:#112214;color:#fff}
           <div class="fc-origin" data-i18n="fasalOrigin">From Arabic فصل (faṣl) — season, chapter. Every Indian farmer knows this word.</div>
         </div>
 
-        <div style="margin:10px 0 4px;font-size:10px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Choose Your Language</div>
+        <div style="margin:10px 0 4px;font-size:10px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,.5);text-transform:uppercase" data-i18n="chooseLanguage">Choose Your Language</div>
         <div class="lang-picker" id="lp">
           <button class="lp-btn sel" onclick="setLang('en',this)">English</button>
           <button class="lp-btn" onclick="setLang('kn',this)">ಕನ್ನಡ</button>
@@ -1997,6 +1997,7 @@ function nav(pg){
   document.getElementById('nv-'+pg)?.classList.add('active');
   if(pg==='report'&&S.currentReport){ renderReport(); setTimeout(()=>{ const cs=document.getElementById('cert-summary-block'); if(cs&&S.lang&&S.lang!=='en') cs.innerHTML=renderCertSummary(S.currentReport); },100); }
   if(pg==='share') renderShare();
+  if(typeof applyLang==='function') applyLang();
 }
 
 // ══════════════════════════════════════════
@@ -2066,7 +2067,7 @@ async function identifyProduce(dataURL){
   try{
     const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:dataURL.split(',')[1],sector:S.user?.segments?.[0]||'agri'})});
     const d=await r.json();
-    showDetect(d.produce||'Unknown',d.confidence||85,(d.tag||d.sector||'agri').toUpperCase(),d.tag==='pulse'?'🫘':d.tag==='grain'?'🌾':d.tag==='veggie'?'🥦':d.tag==='fruit'?'🍎':d.tag==='seafood'?'🐟':'🌾');
+    showDetect(d.produce||'Unknown',d.confidence||85,(d.tag||d.sector||'AGRI').toUpperCase(),d.tag==='pulse'?'🫘':d.tag==='grain'?'🌾':d.tag==='veggie'?'🥦':d.tag==='fruit'?'🍎':d.tag==='seafood'?'🐟':'🌾');
   }catch(e){ showDetect('Moong (Whole)',92,'PULSE','🫘'); }
 }
 function showDetect(prod,conf,seg,em){
@@ -2083,16 +2084,11 @@ function showDetect(prod,conf,seg,em){
 function normalizeReport(r){
   if(!r||r._norm) return r;
   r._norm=true;
-  // certId
   if(!r.certId) r.certId='DG-'+Math.random().toString(16).slice(2,6).toUpperCase()+'-'+Math.random().toString(16).slice(2,6).toUpperCase();
-  // grain size
   if(!r.grainSize&&r.size_measurements?.avg_unit_size_mm) r.grainSize=r.size_measurements.avg_unit_size_mm;
   if(!r.avgGrainSizeMm&&r.grainSize) r.avgGrainSizeMm=parseFloat(r.grainSize)||0;
-  // zAxis
   if(!r.zAxisMm&&r.ref_object?.grain_mm_calibrated){r.zAxisMm=r.ref_object.grain_mm_calibrated;r.zMethod=r.ref_object.method||'visual';}
-  // grade pct
   if(!r.pct&&r.grades) r.pct={A:r.grades.A?.pct||0,B:r.grades.B?.pct||0,C:r.grades.C?.pct||0,D:r.grades.D?.pct||0};
-  // prices
   const lp=r._livePrices;
   if(lp){
     r.priceLocal=r.priceLocal||lp.domestic||r.marketRate||'--';
@@ -2102,17 +2098,15 @@ function normalizeReport(r){
     r.priceMin=r.priceMin||mn(lp.domestic);
     r.priceMax=r.priceMax||mn(lp.dubai);
   } else if(r.marketRate&&!r.priceLocal){
-    r.priceLocal=r.marketRate; r.priceNational=r.marketRate; r.priceExport='--';
+    r.priceLocal=r.marketRate;r.priceNational=r.marketRate;r.priceExport='--';
     const nums=r.marketRate.match(/[0-9][0-9,]*/g);
     if(nums){r.priceMin=parseInt(nums[0].replace(/,/g,''))||0;r.priceMax=parseInt((nums[1]||nums[0]).replace(/,/g,''))||0;}
   }
   if(!r.priceLocal&&r.estimatedRevenue) r.priceLocal=r.estimatedRevenue;
-  // routes
   if(!r.routes||!r.routes.length){
     if(lp) r.routes=[{market:'Local APMC',price:lp.domestic||r.marketRate,std:'AGMARKNET'},{market:'eNAM',price:lp.domestic,std:'eNAM'},{market:'UAE/Dubai',price:lp.dubai||'--',std:'APEDA'},{market:'Germany',price:lp.eu||'--',std:'EU Reg 543/2011'},{market:'USA',price:lp.usda||'--',std:'USDA AMS'}];
     else if(r.marketRate) r.routes=[{market:'Local APMC',price:r.marketRate,std:'AGMARKNET'},{market:'eNAM',price:r.marketRate,std:'eNAM'}];
   }
-  // aliases
   r.gradeMsg=r.gradeMsg||r.aiRemark||r.expertTip||'';
   r.aiNote=r.aiNote||r.aiRemark||'';
   r.gradeMsgNote=r.gradeMsgNote||r.aiRemark||'';
@@ -2120,16 +2114,12 @@ function normalizeReport(r){
   r.shelf=r.shelf||r.shelfLife||'--';
   r.params=r.params||r.parameters||[];
   r.farmer=r.farmer||r.farmerName||S.user?.name||'--';
-  // gps normalize
-  if(r.gps&&typeof r.gps==='object'){
-    r.gps=r.gps.lat&&r.gps.lon?r.gps.lat+'N '+r.gps.lon+'E':(S.gps?S.gps.lat+'N '+S.gps.lon+'E':'--');
-  }
-  // AI native lang
+  if(r.gps&&typeof r.gps==='object'){r.gps=r.gps.lat&&r.gps.lon?r.gps.lat+'N '+r.gps.lon+'E':(S.gps?S.gps.lat+'N '+S.gps.lon+'E':'--');}
   r.aiLang=r.aiRemarkNative||'';
   const lang=S.lang||'en';
   if(lang==='kn') r.aiKn=r.aiRemarkNative||r.aiRemark||'';
   else if(lang==='hi') r.aiHi=r.aiRemarkNative||r.aiRemark||'';
-  r.recommendations=r.recommendations||(r.expertTip?[{icon:'...',title:'Expert Tip',text:r.expertTip}]:[]);
+  r.recommendations=r.recommendations||(r.expertTip?[{icon:'💡',title:'Expert Tip',text:r.expertTip}]:[]);
   return r;
 }
 
@@ -2743,10 +2733,10 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 
 async function generateCertPNG(r){
-  const canvas = await drawDGCertificate(r, S.capturedImage||null);
-  const dataURL = canvas.toDataURL('image/png');
-  const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
-  return {blob, dataURL};
+  const canvas=await drawDGCertificate(r,S.capturedImage||null);
+  const dataURL=canvas.toDataURL('image/png');
+  const blob=await new Promise(res=>canvas.toBlob(res,'image/png'));
+  return {blob,dataURL};
 }
 
 async function shareCertAsPNG(pkg, channel, ev) {
@@ -3513,10 +3503,10 @@ async function loadCertFonts() {
 
 
 async function generateCertPNG(r){
-  const canvas = await drawDGCertificate(r, S.capturedImage||null);
-  const dataURL = canvas.toDataURL('image/png');
-  const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
-  return {blob, dataURL};
+  const canvas=await drawDGCertificate(r,S.capturedImage||null);
+  const dataURL=canvas.toDataURL('image/png');
+  const blob=await new Promise(res=>canvas.toBlob(res,'image/png'));
+  return {blob,dataURL};
 }
 
 async function shareCertAsPNG(pkg, channel, ev) {
