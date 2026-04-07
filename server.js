@@ -566,21 +566,32 @@ async function handleIdentify(req, res) {
       role: 'user',
       content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
-        { type: 'text', text: `You are DeepGazerAI, an expert agricultural produce identification system.
+        { type: 'text', text: `You are DeepGazerAI, an expert agricultural produce identification system for Indian farming.
 
-Identify this produce image precisely.
+Carefully examine this image and identify the produce.
 Sector hint: ${sector||'agri'}
+
+IMPORTANT IDENTIFICATION RULES:
+- Look at colour, shape, size, texture, surface carefully
+- Ragi = small dark brown/black round grains (~1.5mm)
+- Jowar = large cream/white round grains (~4mm)
+- Bajra = small grey/cream oval grains (~3mm)
+- Moong = small green oval grains (~4mm)
+- Soybean = round cream/yellow grains (~6mm)
+- Wheat = golden elongated grains (~6mm)
+- Do NOT guess — if unsure, say so in description
+- Return the MOST SPECIFIC local Indian name possible
 
 Respond ONLY with valid JSON (no markdown, no extra text):
 {
-  "produce": "exact produce name matching: Wheat / Rice / Paddy / Maize / Moong (Whole) / Moong Dal / Toor Dal / Chana Dal / Soybean / Groundnut / Tomato / Onion / Potato / Chilli / Turmeric / Ginger / Mango / Banana / Grapes / Tiger Prawn / Rohu / Pomfret / Cow Milk / Buffalo Milk / Paneer / Ghee (Cow) / or closest match",
+  "produce": "Specific Indian produce name — e.g. Ragi / Jowar / Bajra / Wheat / Rice / Paddy / Maize / Moong (Whole) / Moong Dal / Toor Dal / Chana Dal / Urad Dal / Masoor Dal / Horse Gram / Rajma / Soybean / Groundnut / Mustard Seeds / Sesame / Sunflower / Castor / Cotton / Turmeric / Chilli / Ginger / Garlic / Coriander / Cumin / Tomato / Onion / Potato / Brinjal / Okra / Cabbage / Cauliflower / Mango / Banana / Grapes / Pomegranate / Papaya / Sapota / Arecanut / Cashew / Coconut / Tiger Prawn / Rohu / Pomfret / Hilsa / Mackerel / Cow Milk / Buffalo Milk / Paneer / Ghee (Cow) / or exact name if known",
   "sector": "agri|dairy|fish",
-  "tag": "grain|pulse|oilseed|veggie|fruit|spice|liquid|seafood",
+  "tag": "grain|pulse|oilseed|veggie|fruit|spice|nut|fiber|liquid|seafood",
   "confidence": 85,
-  "description": "1 sentence: colour, texture, visible quality",
-  "size_spec": "typical size range e.g. 4-6mm diameter / 60-80mm length",
+  "description": "1 sentence: exact colour, texture, size, visible quality",
+  "size_spec": "typical size range e.g. 4-6mm diameter",
   "agmark_grade_hint": "A|B|C based on visible quality",
-  "reference_objects_detected": ["list any ISO/IEC/BIS objects visible: SIM card / ruler / battery / A4 paper / ID card / none"]
+  "reference_objects_detected": ["list any ISO/IEC/BIS objects visible: bank card / SIM card / ruler / battery / A4 paper / none"]
 }` },
       ],
     }], 400);
