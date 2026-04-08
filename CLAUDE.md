@@ -19,6 +19,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - After every session, append new entries to `EXHIBIT_LOG.md` (patent evidence log)
 - Both files live in the repo root
 
+## Server-Side Only Files (never in GitHub repo)
+- `exhibits.jsonl` — lives at `/app/exhibits.jsonl` on Railway server, created automatically on first scan. NEVER commit or create this file in the repo.
+- `price_cache.json` — runtime cache, already in `.gitignore`
+
 ## API & Model Rules
 - Use `claude-haiku-4-5-20251001` for ALL Claude API calls in server.js (not Sonnet, not Opus)
 - CERT_SCALE = 1 (do not change canvas certificate scale)
