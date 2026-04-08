@@ -2,6 +2,27 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Deployment Rules
+- NEVER create new Railway projects
+- NEVER run railway CLI commands
+- Deployment = `git add` + `git commit` + `git push origin main`
+- Railway auto-deploys from GitHub push to `dgdg225/fasalex`
+
+## Project
+- Railway project: brave-success
+- Service: farex-server
+- URL: www.fasalex.com
+- GitHub: dgdg225/fasalex
+
+## Session Rules
+- After every session, auto-update `CONTINUITY.md` with a summary of changes made
+- After every session, append new entries to `EXHIBIT_LOG.md` (patent evidence log)
+- Both files live in the repo root
+
+## API & Model Rules
+- Use `claude-haiku-4-5-20251001` for ALL Claude API calls in server.js (not Sonnet, not Opus)
+- CERT_SCALE = 1 (do not change canvas certificate scale)
+
 ## Project Overview
 
 **FasalEx** (FarEX) is a single-page web app for AI-powered agricultural produce grading and market pricing. It uses Claude's vision API to analyze produce images against AGMARK standards and enriches results with live commodity prices.
@@ -18,7 +39,7 @@ export ANTHROPIC_API_KEY=sk-ant-api03-...
 npm start
 ```
 
-The server starts on port 3000 (override with `PORT` env var). Access from phone on same WiFi via `http://<local-ip>:3000`.
+The server starts on port 8080 (override with `PORT` env var). Access from phone on same WiFi via `http://<local-ip>:8080`.
 
 Optional env vars:
 - `REFRESH_SECRET` — secret for `/api/refresh-prices` endpoint (default: `fasalex2026`)
@@ -45,14 +66,14 @@ There are no tests, no build step, and no bundler — the app runs directly.
 
 ## Key Implementation Details
 
-- **Claude model used:** `claude-sonnet-4-20250514` with 40-second timeout
+- **Claude model used:** `claude-haiku-4-5-20251001` (Haiku for all API calls)
 - **AGMARK grading data** is hardcoded in `server.js` (object `AGMARK_SRV`, ~lines 284–303) for 20+ commodities
 - **Static price fallbacks** are hardcoded in `server.js` (`STATIC_FALLBACK`, ~lines 310–330) for when external APIs are unavailable
 - **K-calibration:** Patent-pending formula `K = D_known/D_px` for size measurement using reference objects (credit card, SIM packet, ruler, etc.)
 - **Price cache** is written to `price_cache.json` at runtime and auto-refreshed daily at 06:00 IST
 - **GPS fallback** is Hospet, Karnataka (15.2624°N, 76.3823°E)
 - Images are base64-encoded and sent directly to the Claude API; no file storage
-- Certificate generation uses the Canvas API and downloads as PNG
+- Certificate generation uses the Canvas API (CERT_SCALE=1) and downloads as PNG
 
 ## Adding or Changing Features
 
