@@ -4,6 +4,9 @@
 ---
 
 ## SESSION: 2026-04-08
+**Started:** 2026-04-08 (morning IST)
+**Closed:** 2026-04-08 21:48 IST
+**Last commit:** e2c0a06 · pushed to dgdg225/fasalex main
 
 ### Summary
 Full audit, fix, and hardening session. App deployed to Railway (brave-success / farex-server) at www.fasalex.com.
@@ -25,7 +28,7 @@ Full audit, fix, and hardening session. App deployed to Railway (brave-success /
 
 ### Deployment State
 - **Repo:** dgdg225/fasalex · branch: main
-- **Latest commit:** 93dc233
+- **Latest commit:** e2c0a06 (2026-04-08 21:48 IST)
 - **Railway project:** brave-success · service: farex-server
 - **URL:** www.fasalex.com
 - **Auto-deploy:** on every push to main
@@ -37,11 +40,10 @@ Full audit, fix, and hardening session. App deployed to Railway (brave-success /
 - `/api/prices` endpoint exists in server but frontend never calls it (market page uses static fallback data)
 
 ### Architecture Reminder
-- `server.js` — pure Node.js HTTP server, no Express used despite being in package.json
+- `server.js` — Express server (273 lines), uses `@anthropic-ai/sdk`, both endpoints use Haiku
 - `public/index.html` — 3500+ line SPA, all state in global `S`, persisted to localStorage key `fx10`
-- Two Claude API functions: `callClaude()` and `callHaiku()` — both now use Haiku model
 - CERT_SCALE=1 (do not change)
 
 ---
 
-*Log auto-updated per CLAUDE.md session rules.*
+*Log last updated: 2026-04-08 21:48 IST · auto-updated per CLAUDE.md session rules.*
