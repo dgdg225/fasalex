@@ -98,7 +98,9 @@ app.post('/api/identify', async (req, res) => {
 
   const { imageBase64: rawImg, sector } = req.body;
   if (!rawImg) return res.json({ produce:'Unknown', sector:'agri', confidence:0 });
-  // Strip data URL prefix if frontend accidentally included it
+  // Detect media type from prefix, then strip it — default to image/jpeg
+  const mimeMatch = rawImg.match(/^data:(image\/\w+);base64,/);
+  const mediaType = (mimeMatch && mimeMatch[1]) || 'image/jpeg';
   const imageBase64 = rawImg.replace(/^data:image\/\w+;base64,/, '');
 
   try {
@@ -109,7 +111,7 @@ app.post('/api/identify', async (req, res) => {
       messages: [{
         role: 'user',
         content: [
-          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
           { type: 'text',  text: `Identify the agricultural produce in this image. Sector hint: ${sector||'agri'}.
 Return ONLY valid JSON (no markdown):
 {"produce":"<name>","sector":"agri|dairy|fish","confidence":<0-100>,"notes":"<one line>"}` }

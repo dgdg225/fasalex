@@ -2074,12 +2074,29 @@ async function onImg(ev){
   reader.readAsDataURL(file);
   ev.target.value='';
 }
+async function toJpegBase64(dataURL){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=function(){
+      const MAX=1024;
+      let w=img.width,h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+      const cv=document.createElement('canvas');
+      cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      res(cv.toDataURL('image/jpeg',0.85).split(',')[1]);
+    };
+    img.onerror=function(){res(dataURL.split(',')[1]);};
+    img.src=dataURL;
+  });
+}
 async function identifyProduce(dataURL){
   document.getElementById('scan-load').style.display='block';
   document.getElementById('load-txt').textContent='Identifying produce...';
   document.getElementById('det-res').style.display='none';
   try{
-    const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:dataURL.split(',')[1],sector:S.user?.segments?.[0]||'agri'})});
+    const imageBase64=await toJpegBase64(dataURL);
+    const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64,sector:S.user?.segments?.[0]||'agri'})});
     const d=await r.json();
     if(!r.ok||d.error) throw new Error(d.error||'Server error '+r.status);
     showDetect(d.produce||'Unknown',d.confidence||85,(d.tag||d.sector||'agri').toUpperCase(),d.tag==='pulse'?'🫘':d.tag==='grain'?'🌾':d.tag==='veggie'?'🥦':d.tag==='fruit'?'🍎':d.tag==='spice'?'🌶️':d.tag==='seafood'?'🐟':d.tag==='dairy'?'🥛':'🌾',d.description||'');
