@@ -484,7 +484,7 @@ select option{background:#112214;color:#fff}
     <!-- Language -->
     <div class="field">
       <label data-i18n="language">Preferred Language</label>
-      <select id="r-lang">
+      <select id="r-lang" onchange="setLang(this.value,null)">
         <option value="en">🇬🇧 English</option>
         <option value="kn">🇮🇳 ಕನ್ನಡ Kannada</option>
         <option value="hi">🇮🇳 हिन्दी Hindi</option>
@@ -730,7 +730,7 @@ select option{background:#112214;color:#fff}
       </div>
       <div id="det-desc" style="display:none;margin-top:8px;font-size:12px;color:var(--dim);line-height:1.5;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:10px"></div>
       <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="btn btn-gold f1" style="padding:12px" onclick="confirmGrade()" data-i18n="confirmGradeBtn">✓ Confirm & Grade →</button>
+        <button class="btn btn-gold f1" style="padding:12px" onclick="confirmGrade()" data-i18n="confirm">✓ Confirm & Grade →</button>
         <button class="btn btn-ghost" style="padding:12px;width:auto" onclick="editProd()">✏️</button>
       </div>
     </div>
@@ -1982,8 +1982,11 @@ function verifyOTP(){
     port:document.getElementById('r-port')?.value||'',
     registered: new Date().toISOString(),
   };
+  S.lang = S.user.lang || 'en';
+  document.body.dir = RTL_LANGS.includes(S.lang) ? 'rtl' : 'ltr';
   save();
   refreshHomeProfile();
+  applyLang();
   toast('✓ Welcome, '+S.user.name+'! 🎉');
   setTimeout(()=>{ nav('home'); document.getElementById('nav').style.display='flex'; }, 500);
 }
@@ -2235,8 +2238,8 @@ function renderReport(){
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)">
       <div style="text-align:center"><div class="caption" data-i18n="shelf">SHELF</div><div style="font-weight:700;font-size:11px;margin-top:2px">${r.shelfLife}</div></div>
-      <div style="text-align:center;border-left:1px solid rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.06)"><div class="caption">REVENUE</div><div style="font-weight:700;font-size:11px;margin-top:2px;color:var(--gold)">${r.estimatedRevenue}</div></div>
-      <div style="text-align:center"><div class="caption">MARKET</div><div style="font-weight:700;font-size:11px;margin-top:2px;color:var(--mint)">${r.marketRate}</div></div>
+      <div style="text-align:center;border-left:1px solid rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.06)"><div class="caption">${t('revenue').toUpperCase()}</div><div style="font-weight:700;font-size:11px;margin-top:2px;color:var(--gold)">${r.estimatedRevenue}</div></div>
+      <div style="text-align:center"><div class="caption">${t('marketRate').toUpperCase()}</div><div style="font-weight:700;font-size:11px;margin-top:2px;color:var(--mint)">${r.marketRate}</div></div>
     </div>
   </div>
 
@@ -2464,7 +2467,7 @@ function renderShare(){
     shImg.src=S.capturedImage;
     shImgWrap.style.display='block';
   }
-  document.getElementById('sh-cert').textContent='Cert: '+r.certId;
+  document.getElementById('sh-cert').textContent=t('certId')+': '+r.certId;
   const gc2=document.getElementById('sh-gc');
   gc2.textContent=g; gc2.style.color=c; gc2.style.borderColor=c+'44'; gc2.style.background=c+'12'; gc2.style.border='2px solid '+c+'44';
   document.getElementById('sh-mkt').textContent=r.marketRate;
@@ -2700,6 +2703,9 @@ function applyLang(){
   // Re-render report if visible
   const _rp=document.getElementById('page-report');
   if(_rp&&_rp.classList.contains('active')&&S.currentReport) setTimeout(()=>renderReport(),50);
+  // Re-render share page if visible
+  const _sp=document.getElementById('page-share');
+  if(_sp&&_sp.classList.contains('active')&&S.currentReport) setTimeout(()=>renderShare(),50);
 }
 const PH=[['Moong','₹8,800','+0.4%',true],['Wheat','₹2,180','+1.2%',true],['Rice A','₹3,640','+2.8%',true],['Onion','₹890','+0.7%',true],['Tomato','₹1,420','-5.3%',false]];
 const PM=[['Moong','₹8,800','+0.4%',true],['Wheat','₹2,180','+1.2%',true],['Rice A','₹3,640','+2.8%',true],['Chana','₹5,200','-0.8%',false],['Toor Dal','₹7,600','+1.5%',true],['Onion','₹890','+0.7%',true],['Tomato','₹1,420','-5.3%',false],['Buffalo Milk','₹66/L','+0.3%',true],['Tiger Prawn','₹620/kg','+3.1%',true]];
