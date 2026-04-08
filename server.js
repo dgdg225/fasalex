@@ -568,30 +568,27 @@ async function handleIdentify(req, res) {
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
         { type: 'text', text: `You are DeepGazerAI, an expert agricultural produce identification system for Indian farming.
 
-Carefully examine this image and identify the produce.
+Examine this image carefully and identify WHATEVER agricultural produce is shown — grains, pulses, vegetables, fruits, spices, oilseeds, dairy, seafood, or any other farm produce. Do not limit yourself to any predefined list.
+
 Sector hint: ${sector||'agri'}
 
-IMPORTANT IDENTIFICATION RULES:
-- Look at colour, shape, size, texture, surface carefully
-- Ragi = small dark brown/black round grains (~1.5mm)
-- Jowar = large cream/white round grains (~4mm)
-- Bajra = small grey/cream oval grains (~3mm)
-- Moong = small green oval grains (~4mm)
-- Soybean = round cream/yellow grains (~6mm)
-- Wheat = golden elongated grains (~6mm)
-- Do NOT guess — if unsure, say so in description
-- Return the MOST SPECIFIC local Indian name possible
+IDENTIFICATION RULES:
+- Analyse colour, shape, size, texture, surface pattern, and any visible quality markers
+- Use the most specific local Indian name (e.g. "Toor Dal" not just "Dal", "Cherry Tomato" not just "Tomato")
+- If multiple produce are visible, identify the dominant one
+- If the image is unclear or not agricultural produce, set confidence below 50 and explain in description
+- Never guess blindly — reflect uncertainty in confidence score and description
 
 Respond ONLY with valid JSON (no markdown, no extra text):
 {
-  "produce": "Specific Indian produce name — e.g. Ragi / Jowar / Bajra / Wheat / Rice / Paddy / Maize / Moong (Whole) / Moong Dal / Toor Dal / Chana Dal / Urad Dal / Masoor Dal / Horse Gram / Rajma / Soybean / Groundnut / Mustard Seeds / Sesame / Sunflower / Castor / Cotton / Turmeric / Chilli / Ginger / Garlic / Coriander / Cumin / Tomato / Onion / Potato / Brinjal / Okra / Cabbage / Cauliflower / Mango / Banana / Grapes / Pomegranate / Papaya / Sapota / Arecanut / Cashew / Coconut / Tiger Prawn / Rohu / Pomfret / Hilsa / Mackerel / Cow Milk / Buffalo Milk / Paneer / Ghee (Cow) / or exact name if known",
+  "produce": "Most specific Indian name for what you see in the image",
   "sector": "agri|dairy|fish",
   "tag": "grain|pulse|oilseed|veggie|fruit|spice|nut|fiber|liquid|seafood",
-  "confidence": 85,
-  "description": "1 sentence: exact colour, texture, size, visible quality",
-  "size_spec": "typical size range e.g. 4-6mm diameter",
-  "agmark_grade_hint": "A|B|C based on visible quality",
-  "reference_objects_detected": ["list any ISO/IEC/BIS objects visible: bank card / SIM card / ruler / battery / A4 paper / none"]
+  "confidence": 0-100,
+  "description": "1-2 sentences: colour, texture, size, visible quality indicators",
+  "size_spec": "typical size range e.g. 4-6mm diameter, or N/A",
+  "agmark_grade_hint": "A|B|C based on visible quality, or N/A",
+  "reference_objects_detected": ["any visible reference objects: bank card / SIM card / ruler / battery / A4 paper / none"]
 }` },
       ],
     }], 400);

@@ -114,6 +114,8 @@ select option{background:#112214;color:#fff}
 .scanline{position:absolute;left:14px;right:14px;height:2px;background:linear-gradient(90deg,transparent,var(--mint),transparent);animation:sl 2.5s ease-in-out infinite}
 @keyframes sl{0%,100%{top:14px;opacity:0}10%{opacity:1}90%{opacity:1}90%{top:calc(75% - 2px)}}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes confFill{from{width:0}to{width:var(--conf-w)}}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
 
 /* PRICE GAP */
 .gap-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.08);position:relative;margin:8px 0}
@@ -717,14 +719,16 @@ select option{background:#112214;color:#fff}
     <div id="scan-info" style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,.04);border-radius:12px;font-size:11px;color:var(--dim);text-align:center" data-i18n="betterLight">📍 GPS auto-stamped · 🔒 AI encrypted · ✨ Better light = better grade</div>
     <!-- Detect result -->
     <div id="det-res" style="display:none;margin-top:12px" class="card-green">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mint);margin-bottom:4px">🤖 AI AUTO-DETECTED</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--mint);margin-bottom:6px">🤖 AI AUTO-DETECTED</div>
       <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
+        <div style="flex:1;min-width:0">
           <div style="font-family:var(--ff);font-size:22px;font-weight:700" id="det-prod">Moong (Whole)</div>
-          <div style="font-size:12px;color:var(--dim)">Confidence: <span id="det-conf" style="color:var(--gold);font-weight:700">92%</span> · <span id="det-seg">PULSE</span></div>
+          <div style="font-size:12px;color:var(--dim);margin-top:2px">Confidence: <span id="det-conf" style="color:var(--gold);font-weight:700">92%</span> · <span id="det-seg">PULSE</span></div>
+          <div style="margin-top:6px;height:5px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden"><div id="det-conf-bar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--mint),var(--gold));width:0;transition:width .8s cubic-bezier(.4,0,.2,1)"></div></div>
         </div>
-        <div style="font-size:36px" id="det-emoji">🫘</div>
+        <div style="font-size:36px;margin-left:12px" id="det-emoji">🫘</div>
       </div>
+      <div id="det-desc" style="display:none;margin-top:8px;font-size:12px;color:var(--dim);line-height:1.5;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:10px"></div>
       <div style="display:flex;gap:8px;margin-top:12px">
         <button class="btn btn-gold f1" style="padding:12px" onclick="confirmGrade()" data-i18n="confirmGradeBtn">✓ Confirm & Grade →</button>
         <button class="btn btn-ghost" style="padding:12px;width:auto" onclick="editProd()">✏️</button>
@@ -843,7 +847,7 @@ select option{background:#112214;color:#fff}
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-wa btn-sm f1" onclick="shareCertAsPNG('local','wa',event)">📲 WhatsApp</button>
-        <button class="btn btn-ghost btn-sm f1" onclick="sharePkg('local','sms',event)">💬 SMS</button>
+        <button class="btn btn-ghost btn-sm f1" onclick="toast('Share failed — please try again')">💬 SMS</button>
         <button class="btn btn-ghost btn-sm" onclick="addContact('local',event)" style="padding:9px 12px">➕</button>
       </div>
     </div>
@@ -866,7 +870,7 @@ select option{background:#112214;color:#fff}
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px" data-i18n="sendsNational">Sends: Grade · AGMARK compliance · Moisture · Grain size · eNAM price</div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-wa btn-sm f1" onclick="shareCertAsPNG('national','wa',event)">📲 WhatsApp</button>
-        <button class="btn btn-ghost btn-sm f1" onclick="sharePkg('national','email',event)">📧 Email</button>
+        <button class="btn btn-ghost btn-sm f1" onclick="toast('Share failed — please try again')">📧 Email</button>
         <button class="btn btn-ghost btn-sm" onclick="addContact('national',event)" style="padding:9px 12px">➕</button>
       </div>
     </div>
@@ -889,7 +893,7 @@ select option{background:#112214;color:#fff}
       <div style="font-size:11px;color:var(--dim);margin-bottom:10px" id="pk-exp-desc" data-i18n="sendsExport">Sends: Grade · EU/USDA compliance · Size mm · APEDA route · CIF price</div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-wa btn-sm f1" onclick="shareCertAsPNG('export','wa',event)">📲 WhatsApp</button>
-        <button class="btn btn-ghost btn-sm f1" onclick="sharePkg('export','email',event)">📧 Email</button>
+        <button class="btn btn-ghost btn-sm f1" onclick="toast('Share failed — please try again')">📧 Email</button>
         <button class="btn btn-ghost btn-sm" onclick="postPublic(event)" style="padding:9px 12px">🌐</button>
       </div>
     </div>
@@ -2071,16 +2075,24 @@ async function identifyProduce(dataURL){
   try{
     const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:dataURL.split(',')[1],sector:S.user?.segments?.[0]||'agri'})});
     const d=await r.json();
-    showDetect(d.produce||'Unknown',d.confidence||85,(d.tag||d.sector||'agri').toUpperCase(),d.tag==='pulse'?'🫘':d.tag==='grain'?'🌾':d.tag==='veggie'?'🥦':'🌾');
-  }catch(e){ showDetect('Unknown',0,'AGRI','🌾'); }
+    if(!r.ok||d.error) throw new Error(d.error||'Server error '+r.status);
+    showDetect(d.produce||'Unknown',d.confidence||85,(d.tag||d.sector||'agri').toUpperCase(),d.tag==='pulse'?'🫘':d.tag==='grain'?'🌾':d.tag==='veggie'?'🥦':d.tag==='fruit'?'🍎':d.tag==='spice'?'🌶️':d.tag==='seafood'?'🐟':d.tag==='dairy'?'🥛':'🌾',d.description||'');
+  }catch(e){ 
+    document.getElementById('scan-load').style.display='none';
+    toast('Detection failed: '+e.message);
+  }
 }
-function showDetect(prod,conf,seg,em){
+function showDetect(prod,conf,seg,em,desc){
   document.getElementById('scan-load').style.display='none';
   document.getElementById('vf-det').style.display='block';
   document.getElementById('det-prod').textContent=prod;
   document.getElementById('det-conf').textContent=conf+'%';
   document.getElementById('det-seg').textContent=seg;
   document.getElementById('det-emoji').textContent=em;
+  var bar=document.getElementById('det-conf-bar');
+  if(bar){ setTimeout(function(){bar.style.width=conf+'%';},50); }
+  var descEl=document.getElementById('det-desc');
+  if(descEl){ if(desc){descEl.textContent=desc;descEl.style.display='block';}else{descEl.style.display='none';} }
   document.getElementById('det-res').style.display='block';
   S._pendingId={produce:prod,confidence:conf};
 }
@@ -2720,38 +2732,6 @@ window.addEventListener('DOMContentLoaded',()=>{
 // ══════════════════════════════════════════════════════════════
 
 
-async function shareCertAsPNG(pkg, channel, ev) {
-  if (ev) ev.stopPropagation();
-  const r = S.currentReport;
-  if (!r) { alert('No report to share'); return; }
-  showToast('Generating DG Certificate...');
-  try {
-    const { blob, dataURL } = await generateCertPNG(r);
-    // Mobile Web Share API — shares as image file
-    if (navigator.share && navigator.canShare) {
-      const file = new File([blob], `DG-Certificate-${r.certId}.png`, { type: 'image/png' });
-      if (navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: `DG Certificate — ${r.produce}`,
-          text: `FasalEx · DeepGazerAI\nGrade: ${r.overallGrade} · ${r.produce}\nCert: ${r.certId}\nfasalex.com`,
-          files: [file]
-        });
-        showToast('Certificate shared! ✅');
-        return;
-      }
-    }
-    // Fallback: download
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'DG-'+r.certId+'.png';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 3000);
-    showToast('Certificate saved to phone ✅');
-  } catch(e) {
-    console.error('PNG share error:', e);
-    sharePkg(pkg, channel, ev);
-  }
-}
 
 
 
@@ -3488,7 +3468,7 @@ async function shareCertAsPNG(pkg, channel, ev) {
   if (ev) ev.stopPropagation();
   const r = S.currentReport;
   if (!r) { alert('No report'); return; }
-  showToast('Generating DG Certificate...');
+  toast('Generating DG Certificate...');
   try {
     const canvas = await drawDGCertificate(r, S.capturedImage||null);
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 0.92));
@@ -3496,7 +3476,7 @@ async function shareCertAsPNG(pkg, channel, ev) {
     // Try Web Share with file (Android Chrome 86+)
     if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
       await navigator.share({title:'DG Certificate — '+r.produce, files:[file]});
-      showToast('Certificate shared ✅');
+      toast('Certificate shared ✅');
       return;
     }
     // Fallback: download to phone (works on ALL Android browsers)
@@ -3508,10 +3488,10 @@ async function shareCertAsPNG(pkg, channel, ev) {
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 3000);
-    showToast('Certificate saved to phone ✅ — share from gallery');
+    toast('Certificate saved to phone ✅ — share from gallery');
   } catch(e) {
     console.error('Cert error:', e);
-    sharePkg(pkg, channel, ev);
+    toast('Share failed — please try again');
   }
 }
 
@@ -3519,7 +3499,7 @@ async function downloadCertPDF() {
   const r = S.currentReport;
   if (!r) { alert('No report to share'); return; }
 
-  showToast('Generating certificate...');
+  toast('Generating certificate...');
   try {
     const canvas = await drawDGCertificate(r, S.capturedImage);
     const dataURL = canvas.toDataURL('image/png');
@@ -3527,10 +3507,10 @@ async function downloadCertPDF() {
     a.href = dataURL;
     a.download = `DG-Certificate-${r.certId}.png`;
     a.click();
-    showToast('Certificate downloaded ✅');
+    toast('Certificate downloaded ✅');
   } catch(e) {
     console.error('Download error:', e);
-    showToast('Download failed');
+    toast('Download failed');
   }
 }
 
