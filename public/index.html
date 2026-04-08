@@ -2027,7 +2027,7 @@ function toast(msg){
 // ══════════════════════════════════════════
 // GPS
 // ══════════════════════════════════════════
-function getGPS(){ return new Promise(r=>{ navigator.geolocation?.getCurrentPosition(p=>{S.gps={lat:p.coords.latitude.toFixed(4),lon:p.coords.longitude.toFixed(4)};r(S.gps)},()=>{S.gps={lat:'15.2624',lon:'76.3823'};r(S.gps)},{timeout:5000,enableHighAccuracy:true}) || r(S.gps={lat:'15.2624',lon:'76.3823'}); }); }
+function getGPS(silent){ return new Promise(r=>{ if(!navigator.geolocation){S.gps={lat:'15.2624',lon:'76.3823'};if(!silent)toast('📍 GPS unavailable — using default location');r(S.gps);return;} navigator.geolocation.getCurrentPosition(p=>{S.gps={lat:p.coords.latitude.toFixed(4),lon:p.coords.longitude.toFixed(4)};r(S.gps)},()=>{S.gps={lat:'15.2624',lon:'76.3823'};if(!silent)toast('📍 GPS denied — using default location');r(S.gps)},{timeout:5000,enableHighAccuracy:true}); }); }
 
 // ══════════════════════════════════════════
 // DEVICE DETECT
@@ -2619,8 +2619,17 @@ function copyLink(){
 function sendAll(){
   const types=['local','national','export'].filter(t=>document.getElementById('pk-'+t)?.classList.contains('sel'));
   if(!types.length){ toast('Select at least one package'); return; }
-  types.forEach((t,i)=>setTimeout(()=>{ const txt=pkgText(t); window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank'); },i*700));
-  toast('📤 Sending '+types.length+' packages...');
+  const combined=types.map(t=>pkgText(t)).join('\n\n──────────────\n\n');
+  // navigator.share works on both Android & iOS without gesture/popup-blocker issues
+  if(navigator.share){
+    navigator.share({title:'FasalEx DG Certificate',text:combined})
+      .then(()=>toast('📤 Packages shared ✅'))
+      .catch(()=>{});
+    return;
+  }
+  // Fallback: single window.open in same gesture (no setTimeout — gesture intact)
+  window.open('https://wa.me/?text='+encodeURIComponent(combined),'_blank');
+  toast('📤 '+types.length+' package'+(types.length>1?'s':'')+' sent');
 }
 
 // ══════════════════════════════════════════
@@ -2722,7 +2731,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   load();
   detectDevice();
   onCountryChange();
-  getGPS().then(g=>{ if(g) document.getElementById('vf-gps').textContent=`📍 ${g.lat}°N ${g.lon}°E`; });
+  getGPS(true).then(g=>{ if(g) document.getElementById('vf-gps').textContent=`📍 ${g.lat}°N ${g.lon}°E`; });
   initWelcomeGrains();
   setTimeout(()=>{
     document.getElementById('page-splash').classList.remove('active');
