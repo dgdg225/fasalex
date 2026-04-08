@@ -449,6 +449,40 @@ function scheduleDailyRefresh() {
 //  ANTHROPIC API CALL
 // ═══════════════════════════════════════════════════════════════
 
+// Haiku — fast + cheap for identification (~$0.001/call)
+function callHaiku(messages, maxTokens = 400) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      messages,
+    });
+    const req = https.request({
+      hostname: 'api.anthropic.com',
+      path: '/v1/messages',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Length': Buffer.byteLength(body),
+      },
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch (e) { reject(e); }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(20000, () => { req.destroy(); reject(new Error('Haiku timeout')); });
+    req.write(body);
+    req.end();
+  });
+}
+
+// Sonnet — accurate for grading (~$0.04/call)
 function callClaude(messages, maxTokens = 1800) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({
@@ -562,33 +596,25 @@ async function handleIdentify(req, res) {
     const { imageBase64, sector } = await parseBody(req);
     if (!imageBase64) return sendJSON(res, 400, { error: 'imageBase64 required' });
 
-    const result = await callClaude([{
+    const result = await callHaiku([{
       role: 'user',
       content: [
         { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
-        { type: 'text', text: `You are DeepGazerAI, an expert agricultural produce identification system for Indian farming.
+        { type: 'text', text: `You are DeepGazerAI, an expert agricultural produce identification system.
 
-Examine this image carefully and identify WHATEVER agricultural produce is shown — grains, pulses, vegetables, fruits, spices, oilseeds, dairy, seafood, or any other farm produce. Do not limit yourself to any predefined list.
-
+Identify this produce image precisely.
 Sector hint: ${sector||'agri'}
-
-IDENTIFICATION RULES:
-- Analyse colour, shape, size, texture, surface pattern, and any visible quality markers
-- Use the most specific local Indian name (e.g. "Toor Dal" not just "Dal", "Cherry Tomato" not just "Tomato")
-- If multiple produce are visible, identify the dominant one
-- If the image is unclear or not agricultural produce, set confidence below 50 and explain in description
-- Never guess blindly — reflect uncertainty in confidence score and description
 
 Respond ONLY with valid JSON (no markdown, no extra text):
 {
-  "produce": "Most specific Indian name for what you see in the image",
+  "produce": "exact produce name matching: Wheat / Rice / Paddy / Maize / Moong (Whole) / Moong Dal / Toor Dal / Chana Dal / Soybean / Groundnut / Tomato / Onion / Potato / Chilli / Turmeric / Ginger / Mango / Banana / Grapes / Tiger Prawn / Rohu / Pomfret / Cow Milk / Buffalo Milk / Paneer / Ghee (Cow) / or closest match",
   "sector": "agri|dairy|fish",
-  "tag": "grain|pulse|oilseed|veggie|fruit|spice|nut|fiber|liquid|seafood",
-  "confidence": 0-100,
-  "description": "1-2 sentences: colour, texture, size, visible quality indicators",
-  "size_spec": "typical size range e.g. 4-6mm diameter, or N/A",
-  "agmark_grade_hint": "A|B|C based on visible quality, or N/A",
-  "reference_objects_detected": ["any visible reference objects: bank card / SIM card / ruler / battery / A4 paper / none"]
+  "tag": "grain|pulse|oilseed|veggie|fruit|spice|liquid|seafood",
+  "confidence": 85,
+  "description": "1 sentence: colour, texture, visible quality",
+  "size_spec": "typical size range e.g. 4-6mm diameter / 60-80mm length",
+  "agmark_grade_hint": "A|B|C based on visible quality",
+  "reference_objects_detected": ["list any ISO/IEC/BIS objects visible: SIM card / ruler / battery / A4 paper / ID card / none"]
 }` },
       ],
     }], 400);
@@ -857,7 +883,7 @@ const server = http.createServer(async (req, res) => {
 
 loadCacheFromDisk();
 
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, () => {
   console.log('');
   console.log('  🌿 FasalEx · DeepGazerAI');
   console.log('  ─────────────────────────────');
