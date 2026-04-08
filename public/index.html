@@ -905,7 +905,10 @@ select option{background:#112214;color:#fff}
       <div style="font-weight:600;font-size:13px;margin-bottom:4px">🔗 Public Certificate Link</div>
       <div class="caption" style="margin-bottom:10px" data-i18n="pubSub">Any buyer worldwide can find your batch</div>
       <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px;font-size:11px;color:var(--mint);font-family:monospace;margin-bottom:10px;word-break:break-all" id="pub-url">fasalex.com/cert/DG-XXXX-XXXX</div>
-      <button class="btn btn-mint" onclick="copyLink()">📋 Copy Public Link</button>
+      <div style="display:flex;gap:8px;margin-top:0">
+        <button class="btn btn-mint f1" onclick="copyLink()">📋 Copy Public Link</button>
+        <button class="btn btn-ghost" style="padding:12px 14px" onclick="downloadCertPDF()" title="Download Certificate PNG">⬇️</button>
+      </div>
     </div>
 
   </div>
@@ -2710,7 +2713,7 @@ function applyLang(){
 const PH=[['Moong','₹8,800','+0.4%',true],['Wheat','₹2,180','+1.2%',true],['Rice A','₹3,640','+2.8%',true],['Onion','₹890','+0.7%',true],['Tomato','₹1,420','-5.3%',false]];
 const PM=[['Moong','₹8,800','+0.4%',true],['Wheat','₹2,180','+1.2%',true],['Rice A','₹3,640','+2.8%',true],['Chana','₹5,200','-0.8%',false],['Toor Dal','₹7,600','+1.5%',true],['Onion','₹890','+0.7%',true],['Tomato','₹1,420','-5.3%',false],['Buffalo Milk','₹66/L','+0.3%',true],['Tiger Prawn','₹620/kg','+3.1%',true]];
 function renderPriceLists(){const hp=document.getElementById('home-price-list');if(hp)hp.innerHTML=PH.map(([n,p,c,u])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;align-items:center;gap:8px"><span>🌾</span><span style="font-size:13px;font-weight:500">${n}</span></div><div style="text-align:right"><div style="font-weight:700;font-size:13px">${p}/qtl</div><div style="font-size:10px;color:${u?'#22C55E':'var(--red)'}">${u?'▲':'▼'} ${c}</div></div></div>`).join('');const mp=document.getElementById('market-price-list');if(mp)mp.innerHTML=PM.map(([n,p,c,u])=>`<div class="card" style="margin-bottom:8px;display:flex;align-items:center"><span style="font-size:20px;margin-right:12px">🌾</span><div style="flex:1"><div style="font-weight:600;font-size:13px">${n}</div><div class="caption">APMC</div></div><div style="text-align:right"><div style="font-weight:700;font-size:13px">${p}</div><div style="font-size:10px;color:${u?'#22C55E':'var(--red)'}">${u?'▲':'▼'} ${c}</div></div></div>`).join('');}
-function renderCertSummary(r){if(!r||!S.lang||S.lang==='en')return '';return `<div class="cert-summary"><div class="cs-title">${t('certSummaryTitle')} · ${S.lang.toUpperCase()}</div><div class="cs-row"><span class="cs-key">${t('farmer')}</span><span class="cs-val">${r.farmer||S.user?.name||'—'}</span></div><div class="cs-row"><span class="cs-key">${t('grade')}</span><span class="cs-val">${r.grade||'—'}</span></div><div class="cs-row"><span class="cs-key">${t('price')}</span><span class="cs-val">${r.priceLocal||'—'}</span></div><div class="cs-row"><span class="cs-key">${t('batchNo')}</span><span class="cs-val">${r.certId||'—'}</span></div><div class="cs-note">${t('certNote')}</div></div>`;}
+function renderCertSummary(r){if(!r||!S.lang||S.lang==='en')return '';return `<div class="cert-summary"><div class="cs-title">${t('certSummaryTitle')} · ${S.lang.toUpperCase()}</div><div class="cs-row"><span class="cs-key">${t('farmer')}</span><span class="cs-val">${r.farmer||S.user?.name||'—'}</span></div><div class="cs-row"><span class="cs-key">${t('grade')}</span><span class="cs-val">${r.overallGrade||r.grade||'—'}</span></div><div class="cs-row"><span class="cs-key">${t('price')}</span><span class="cs-val">${r.priceLocal||'—'}</span></div><div class="cs-row"><span class="cs-key">${t('batchNo')}</span><span class="cs-val">${r.certId||'—'}</span></div><div class="cs-note">${t('certNote')}</div></div>`;}
 function buildLangSelect(){const sel=document.getElementById('ed-lang');if(!sel)return;sel.innerHTML=[['en','English'],['kn','ಕನ್ನಡ'],['hi','हिन्दी'],['te','తెలుగు'],['ta','தமிழ்'],['ml','മലയാളം'],['mr','मराठी'],['gu','ગુજ'],['pa','ਪੰਜ'],['bn','বাং'],['or','ଓଡ଼'],['as','অস'],['ur','اردو'],['ar','عربي'],['fr','Français'],['de','Deutsch'],['zh','中文']].map(([v,l])=>`<option value="${v}">${l}</option>`).join('');sel.value=S.lang||'en';sel.onchange=()=>{S.lang=sel.value;applyLang();save();};}
 window.addEventListener('DOMContentLoaded',()=>{
   renderPriceLists();
@@ -2762,6 +2765,7 @@ async function drawDGCertificate(report, capturedImageSrc) {
   const canvas = document.createElement('canvas');
   canvas.width = W;
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas 2D context unavailable');
 
   // Load fonts
   await loadCertFonts();
@@ -2773,7 +2777,7 @@ async function drawDGCertificate(report, capturedImageSrc) {
   const produce    = r.produce      || 'Produce';
   const farmer     = r.farmerName   || S.user?.name || 'Farmer';
   const phone      = S.user?.phone  || r.farmerPhone || '';
-  const gps        = r.gps?.lat ? `${r.gps.lat}°N ${r.gps.lon}°E`
+  const gps        = r.gps?.lat && r.gps?.lon ? `${r.gps.lat}°N ${r.gps.lon}°E`
                    : (typeof r.gps==='string' ? r.gps : '—');
   const dateStr    = r.date || new Date().toLocaleDateString('en-IN');
   const certId     = r.certId || 'DG-XXXX-XXXX';
@@ -3477,7 +3481,9 @@ async function shareCertAsPNG(pkg, channel, ev) {
   toast('Generating DG Certificate...');
   try {
     const canvas = await drawDGCertificate(r, S.capturedImage||null);
+    if (!canvas) throw new Error('Certificate canvas generation failed');
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 0.92));
+    if (!blob) throw new Error('Certificate image could not be created');
     const file = new File([blob], 'DG-'+r.certId+'.png', {type:'image/png'});
     // Try Web Share with file (Android Chrome 86+)
     if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
@@ -3508,7 +3514,9 @@ async function downloadCertPDF() {
   toast('Generating certificate...');
   try {
     const canvas = await drawDGCertificate(r, S.capturedImage);
+    if (!canvas) throw new Error('Certificate canvas generation failed');
     const dataURL = canvas.toDataURL('image/png');
+    if (!dataURL || dataURL === 'data:,') throw new Error('Certificate image empty');
     const a = document.createElement('a');
     a.href = dataURL;
     a.download = `DG-Certificate-${r.certId}.png`;
