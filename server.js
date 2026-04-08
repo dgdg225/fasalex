@@ -857,7 +857,7 @@ const server = http.createServer(async (req, res) => {
 
 loadCacheFromDisk();
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log('');
   console.log('  🌿 FasalEx · DeepGazerAI');
   console.log('  ─────────────────────────────');
