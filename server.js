@@ -28,7 +28,7 @@ const fs      = require('fs');
 const path    = require('path');
 const url     = require('url');
 
-const PORT    = process.env.PORT || 3000;
+const PORT    = process.env.PORT || 8080;
 const API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const CACHE_FILE = path.join(__dirname, 'price_cache.json');
 
@@ -908,7 +908,7 @@ server.listen(PORT, () => {
 
 server.on('error', e => {
   if (e.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} in use — try PORT=3001 node server.js`);
+    console.error(`Port ${PORT} in use — try PORT=3001 node server.js or PORT=8080 node server.js`);
   } else {
     console.error('[SERVER]', e.message);
   }
