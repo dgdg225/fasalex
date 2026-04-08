@@ -450,7 +450,7 @@ function scheduleDailyRefresh() {
 // ═══════════════════════════════════════════════════════════════
 
 // Haiku — fast + cheap for identification (~$0.001/call)
-function callHaiku(messages, maxTokens = 400) {
+function callHaiku(messages, maxTokens = 2000) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
@@ -476,7 +476,7 @@ function callHaiku(messages, maxTokens = 400) {
       });
     });
     req.on('error', reject);
-    req.setTimeout(20000, () => { req.destroy(); reject(new Error('Haiku timeout')); });
+    req.setTimeout(35000, () => { req.destroy(); reject(new Error('Haiku timeout')); });
     req.write(body);
     req.end();
   });
@@ -697,7 +697,7 @@ Also evaluate each AGMARK parameter with measured value, spec, PASS/FAIL/BORDERL
       ? [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } }]
       : [];
 
-    const result = await callClaude([{
+    const result = await callHaiku([{
       role: 'user',
       content: [
         ...imageContent,
