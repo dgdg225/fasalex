@@ -18,6 +18,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - After every session, auto-update `CONTINUITY.md` with a summary of changes made
 - After every session, append new entries to `EXHIBIT_LOG.md` (patent evidence log)
 - Both files live in the repo root
+- Always include timestamp format: `YYYY-MM-DD HH:MM IST` on every session entry and every exhibit entry
+- A git post-commit hook (`.git/hooks/post-commit`) auto-stamps both files on every commit — do not remove it
 
 ## Server-Side Only Files (never in GitHub repo)
 - `exhibits.jsonl` — lives at `/app/exhibits.jsonl` on Railway server, created automatically on first scan. NEVER commit or create this file in the repo.
