@@ -4,7 +4,7 @@ const path     = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 
 const app  = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const KEY  = process.env.ANTHROPIC_API_KEY || '';
 
 app.use(express.json({ limit: '25mb' }));
@@ -96,13 +96,15 @@ app.get('/api/market', (req, res) => {
 app.post('/api/identify', async (req, res) => {
   if (!KEY) return res.json({ produce:'Unknown', sector:'agri', confidence:0, _demo:true });
 
-  const { imageBase64, sector } = req.body;
-  if (!imageBase64) return res.json({ produce:'Unknown', sector:'agri', confidence:0 });
+  const { imageBase64: rawImg, sector } = req.body;
+  if (!rawImg) return res.json({ produce:'Unknown', sector:'agri', confidence:0 });
+  // Strip data URL prefix if frontend accidentally included it
+  const imageBase64 = rawImg.replace(/^data:image\/\w+;base64,/, '');
 
   try {
     const client  = new Anthropic({ apiKey: KEY });
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 256,
       messages: [{
         role: 'user',
@@ -125,7 +127,8 @@ Return ONLY valid JSON (no markdown):
 
 /* ── Analyze / Grade ── */
 app.post('/api/analyze', async (req, res) => {
-  const { produce, sector, qty, unit, farmerName, language, gps, imageBase64, grainMeasure } = req.body;
+  const { produce, sector, qty, unit, farmerName, language, gps, imageBase64: rawImg2, grainMeasure } = req.body;
+  const imageBase64 = rawImg2 ? rawImg2.replace(/^data:image\/\w+;base64,/, '') : null;
 
   if (!KEY) return res.json(demoReport(req.body));
 
@@ -204,7 +207,7 @@ RULES:
 - exportCerts: relevant certifications (APEDA, FSSAI, EIC, MPEDA, etc.)`;
 
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 2000,
       messages: [{
         role: 'user',
@@ -265,7 +268,7 @@ function demoReport({ produce='Wheat', sector='agri', qty='10', unit='qtl', farm
   };
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n✅ FarEX Server running on http://localhost:${PORT}`);
   console.log(`   API Key: ${KEY ? '✓ Set (' + KEY.slice(0,8) + '...)' : '✗ Missing — running in DEMO mode'}`);
   console.log(`   Place your index.html in the /public folder\n`);
