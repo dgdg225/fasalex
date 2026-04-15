@@ -211,28 +211,30 @@ app.post('/api/identify', async (req, res) => {
 
   if (!GEMINI_KEY) return res.json({ produce:'Unknown', sector:'agri', confidence:0, _demo:true });
 
-  const prompt = `Identify the agricultural produce in this image.
-Note: There may be a bank card or reference object in the image — ignore it and focus only on the produce/food item.
-Sector context: ${sector||'agri'} (agri/dairy/fish)
+  const prompt = `Look at this image and identify the agricultural produce.
+Ignore any bank card, ruler, or reference object — focus only on the food/crop.
+Sector: ${sector||'agri'}
 
-Look at the produce carefully and identify it. Use standard Indian market names.
-Examples of valid produce names: Wheat, Rice, Maize, Ragi, Jowar, Bajra, Moong (Whole), Moong Dal, Toor Dal, Chana Dal, Urad Dal, Soybean, Groundnut, Mustard, Tomato, Onion, Potato, Chilli, Turmeric, Mango, Banana, Tiger Prawn, Rohu, Cow Milk, Buffalo Milk, Paneer.
+Respond with ONLY this JSON (no markdown, no explanation):
+{"produce":"Soybean","sector":"agri","confidence":90,"tag":"oilseed","notes":"pale yellow round seeds"}
 
-Respond ONLY with valid JSON, no markdown:
-{"produce":"<name of the produce you see>","sector":"agri|dairy|fish","confidence":<0-100>,"tag":"grain|pulse|oilseed|veggie|fruit|spice|liquid|seafood","notes":"<one line describing what you see>"}`;
+Use the actual produce name you see. Examples of valid names:
+Wheat, Rice, Maize, Ragi, Jowar, Bajra, Soybean, Groundnut, Mustard,
+Moong (Whole), Toor Dal, Chana Dal, Urad Dal, Masoor Dal,
+Tomato, Onion, Potato, Chilli, Turmeric, Ginger, Garlic,
+Mango, Banana, Tiger Prawn, Rohu, Cow Milk, Buffalo Milk, Paneer`;
 
   try {
     const text = await callGemini(prompt, b64);
-    console.log('[identify] Gemini raw:', text.substring(0,200));
+    console.log('[identify] Gemini:', text.substring(0,150));
     const result = parseJSON(text);
-    // Guard: if produce is placeholder or empty, it means Gemini misread prompt
-    if (!result.produce || result.produce.includes('<') || result.produce === 'Unknown') {
-      console.warn('[identify] Bad produce value:', result.produce);
-      return res.json({ produce:'Unknown', sector: result.sector||sector||'agri', confidence:0, _retry:true });
+    // Reject if produce is empty or still a placeholder
+    if (!result.produce || result.produce.length < 2 || result.produce.includes('<')) {
+      return res.json({ produce:'Unknown', sector: sector||'agri', confidence:0, _bad_parse:true });
     }
     res.json(result);
   } catch(e) {
-    console.error('[identify] error:', e.message);
+    console.error('[identify]', e.message);
     res.json({ produce:'Unknown', sector:'agri', confidence:0, error: e.message });
   }
 });
