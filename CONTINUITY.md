@@ -46,4 +46,4 @@ Full audit, fix, and hardening session. App deployed to Railway (brave-success /
 
 ---
 
-*Log last updated: 2026-04-15 09:32 IST · commit: 521fe65
+*Log last updated:  · commit: bf75401

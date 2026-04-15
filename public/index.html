@@ -787,7 +787,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.07);margin:14px 0}
         <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:8px">
           <div style="font-size:18px;margin-bottom:2px">🪙</div>
           <div style="font-size:11px;font-weight:700;color:var(--gold)">Coin Reference</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.4">Place ₹1 coin (20mm) next to grains. AI detects coin pixels → calibrates grain size in real mm</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.45);line-height:1.4">Place Axis Bank card (85.6mm) next to produce. AI detects card pixels → calibrates size in real mm</div>
         </div>
         <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:8px">
           <div style="font-size:18px;margin-bottom:2px">🔢</div>
@@ -801,7 +801,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.07);margin:14px 0}
       </div>
     </div>
     <div style="background:rgba(82,183,136,.05);border:1px solid rgba(82,183,136,.12);border-radius:13px;padding:10px 14px;font-size:11px;color:rgba(255,255,255,.35);line-height:1.6;margin-bottom:14px">
-      📍 GPS auto-stamped · 🔒 Encrypted to Claude AI · ✨ Better lighting = better grade
+      📍 GPS auto-stamped · 🔒 Secured by DeepGazerAI · ✨ Better lighting = better grade
     </div>
 
     <button class="btn btn-primary" id="demoGradeBtn" onclick="analyze()">🤖 Grade Produce (Demo — no photo)</button>
@@ -836,6 +836,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.07);margin:14px 0}
     <button class="tab-item" onclick="switchTab(2)">BUYERS</button>
     <button class="tab-item" onclick="switchTab(3)">MARKET</button>
     <button class="tab-item" onclick="switchTab(4)">EXPORT</button>
+    <button class="tab-item" onclick="switchTab(5)" style="color:var(--gold)">📜 DG CERT</button>
   </div>
   <div class="scroll" style="padding:16px 18px 40px">
     <div id="tab0"></div>
@@ -843,6 +844,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.07);margin:14px 0}
     <div id="tab2" style="display:none"></div>
     <div id="tab3" style="display:none"></div>
     <div id="tab4" style="display:none"></div>
+    <div id="tab5" style="display:none"></div>
   </div>
 </div>
 
@@ -1192,6 +1194,11 @@ function goFromLang(){
   const l=LANGUAGES[selLangIdx];
   S.user.language=l.name;
   S.user.langCode=l.code;
+  // Set lang code for t() function
+  const codeMap={'en-IN':'en','hi-IN':'hi','kn-IN':'kn','te-IN':'te','ta-IN':'ta','mr-IN':'mr','bn-IN':'bn','pa-IN':'pa','es-ES':'es','fr-FR':'fr','ar-SA':'ar','de-DE':'de'};
+  _lang = codeMap[l.code] || 'en';
+  save();
+  applyLang();
   navigate('phone');
 }
 
@@ -2659,6 +2666,7 @@ async function analyze(){
     const report = await res.json();
     if(report.error) throw new Error(report.error);
     clearInterval(stepTimer); ov.classList.remove('show'); stEl.innerHTML='';
+    if(!report.certId) report.certId='DG-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.random().toString(36).substr(2,4).toUpperCase();
     S.currentReport=report; S.history.unshift({report,date:new Date().toISOString()});
     if(S.history.length>20) S.history.pop();
     S.freeScans++; save(); renderReport(); navigate('report');
@@ -3301,10 +3309,11 @@ function savePriceCorrection(produce, estimatedRevenue) {
 }
 
 function switchTab(i){
-  [0,1,2,3,4].forEach(x=>{
+  [0,1,2,3,4,5].forEach(x=>{
     const el=document.getElementById('tab'+x);if(el)el.style.display=x===i?'block':'none';
-    const btn=document.querySelectorAll('.tab-item')[x];if(btn)btn.classList.toggle('on',x===i);
+    const btn=document.querySelectorAll('#reportTabs .tab-item')[x];if(btn)btn.classList.toggle('on',x===i);
   });
+  if(i===5) renderDGCertTab();
 }
 
 function shareReport(){
@@ -3592,6 +3601,12 @@ document.addEventListener('keydown',e=>{
 //  BOOT
 // ══════════════════════════════════════════════════
 async function boot(){
+  // Restore language from saved state
+  if(S.user?.langCode){
+    const codeMap={'en-IN':'en','hi-IN':'hi','kn-IN':'kn','te-IN':'te','ta-IN':'ta','mr-IN':'mr','bn-IN':'bn','pa-IN':'pa','es-ES':'es','fr-FR':'fr','ar-SA':'ar','de-DE':'de'};
+    _lang = codeMap[S.user.langCode] || 'en';
+    applyLang();
+  }
   // ── GUARANTEED ESCAPE: always navigate after 3s no matter what ──
   const escapeTimer = setTimeout(()=>{
     try{ isRegistered() ? navigate('home') : navigate('language'); }catch(e){}
@@ -4441,6 +4456,576 @@ function renderStandardsTable(produceName) {
 
 
 document.addEventListener('DOMContentLoaded', boot);
+
+// ══════════════════════════════════════════════════
+//  LANGUAGE SYSTEM — t() + applyLang()
+// ══════════════════════════════════════════════════
+const TRANSLATIONS = {
+  en: {
+    scanProduce:'Scan Produce', grade:'Grade', gradeReport:'Grade Report',
+    confirm:'✓ Confirm & Grade →', change:'🔄 Change',
+    marketPrices:'Market Prices', history:'History', profile:'Profile',
+    home:'Home', scan:'Scan', connect:'Connect',
+    shareReport:'📤 Share', dgCert:'📜 DG Cert',
+    tapIdentify:'TAP YOUR PRODUCE TO IDENTIFY',
+    grade_A:'Premium Export', grade_B:'Good Domestic', grade_C:'Processing', grade_D:'Reject',
+    certTitle:'DeepGazerAI Grading Certificate', certIssued:'Issued by FasalEx · DeepGazerAI',
+    certFarmer:'Farmer', certGrade:'AGMARK Grade', certGPS:'GPS Location', certDate:'Date',
+    certMarketRate:'Market Rate', certRevenue:'Est. Revenue',
+    certPatent:'Patent Pending · Bengaluru IPO · 20 Mar 2026',
+    certShare:'📤 Share DG Certificate', certGenerate:'🖨 Generate Certificate',
+    buyers:'Buyers', standards:'Standards', market:'Market', export:'Export',
+    aiGrading:'AI Grading…', analyzing:'Analyzing produce',
+    noReport:'No report yet — scan a produce first.',
+    scanFirst:'No report — scan first',
+  },
+  hi: {
+    scanProduce:'उत्पाद स्कैन करें', grade:'ग्रेड', gradeReport:'ग्रेड रिपोर्ट',
+    confirm:'✓ ग्रेड करें →', change:'🔄 बदलें',
+    marketPrices:'बाज़ार भाव', history:'इतिहास', profile:'प्रोफाइल',
+    home:'होम', scan:'स्कैन', connect:'कनेक्ट',
+    shareReport:'📤 शेयर करें', dgCert:'📜 डीजी प्रमाणपत्र',
+    tapIdentify:'उत्पाद की पहचान के लिए टैप करें',
+    grade_A:'प्रीमियम निर्यात', grade_B:'घरेलू ग्रेड', grade_C:'प्रसंस्करण', grade_D:'अस्वीकार',
+    certTitle:'डीपगेज़रएआई ग्रेडिंग प्रमाणपत्र', certIssued:'फसलएक्स द्वारा जारी',
+    certFarmer:'किसान', certGrade:'एजीमार्क ग्रेड', certGPS:'जीपीएस स्थान', certDate:'दिनांक',
+    certMarketRate:'बाज़ार दर', certRevenue:'अनुमानित आय',
+    certPatent:'पेटेंट लंबित · बेंगलुरु IPO · 20 मार्च 2026',
+    certShare:'📤 डीजी प्रमाणपत्र शेयर करें', certGenerate:'🖨 प्रमाणपत्र बनाएं',
+    buyers:'खरीदार', standards:'मानक', market:'बाज़ार', export:'निर्यात',
+    aiGrading:'एआई ग्रेडिंग…', analyzing:'उत्पाद का विश्लेषण',
+    noReport:'कोई रिपोर्ट नहीं — पहले स्कैन करें।',
+    scanFirst:'कोई रिपोर्ट नहीं — पहले स्कैन करें',
+  },
+  kn: {
+    scanProduce:'ಉತ್ಪನ್ನ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ', grade:'ದರ್ಜೆ', gradeReport:'ದರ್ಜೆ ವರದಿ',
+    confirm:'✓ ದರ್ಜೆ ನಿರ್ಧರಿಸಿ →', change:'🔄 ಬದಲಿಸಿ',
+    marketPrices:'ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು', history:'ಇತಿಹಾಸ', profile:'ಪ್ರೊಫೈಲ್',
+    home:'ಮುಖಪುಟ', scan:'ಸ್ಕ್ಯಾನ್', connect:'ಸಂಪರ್ಕ',
+    shareReport:'📤 ಹಂಚಿಕೊಳ್ಳಿ', dgCert:'📜 ಡಿಜಿ ಪ್ರಮಾಣಪತ್ರ',
+    tapIdentify:'ನಿಮ್ಮ ಉತ್ಪನ್ನ ಟ್ಯಾಪ್ ಮಾಡಿ ಗುರುತಿಸಲು',
+    grade_A:'ಪ್ರೀಮಿಯಂ ರಫ್ತು', grade_B:'ದೇಶೀಯ ದರ್ಜೆ', grade_C:'ಸಂಸ್ಕರಣೆ', grade_D:'ತಿರಸ್ಕಾರ',
+    certTitle:'ಡೀಪ್‌ಗೇಝರ್ ಎಐ ಗ್ರೇಡಿಂಗ್ ಪ್ರಮಾಣಪತ್ರ', certIssued:'ಫಸಲ್‌ಎಕ್ಸ್ ನೀಡಿದ ಪ್ರಮಾಣಪತ್ರ',
+    certFarmer:'ರೈತ', certGrade:'ಎಜಿಎಂಎಆರ್‌ಕೆ ದರ್ಜೆ', certGPS:'ಜಿಪಿಎಸ್ ಸ್ಥಳ', certDate:'ದಿನಾಂಕ',
+    certMarketRate:'ಮಾರುಕಟ್ಟೆ ದರ', certRevenue:'ಅಂದಾಜು ಆದಾಯ',
+    certPatent:'ಪೇಟೆಂಟ್ ಬಾಕಿ · ಬೆಂಗಳೂರು IPO · 20 ಮಾರ್ 2026',
+    certShare:'📤 ಡಿಜಿ ಪ್ರಮಾಣಪತ್ರ ಹಂಚಿಕೊಳ್ಳಿ', certGenerate:'🖨 ಪ್ರಮಾಣಪತ್ರ ರಚಿಸಿ',
+    buyers:'ಖರೀದಿದಾರರು', standards:'ಮಾನದಂಡಗಳು', market:'ಮಾರುಕಟ್ಟೆ', export:'ರಫ್ತು',
+    aiGrading:'ಎಐ ಗ್ರೇಡಿಂಗ್…', analyzing:'ಉತ್ಪನ್ನ ವಿಶ್ಲೇಷಣೆ',
+    noReport:'ಯಾವುದೇ ವರದಿ ಇಲ್ಲ — ಮೊದಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ.',
+    scanFirst:'ಯಾವುದೇ ವರದಿ ಇಲ್ಲ — ಮೊದಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ',
+  },
+  te: {
+    scanProduce:'ఉత్పత్తి స్కాన్ చేయండి', grade:'గ్రేడ్', gradeReport:'గ్రేడ్ నివేదిక',
+    confirm:'✓ గ్రేడ్ చేయండి →', change:'🔄 మార్చండి',
+    marketPrices:'మార్కెట్ ధరలు', history:'చరిత్ర', profile:'ప్రొఫైల్',
+    home:'హోమ్', scan:'స్కాన్', connect:'కనెక్ట్',
+    shareReport:'📤 పంచుకోండి', dgCert:'📜 డిజి సర్టిఫికేట్',
+    tapIdentify:'మీ ఉత్పత్తిని గుర్తించడానికి నొక్కండి',
+    grade_A:'ప్రీమియం ఎగుమతి', grade_B:'దేశీయ గ్రేడ్', grade_C:'ప్రాసెసింగ్', grade_D:'తిరస్కరణ',
+    certTitle:'డీప్‌గేజర్ AI గ్రేడింగ్ సర్టిఫికేట్', certIssued:'ఫసల్‌ఎక్స్ జారీ చేసింది',
+    certFarmer:'రైతు', certGrade:'ఆగ్మార్క్ గ్రేడ్', certGPS:'జిపిఎస్ స్థానం', certDate:'తేదీ',
+    certMarketRate:'మార్కెట్ రేటు', certRevenue:'అంచనా ఆదాయం',
+    certPatent:'పేటెంట్ పెండింగ్ · బెంగళూరు IPO · 20 మార్ 2026',
+    certShare:'📤 డిజి సర్టిఫికేట్ పంచుకోండి', certGenerate:'🖨 సర్టిఫికేట్ తయారు చేయండి',
+    buyers:'కొనుగోలుదారులు', standards:'ప్రమాణాలు', market:'మార్కెట్', export:'ఎగుమతి',
+    aiGrading:'AI గ్రేడింగ్…', analyzing:'ఉత్పత్తి విశ్లేషిస్తున్నాం',
+    noReport:'నివేదిక లేదు — ముందు స్కాన్ చేయండి.',
+    scanFirst:'నివేదిక లేదు — ముందు స్కాన్ చేయండి',
+  },
+  ta: {
+    scanProduce:'விளைபொருள் ஸ்கேன்', grade:'தரம்', gradeReport:'தர அறிக்கை',
+    confirm:'✓ தரம் நிர்ணயி →', change:'🔄 மாற்று',
+    marketPrices:'சந்தை விலைகள்', history:'வரலாறு', profile:'சுயவிவரம்',
+    home:'முகப்பு', scan:'ஸ்கேன்', connect:'இணை',
+    shareReport:'📤 பகிர்', dgCert:'📜 டிஜி சான்றிதழ்',
+    tapIdentify:'உங்கள் விளைபொருளை அடையாளம் காண தட்டுங்கள்',
+    grade_A:'பிரீமியம் ஏற்றுமதி', grade_B:'உள்நாட்டு தரம்', grade_C:'பதப்படுத்தல்', grade_D:'நிராகரிப்பு',
+    certTitle:'டீப்கேஸர் AI தர சான்றிதழ்', certIssued:'ஃபசல்எக்ஸ் வழங்கியது',
+    certFarmer:'விவசாயி', certGrade:'ஆக்மார்க் தரம்', certGPS:'ஜிபிஎஸ் இடம்', certDate:'தேதி',
+    certMarketRate:'சந்தை விலை', certRevenue:'மதிப்பீட்டு வருவாய்',
+    certPatent:'காப்புரிமை நிலுவை · பெங்களூரு IPO · 20 மார் 2026',
+    certShare:'📤 டிஜி சான்றிதழ் பகிர்', certGenerate:'🖨 சான்றிதழ் உருவாக்கு',
+    buyers:'வாங்குபவர்கள்', standards:'தரநிலைகள்', market:'சந்தை', export:'ஏற்றுமதி',
+    aiGrading:'AI தரமிடல்…', analyzing:'விளைபொருள் பகுப்பாய்வு',
+    noReport:'அறிக்கை இல்லை — முதலில் ஸ்கேன் செய்யுங்கள்.',
+    scanFirst:'அறிக்கை இல்லை — முதலில் ஸ்கேன் செய்யுங்கள்',
+  },
+  mr: {
+    scanProduce:'उत्पादन स्कॅन करा', grade:'दर्जा', gradeReport:'दर्जा अहवाल',
+    confirm:'✓ दर्जा निश्चित करा →', change:'🔄 बदला',
+    marketPrices:'बाजारभाव', history:'इतिहास', profile:'प्रोफाइल',
+    home:'मुखपृष्ठ', scan:'स्कॅन', connect:'कनेक्ट',
+    shareReport:'📤 शेअर करा', dgCert:'📜 डीजी प्रमाणपत्र',
+    tapIdentify:'उत्पादन ओळखण्यासाठी टॅप करा',
+    grade_A:'प्रीमियम निर्यात', grade_B:'देशांतर्गत दर्जा', grade_C:'प्रक्रिया', grade_D:'नाकारणे',
+    certTitle:'डीपगेझरएआय ग्रेडिंग प्रमाणपत्र', certIssued:'फसलएक्स द्वारे जारी',
+    certFarmer:'शेतकरी', certGrade:'एजीमार्क दर्जा', certGPS:'जीपीएस स्थान', certDate:'दिनांक',
+    certMarketRate:'बाजार दर', certRevenue:'अंदाजे उत्पन्न',
+    certPatent:'पेटंट प्रलंबित · बेंगळुरू IPO · 20 मार्च 2026',
+    certShare:'📤 डीजी प्रमाणपत्र शेअर करा', certGenerate:'🖨 प्रमाणपत्र तयार करा',
+    buyers:'खरेदीदार', standards:'मानके', market:'बाजार', export:'निर्यात',
+    aiGrading:'एआय ग्रेडिंग…', analyzing:'उत्पादनाचे विश्लेषण',
+    noReport:'अहवाल नाही — आधी स्कॅन करा.',
+    scanFirst:'अहवाल नाही — आधी स्कॅन करा',
+  },
+  bn: {
+    scanProduce:'পণ্য স্ক্যান করুন', grade:'গ্রেড', gradeReport:'গ্রেড রিপোর্ট',
+    confirm:'✓ গ্রেড করুন →', change:'🔄 পরিবর্তন',
+    marketPrices:'বাজার মূল্য', history:'ইতিহাস', profile:'প্রোফাইল',
+    home:'হোম', scan:'স্ক্যান', connect:'সংযোগ',
+    shareReport:'📤 শেয়ার করুন', dgCert:'📜 ডিজি সার্টিফিকেট',
+    tapIdentify:'পণ্য চিহ্নিত করতে ট্যাপ করুন',
+    grade_A:'প্রিমিয়াম রপ্তানি', grade_B:'দেশীয় গ্রেড', grade_C:'প্রক্রিয়াকরণ', grade_D:'প্রত্যাখ্যান',
+    certTitle:'ডিপগেজার AI গ্রেডিং সার্টিফিকেট', certIssued:'ফসলএক্স প্রদত্ত',
+    certFarmer:'কৃষক', certGrade:'এজিমার্ক গ্রেড', certGPS:'জিপিএস অবস্থান', certDate:'তারিখ',
+    certMarketRate:'বাজার দর', certRevenue:'আনুমানিক আয়',
+    certPatent:'পেটেন্ট মুলতুবি · বেঙ্গালুরু IPO · 20 মার্চ 2026',
+    certShare:'📤 ডিজি সার্টিফিকেট শেয়ার করুন', certGenerate:'🖨 সার্টিফিকেট তৈরি করুন',
+    buyers:'ক্রেতা', standards:'মান', market:'বাজার', export:'রপ্তানি',
+    aiGrading:'AI গ্রেডিং…', analyzing:'পণ্য বিশ্লেষণ',
+    noReport:'কোনো রিপোর্ট নেই — আগে স্ক্যান করুন।',
+    scanFirst:'কোনো রিপোর্ট নেই — আগে স্ক্যান করুন',
+  },
+  pa: {
+    scanProduce:'ਉਤਪਾਦ ਸਕੈਨ ਕਰੋ', grade:'ਗ੍ਰੇਡ', gradeReport:'ਗ੍ਰੇਡ ਰਿਪੋਰਟ',
+    confirm:'✓ ਗ੍ਰੇਡ ਕਰੋ →', change:'🔄 ਬਦਲੋ',
+    marketPrices:'ਬਾਜ਼ਾਰ ਭਾਅ', history:'ਇਤਿਹਾਸ', profile:'ਪ੍ਰੋਫਾਈਲ',
+    home:'ਘਰ', scan:'ਸਕੈਨ', connect:'ਜੁੜੋ',
+    shareReport:'📤 ਸਾਂਝਾ ਕਰੋ', dgCert:'📜 ਡੀਜੀ ਸਰਟੀਫਿਕੇਟ',
+    tapIdentify:'ਉਤਪਾਦ ਪਛਾਣਨ ਲਈ ਟੈਪ ਕਰੋ',
+    grade_A:'ਪ੍ਰੀਮੀਅਮ ਨਿਰਯਾਤ', grade_B:'ਘਰੇਲੂ ਗ੍ਰੇਡ', grade_C:'ਪ੍ਰੋਸੈਸਿੰਗ', grade_D:'ਰੱਦ',
+    certTitle:'ਡੀਪਗੇਜ਼ਰ AI ਗ੍ਰੇਡਿੰਗ ਸਰਟੀਫਿਕੇਟ', certIssued:'ਫ਼ਸਲਐਕਸ ਵੱਲੋਂ ਜਾਰੀ',
+    certFarmer:'ਕਿਸਾਨ', certGrade:'ਏਜੀਮਾਰਕ ਗ੍ਰੇਡ', certGPS:'ਜੀਪੀਐਸ ਸਥਾਨ', certDate:'ਮਿਤੀ',
+    certMarketRate:'ਬਾਜ਼ਾਰ ਦਰ', certRevenue:'ਅਨੁਮਾਨਿਤ ਆਮਦਨ',
+    certPatent:'ਪੇਟੈਂਟ ਲੰਬਿਤ · ਬੇਂਗਲੁਰੂ IPO · 20 ਮਾਰਚ 2026',
+    certShare:'📤 ਡੀਜੀ ਸਰਟੀਫਿਕੇਟ ਸਾਂਝਾ ਕਰੋ', certGenerate:'🖨 ਸਰਟੀਫਿਕੇਟ ਬਣਾਓ',
+    buyers:'ਖਰੀਦਦਾਰ', standards:'ਮਿਆਰ', market:'ਬਾਜ਼ਾਰ', export:'ਨਿਰਯਾਤ',
+    aiGrading:'AI ਗ੍ਰੇਡਿੰਗ…', analyzing:'ਉਤਪਾਦ ਵਿਸ਼ਲੇਸ਼ਣ',
+    noReport:'ਕੋਈ ਰਿਪੋਰਟ ਨਹੀਂ — ਪਹਿਲਾਂ ਸਕੈਨ ਕਰੋ।',
+    scanFirst:'ਕੋਈ ਰਿਪੋਰਟ ਨਹੀਂ — ਪਹਿਲਾਂ ਸਕੈਨ ਕਰੋ',
+  },
+  es: {
+    scanProduce:'Escanear Producto', grade:'Grado', gradeReport:'Informe de Grado',
+    confirm:'✓ Confirmar y Clasificar →', change:'🔄 Cambiar',
+    marketPrices:'Precios del Mercado', history:'Historial', profile:'Perfil',
+    home:'Inicio', scan:'Escanear', connect:'Conectar',
+    shareReport:'📤 Compartir', dgCert:'📜 Cert. DG',
+    tapIdentify:'TOCA TU PRODUCTO PARA IDENTIFICAR',
+    grade_A:'Exportación Premium', grade_B:'Mercado Nacional', grade_C:'Procesamiento', grade_D:'Rechazado',
+    certTitle:'Certificado de Clasificación DeepGazerAI', certIssued:'Emitido por FasalEx',
+    certFarmer:'Agricultor', certGrade:'Grado AGMARK', certGPS:'Ubicación GPS', certDate:'Fecha',
+    certMarketRate:'Precio de Mercado', certRevenue:'Ingresos Estimados',
+    certPatent:'Patente Pendiente · Bengaluru IPO · 20 Mar 2026',
+    certShare:'📤 Compartir Certificado DG', certGenerate:'🖨 Generar Certificado',
+    buyers:'Compradores', standards:'Estándares', market:'Mercado', export:'Exportar',
+    aiGrading:'Clasificando con IA…', analyzing:'Analizando producto',
+    noReport:'Sin informe — escanea primero.',
+    scanFirst:'Sin informe — escanea primero',
+  },
+  fr: {
+    scanProduce:'Scanner le Produit', grade:'Grade', gradeReport:'Rapport de Grade',
+    confirm:'✓ Confirmer et Classer →', change:'🔄 Changer',
+    marketPrices:'Prix du Marché', history:'Historique', profile:'Profil',
+    home:'Accueil', scan:'Scanner', connect:'Connecter',
+    shareReport:'📤 Partager', dgCert:'📜 Cert. DG',
+    tapIdentify:'APPUYEZ POUR IDENTIFIER VOTRE PRODUIT',
+    grade_A:'Export Premium', grade_B:'Marché National', grade_C:'Transformation', grade_D:'Rejeté',
+    certTitle:'Certificat de Classement DeepGazerAI', certIssued:'Émis par FasalEx',
+    certFarmer:'Agriculteur', certGrade:'Grade AGMARK', certGPS:'Position GPS', certDate:'Date',
+    certMarketRate:'Prix du Marché', certRevenue:'Revenu Estimé',
+    certPatent:'Brevet en attente · Bengaluru IPO · 20 Mar 2026',
+    certShare:'📤 Partager Certificat DG', certGenerate:'🖨 Générer Certificat',
+    buyers:'Acheteurs', standards:'Normes', market:'Marché', export:'Exporter',
+    aiGrading:'Classement IA…', analyzing:'Analyse du produit',
+    noReport:'Aucun rapport — scannez d'abord.',
+    scanFirst:'Aucun rapport — scannez d'abord',
+  },
+  ar: {
+    scanProduce:'مسح المنتج', grade:'درجة', gradeReport:'تقرير الدرجة',
+    confirm:'✓ تأكيد والتصنيف →', change:'🔄 تغيير',
+    marketPrices:'أسعار السوق', history:'السجل', profile:'الملف الشخصي',
+    home:'الرئيسية', scan:'مسح', connect:'تواصل',
+    shareReport:'📤 مشاركة', dgCert:'📜 شهادة DG',
+    tapIdentify:'اضغط على منتجك للتعرف عليه',
+    grade_A:'تصدير مميز', grade_B:'السوق المحلي', grade_C:'معالجة', grade_D:'مرفوض',
+    certTitle:'شهادة تصنيف DeepGazerAI', certIssued:'صادرة عن FasalEx',
+    certFarmer:'مزارع', certGrade:'درجة AGMARK', certGPS:'موقع GPS', certDate:'التاريخ',
+    certMarketRate:'سعر السوق', certRevenue:'الإيرادات المقدرة',
+    certPatent:'براءة اختراع معلقة · بنغالور IPO · 20 مارس 2026',
+    certShare:'📤 مشاركة شهادة DG', certGenerate:'🖨 إنشاء الشهادة',
+    buyers:'المشترون', standards:'المعايير', market:'السوق', export:'التصدير',
+    aiGrading:'تصنيف الذكاء الاصطناعي…', analyzing:'تحليل المنتج',
+    noReport:'لا يوجد تقرير — امسح أولاً.',
+    scanFirst:'لا يوجد تقرير — امسح أولاً',
+  },
+  de: {
+    scanProduce:'Produkt Scannen', grade:'Note', gradeReport:'Qualitätsbericht',
+    confirm:'✓ Bestätigen & Bewerten →', change:'🔄 Ändern',
+    marketPrices:'Marktpreise', history:'Verlauf', profile:'Profil',
+    home:'Startseite', scan:'Scannen', connect:'Verbinden',
+    shareReport:'📤 Teilen', dgCert:'📜 DG-Zertifikat',
+    tapIdentify:'TIPPEN SIE AUF IHR PRODUKT ZUR IDENTIFIKATION',
+    grade_A:'Premium Export', grade_B:'Inlandsmarkt', grade_C:'Verarbeitung', grade_D:'Abgelehnt',
+    certTitle:'DeepGazerAI Qualitätszertifikat', certIssued:'Ausgestellt von FasalEx',
+    certFarmer:'Landwirt', certGrade:'AGMARK-Note', certGPS:'GPS-Standort', certDate:'Datum',
+    certMarketRate:'Marktpreis', certRevenue:'Geschätzter Umsatz',
+    certPatent:'Patent angemeldet · Bengaluru IPO · 20. März 2026',
+    certShare:'📤 DG-Zertifikat teilen', certGenerate:'🖨 Zertifikat erstellen',
+    buyers:'Käufer', standards:'Standards', market:'Markt', export:'Exportieren',
+    aiGrading:'KI-Bewertung…', analyzing:'Produkt wird analysiert',
+    noReport:'Kein Bericht — bitte zuerst scannen.',
+    scanFirst:'Kein Bericht — bitte zuerst scannen',
+  },
+};
+
+// Current lang code — default English
+let _lang = 'en';
+
+function t(key){ return (TRANSLATIONS[_lang]||TRANSLATIONS.en)[key] || TRANSLATIONS.en[key] || key; }
+
+function applyLang(){
+  // Nav bar labels
+  const navMap = {
+    'nb-home':    'home',    'nb-scan':    'scan',
+    'nb-market':  'market',  'nb-history': 'history',
+    'nb-profile': 'profile',
+  };
+  Object.entries(navMap).forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    if(el){ const span=el.querySelector('span'); if(span) span.textContent=t(key); }
+  });
+  // Report share button
+  const shareBtn = document.querySelector('#page-report .ph button[onclick="shareReport()"]');
+  if(shareBtn) shareBtn.textContent = t('shareReport');
+  // DG Cert tab label
+  const tabs = document.querySelectorAll('#reportTabs .tab-item');
+  if(tabs[5]) tabs[5].textContent = t('dgCert');
+  // Scan page title
+  const scanTitle = document.querySelector('#page-scan .ph-title');
+  if(scanTitle) scanTitle.textContent = t('scanProduce');
+  // Confirm button in AI detected card
+  const confirmBtn = document.querySelector('[onclick="confirmAIDetect()"]');
+  if(confirmBtn) confirmBtn.textContent = t('confirm');
+}
+
+// ══════════════════════════════════════════════════
+//  DG CERTIFICATE — Canvas PNG generation
+// ══════════════════════════════════════════════════
+function renderDGCertTab(){
+  const r = S.currentReport;
+  const tab = document.getElementById('tab5');
+  if(!tab) return;
+  if(!r){ tab.innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4)">No report yet — scan a produce first.</div>'; return; }
+
+  const certId = r.certId || ('DG-' + Math.random().toString(36).substr(2,4).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase());
+  if(!r.certId) r.certId = certId;
+  S.currentReport = r;
+
+  const gradeColor = {A:'#22C55E',B:'#F4A100',C:'#F97316',D:'#E63946'}[r.overallGrade] || '#52B788';
+
+  tab.innerHTML = `
+    <div style="background:linear-gradient(135deg,rgba(30,61,34,.9),rgba(45,106,79,.3));border:1.5px solid rgba(82,183,136,.3);border-radius:18px;padding:18px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-family:var(--ff);font-size:22px;font-weight:700;color:#fff">FasalEx</div>
+          <div style="font-size:9px;color:var(--mint);letter-spacing:2px;font-weight:700">DEEPGAZERAI · GRADING CERTIFICATE</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:8px;color:rgba(255,255,255,.4);letter-spacing:1px">CERT ID</div>
+          <div style="font-family:monospace;font-size:13px;font-weight:700;color:var(--gold)">${certId}</div>
+        </div>
+      </div>
+      <div style="height:1px;background:rgba(82,183,136,.2);margin-bottom:12px"></div>
+      <div style="display:grid;grid-template-columns:1fr 80px;gap:12px;align-items:start">
+        <div>
+          <div style="font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1px;margin-bottom:3px">${t('certFarmer').toUpperCase()}</div>
+          <div style="font-size:16px;font-weight:700">${r.farmerName||S.user?.name||'Farmer'}</div>
+          <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);margin-top:6px">${r.produce}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4)">${r.qty||'—'} · ${r.date||new Date().toLocaleDateString('en-IN')}</div>
+        </div>
+        <div style="background:${gradeColor}22;border:2px solid ${gradeColor};border-radius:14px;padding:10px 8px;text-align:center">
+          <div style="font-size:9px;color:${gradeColor};font-weight:700;letter-spacing:1px">GRADE</div>
+          <div style="font-size:36px;font-weight:900;color:${gradeColor};line-height:1;font-family:var(--ff)">${r.overallGrade}</div>
+          <div style="font-size:8px;color:${gradeColor};font-weight:600">AGMARK</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1.5px;font-weight:700;margin-bottom:10px">QUALITY PARAMETERS</div>
+      ${(r.parameters||[]).map(p=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+          <div>
+            <div style="font-size:12px;font-weight:600">${p.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.35)">${p.standard}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;font-weight:700;color:${p.pass?'#22C55E':'#E63946'}">${p.found}</div>
+            <div style="font-size:9px;font-weight:700;color:${p.pass?'#22C55E':'#E63946'}">${p.pass?'✓ PASS':'✗ FAIL'}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1.5px;font-weight:700;margin-bottom:10px">PRICE INTELLIGENCE</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:rgba(255,255,255,.5)">${t('certMarketRate')}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--gold)">${r.marketRate||'—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:rgba(255,255,255,.5)">${t('certRevenue')}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--mint)">${r.estimatedRevenue||'—'}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:12px;color:rgba(255,255,255,.5)">Best Market Route</span>
+        <span style="font-size:12px;font-weight:600;color:#fff">${(r.routes||[]).find(x=>x.best)?.market||'Local APMC'}</span>
+      </div>
+    </div>
+
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 16px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px">
+        <span>${t('certGPS')}: ${r.gps?.lat||'—'}°N, ${r.gps?.lon||'—'}°E</span>
+        <span>K = 0.0984 mm/px</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.35)">
+        <span>AI: DeepGazerAI · Gemini Vision</span>
+        <span>Confidence: ${r.confidence||'—'}%</span>
+      </div>
+    </div>
+
+    <button onclick="generateCertPNG()" class="btn btn-primary" style="margin-bottom:10px">
+      ${t('certShare')}
+    </button>
+    <div style="text-align:center;font-size:9px;color:rgba(255,255,255,.25);line-height:1.6">
+      ${t('certPatent')}<br/>
+      © 2026 H DoddanaGouda · H Vasanthamma · fasalex.com
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────
+// Canvas PNG certificate → WhatsApp
+// ─────────────────────────────────────
+async function generateCertPNG(){
+  const r = S.currentReport;
+  if(!r){ toast('No report — scan first','#E74C3C'); return; }
+  toast('Generating certificate…');
+
+  try {
+    const W=800, H=1130;
+    const cv = document.createElement('canvas');
+    cv.width=W; cv.height=H;
+    const ctx = cv.getContext('2d');
+
+    const gradeColors = {A:'#22C55E',B:'#F4A100',C:'#F97316',D:'#E63946'};
+    const gc = gradeColors[r.overallGrade]||'#52B788';
+
+    // ── Background
+    const bg = ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,'#0C1F0E'); bg.addColorStop(1,'#0A1A0C');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+    // ── Header band
+    const hg = ctx.createLinearGradient(0,0,W,0);
+    hg.addColorStop(0,'#1E3D22'); hg.addColorStop(1,'#2D6A4F');
+    ctx.fillStyle=hg; ctx.fillRect(0,0,W,120);
+
+    // ── Brand
+    ctx.fillStyle='#fff';
+    ctx.font='bold 38px Georgia,serif';
+    ctx.fillText('FasalEx',32,58);
+    ctx.font='600 13px Arial,sans-serif';
+    ctx.fillStyle='#74C69D';
+    ctx.fillText('DEEPGAZERAI · GRADING CERTIFICATE',32,82);
+    ctx.font='12px Arial';
+    ctx.fillStyle='rgba(255,255,255,0.5)';
+    ctx.fillText('"See True. Trade Fair."',32,102);
+
+    // Cert ID box
+    ctx.fillStyle='rgba(255,255,255,0.08)';
+    roundRect(ctx, W-230,20,210,80,10);
+    ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.45)';
+    ctx.font='bold 10px monospace'; ctx.textAlign='right';
+    ctx.fillText('CERTIFICATE ID', W-28, 45);
+    ctx.fillStyle='#E9C46A'; ctx.font='bold 18px monospace';
+    ctx.fillText(r.certId||'DG-0000-0000', W-28, 68);
+    ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='11px monospace';
+    ctx.fillText(r.date||new Date().toLocaleDateString('en-IN'), W-28, 90);
+    ctx.textAlign='left';
+
+    // ── Accent line
+    ctx.fillStyle='#52B788'; ctx.fillRect(0,120,W,3);
+
+    // ── Farmer + Produce block
+    let y=145;
+    ctx.fillStyle='rgba(255,255,255,0.08)';
+    roundRect(ctx,28,y,W-56,120,12); ctx.fill();
+
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='bold 11px Arial';
+    ctx.fillText('FARMER', 48, y+22);
+    ctx.fillStyle='#fff'; ctx.font='bold 22px Arial';
+    ctx.fillText(r.farmerName||S.user?.name||'Farmer', 48, y+50);
+    ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='16px Arial';
+    ctx.fillText(r.produce||'—', 48, y+76);
+    ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='12px Arial';
+    ctx.fillText((r.qty||'—') + ' · ' + (r.date||''), 48, y+100);
+
+    // Grade badge
+    ctx.fillStyle=gc+'33';
+    roundRect(ctx, W-140, y+10, 112, 100, 12); ctx.fill();
+    ctx.strokeStyle=gc; ctx.lineWidth=2;
+    roundRect(ctx, W-140, y+10, 112, 100, 12); ctx.stroke();
+    ctx.fillStyle=gc; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+    ctx.fillText('GRADE', W-84, y+35);
+    ctx.font='bold 60px Georgia,serif';
+    ctx.fillText(r.overallGrade||'B', W-84, y+85);
+    ctx.textAlign='left';
+
+    // ── Parameters
+    y=300;
+    ctx.fillStyle='rgba(255,255,255,0.06)';
+    roundRect(ctx,28,y,W-56,220,12); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='bold 11px Arial';
+    ctx.fillText('QUALITY PARAMETERS', 48, y+24);
+
+    const params = r.parameters||[];
+    params.slice(0,5).forEach((p,i)=>{
+      const py = y+46 + i*34;
+      ctx.fillStyle='rgba(255,255,255,0.04)';
+      ctx.fillRect(38, py-4, W-76, 30);
+      ctx.fillStyle='#fff'; ctx.font='13px Arial';
+      ctx.fillText(p.name, 50, py+14);
+      ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='11px Arial';
+      ctx.fillText(p.found||'—', 340, py+14);
+      const passColor = p.pass ? '#22C55E' : '#E63946';
+      ctx.fillStyle=passColor; ctx.font='bold 11px Arial'; ctx.textAlign='right';
+      ctx.fillText(p.pass ? '✓ PASS' : '✗ FAIL', W-50, py+14);
+      ctx.textAlign='left';
+    });
+
+    // ── Price Intelligence
+    y=540;
+    ctx.fillStyle='rgba(255,255,255,0.06)';
+    roundRect(ctx,28,y,W-56,130,12); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='bold 11px Arial';
+    ctx.fillText('PRICE INTELLIGENCE', 48, y+24);
+
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='13px Arial';
+    ctx.fillText('Market Rate', 48, y+54);
+    ctx.fillStyle='#E9C46A'; ctx.font='bold 17px Arial'; ctx.textAlign='right';
+    ctx.fillText(r.marketRate||'—', W-50, y+54);
+
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='13px Arial'; ctx.textAlign='left';
+    ctx.fillText('Est. Revenue', 48, y+84);
+    ctx.fillStyle='#74C69D'; ctx.font='bold 17px Arial'; ctx.textAlign='right';
+    ctx.fillText(r.estimatedRevenue||'—', W-50, y+84);
+
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='13px Arial'; ctx.textAlign='left';
+    ctx.fillText('Best Route', 48, y+114);
+    ctx.fillStyle='#fff'; ctx.font='bold 14px Arial'; ctx.textAlign='right';
+    ctx.fillText((r.routes||[]).find(x=>x.best)?.market||'Local APMC', W-50, y+114);
+    ctx.textAlign='left';
+
+    // ── AI Remark
+    y=695;
+    ctx.fillStyle='rgba(82,183,136,0.08)';
+    roundRect(ctx,28,y,W-56,90,12); ctx.fill();
+    ctx.strokeStyle='rgba(82,183,136,0.25)'; ctx.lineWidth=1;
+    roundRect(ctx,28,y,W-56,90,12); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='bold 11px Arial';
+    ctx.fillText('AI EXPERT REMARK', 48, y+22);
+    ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.font='12px Arial';
+    const remark = (r.aiRemark||'Quality assessment complete.').substring(0,120);
+    wrapText(ctx, remark, 48, y+44, W-96, 18);
+
+    // ── Traceability
+    y=808;
+    ctx.fillStyle='rgba(255,255,255,0.04)';
+    roundRect(ctx,28,y,W-56,80,12); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='11px monospace';
+    ctx.fillText('GPS: ' + (r.gps?.lat||'—') + '°N, ' + (r.gps?.lon||'—') + '°E', 48, y+26);
+    ctx.fillText('K-Calibration: 0.0984 mm/px · Ref: ISO/IEC 7810 Bank Card', 48, y+46);
+    ctx.fillText('AI Engine: DeepGazerAI · Gemini Flash 2.0 · Confidence: ' + (r.confidence||'—') + '%', 48, y+66);
+
+    // ── Footer
+    y=910;
+    ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fillRect(0,y,W,H-y);
+    ctx.fillStyle='rgba(82,183,136,0.7)'; ctx.fillRect(0,y,W,2);
+
+    ctx.fillStyle='#52B788'; ctx.font='bold 14px Georgia,serif';
+    ctx.fillText('FasalEx · DeepGazerAI', 32, y+30);
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='11px Arial';
+    ctx.fillText('fasalex.com · deepgazerai.com', 32, y+50);
+
+    ctx.textAlign='right';
+    ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='10px Arial';
+    ctx.fillText('Patent Pending · Bengaluru IPO · Prov. App. 20 Mar 2026', W-32, y+30);
+    ctx.fillText('© 2026 H DoddanaGouda · H Vasanthamma', W-32, y+50);
+
+    // Disclaimer
+    ctx.textAlign='center';
+    ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.font='10px Arial';
+    ctx.fillText('This certificate is AI-generated and indicative. For official grading contact nearest accredited AGMARK lab.', W/2, y+75);
+    ctx.textAlign='left';
+
+    // ── Convert to blob and share
+    cv.toBlob(async (blob)=>{
+      const file = new File([blob], `DG-Cert-${r.certId||'0000'}.jpg`, {type:'image/jpeg'});
+      const shareData = {
+        title: 'FasalEx DG Certificate — ' + r.produce,
+        text: `Grade ${r.overallGrade} · ${r.produce} · ${r.qty||''}
+Market Rate: ${r.marketRate||''}
+Farmer: ${r.farmerName||''}
+Cert: ${r.certId||''}
+— FasalEx DeepGazerAI`,
+        files: [file]
+      };
+      if(navigator.canShare && navigator.canShare(shareData)){
+        await navigator.share(shareData);
+        toast('✓ Certificate shared!');
+      } else {
+        // Fallback: download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href=url; a.download=`DG-Cert-${r.certId||'0000'}.jpg`;
+        document.body.appendChild(a); a.click();
+        setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },1000);
+        toast('✓ Certificate downloaded!');
+      }
+    }, 'image/jpeg', 0.88);
+
+  } catch(e){
+    toast('Certificate error: '+e.message, '#E74C3C');
+    console.error('[DG CERT]', e);
+  }
+}
+
+// ── Canvas helper: rounded rectangle
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+// ── Canvas helper: text wrap
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words=text.split(' ');
+  let line='';
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxWidth && line){
+      ctx.fillText(line,x,y); line=w; y+=lineHeight;
+    } else line=test;
+  }
+  if(line) ctx.fillText(line,x,y);
+}
+
 </script>
 </body>
 </html>
