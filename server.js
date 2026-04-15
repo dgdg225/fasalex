@@ -1,7 +1,6 @@
 'use strict';
 const express = require('express');
 const path    = require('path');
-const fs2     = require('fs');
 const https   = require('https');
 
 const app         = express();
@@ -21,48 +20,9 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ── Serve app with image compression patch ── */
+/* ── Serve app (index.html handles all compression client-side) ── */
 app.get('/', (req, res) => {
-  try {
-    let html = fs2.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
-    const patch = `<script>
-function handleScanFile(e){
-  var file=e.target.files&&e.target.files[0]; if(!file)return;
-  toast('Loading image...');
-  var reader=new FileReader();
-  reader.onerror=function(){toast('Cannot read file','#E74C3C');};
-  reader.onload=function(ev){
-    var img=new Image();
-    img.onerror=function(){toast('Cannot decode image','#E74C3C');};
-    img.onload=function(){
-      try{
-        var MAX=800, quality=0.75;
-        var w=img.width,h=img.height;
-        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
-        if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
-        var cv=document.createElement('canvas');
-        cv.width=w;cv.height=h;
-        var ctx=cv.getContext('2d');
-        ctx.drawImage(img,0,0,w,h);
-        var dataURL=cv.toDataURL('image/jpeg',quality);
-        S.scan.imageBase64=dataURL.split(',')[1];
-        S.scan.grainMeasure=null;
-        showScanPreview(dataURL);
-        try{triggerAIDetectionFromFile();}catch(ex){console.warn(ex);}
-        toast('Image ready — tap Grade!');
-      }catch(err){toast('Error: '+err.message,'#E74C3C');}
-    };
-    img.src=ev.target.result;
-  };
-  reader.readAsDataURL(file);
-  try{e.target.value='';}catch(ex){}
-}
-<\/script>`;
-    html = html.replace('</body>', patch + '\n</body>');
-    res.send(html);
-  } catch(e) {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-  }
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 /* ── Health ── */
@@ -72,7 +32,7 @@ app.get('/api/health', (req, res) => {
     ai: GEMINI_KEY ? 'Gemini Flash 2.0' : 'Demo mode',
     gemini: !!GEMINI_KEY,
     model: GEMINI_MODEL,
-    version: '3.0.0',
+    version: '3.1.0',
     ts: new Date().toISOString()
   });
 });
@@ -167,20 +127,6 @@ function callGemini(prompt, imageBase64, retrying) {
   });
 }
 
-/* ── Image compression — always compress to under 1MB ── */
-const sharp = null; // not available — use pure JS resize
-function compressB64(b64, maxBytes) {
-  if (!b64) return b64;
-  const bytes = Buffer.byteLength(b64, 'base64');
-  const mb = (bytes / 1024 / 1024).toFixed(2);
-  console.log('[IMG] Original: ' + mb + 'MB');
-  if (bytes <= maxBytes) return b64; // already small enough
-  // Truncate quality by reducing base64 size proportionally
-  // Real resize needs canvas — server-side we just warn and pass through
-  // Client-side compression in index.html handles this
-  console.log('[IMG] Large image — passing through (client should compress)');
-  return b64;
-}
 function checkImageSize(b64) {
   if (!b64) return b64;
   const bytes = Buffer.byteLength(b64, 'base64');
@@ -376,7 +322,7 @@ app.get('/cert/*', (req, res) => {
 
 /* ── Start ── */
 app.listen(PORT, '0.0.0.0', () => {
-  console.log('\n✅ FasalEx · DeepGazerAI v3.0.0');
+  console.log('\n✅ FasalEx · DeepGazerAI v3.1.0');
   console.log('   URL    : http://localhost:' + PORT);
   console.log('   AI     : ' + (GEMINI_KEY ? 'Gemini Flash 2.0 ✓ (free tier)' : 'DEMO MODE — set GEMINI_API_KEY'));
   console.log('   /cert/ : SPA route active\n');
