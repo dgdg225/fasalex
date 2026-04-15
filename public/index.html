@@ -254,6 +254,7 @@ select option{background:#112214;color:#fff}
 .cs-val{font-weight:600;color:#fff}
 .cs-note{font-size:9px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.5;font-style:italic}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <div id="app">
@@ -781,6 +782,11 @@ select option{background:#112214;color:#fff}
         <div id="sh-gc" style="width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--ff);font-size:30px;font-weight:700;flex-shrink:0">A</div>
       </div>
     </div>
+
+    <!-- ── DOWNLOAD PDF BUTTON ── -->
+    <button onclick="downloadCertPDF()" style="width:100%;padding:16px;background:linear-gradient(135deg,#1B5E20,#2E7D32);border:none;border-radius:16px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--fb)">
+      📄 Download DG Certificate PDF
+    </button>
 
     <!-- ── ASKING PRICE (goes to buyers) ── -->
     <div class="card" style="margin-bottom:12px">
@@ -2110,8 +2116,7 @@ async function identifyProduce(dataURL){
   document.getElementById('load-txt').textContent='Identifying produce...';
   document.getElementById('det-res').style.display='none';
   try{
-    const ctrl1=new AbortController(); setTimeout(()=>ctrl1.abort(),10000);
-    const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:dataURL.split(',')[1],sector:S.user?.segments?.[0]||'agri'}),signal:ctrl1.signal});
+    const r=await fetch('/api/identify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:dataURL.split(',')[1],sector:S.user?.segments?.[0]||'agri'})});
     const d=await r.json();
     showDetect(d.produce||'Unknown',d.confidence||85,(d.tag||d.sector||'agri').toUpperCase(),d.tag==='pulse'?'🫘':d.tag==='grain'?'🌾':d.tag==='veggie'?'🥦':'🌾');
   }catch(e){ showDetect('Unknown',0,'AGRI','🌾'); }
@@ -2160,8 +2165,7 @@ async function confirmGrade(){
   document.getElementById('scan-load').style.display='block';
   document.getElementById('load-txt').textContent='Grading with AGMARK standards...';
   try{
-    const ctrl2=new AbortController(); setTimeout(()=>ctrl2.abort(),30000);
-    const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:S.capturedImage?.split(',')[1],produce,gps:S.gps,lang:S.user?.lang||'en',hasLiDAR:S.hasLiDAR,farmerName:S.user?.name||'Farmer',qty:1,unit:'qtl',sector:S.user?.segments?.[0]||'agri'}),signal:ctrl2.signal});
+    const r=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:S.capturedImage?.split(',')[1],produce,gps:S.gps,lang:S.user?.lang||'en',hasLiDAR:S.hasLiDAR,farmerName:S.user?.name||'Farmer',qty:1,unit:'qtl',sector:S.user?.segments?.[0]||'agri'})});
     const report=await r.json();
     document.getElementById('scan-load').style.display='none';
     S.currentReport=normalizeReport(report); S.history.unshift(S.currentReport); save(); nav('report');
@@ -3564,20 +3568,46 @@ async function shareCertAsPNG(pkg, channel, ev) {
 
 async function downloadCertPDF() {
   const r = S.currentReport;
-  if (!r) { alert('No report to share'); return; }
-
-  showToast('Generating certificate...');
+  if (!r) { showToast('No report — scan first'); return; }
+  showToast('Generating PDF...');
   try {
+    // Draw certificate canvas
     const canvas = await drawDGCertificate(r, S.capturedImage);
-    const dataURL = canvas.toDataURL('image/png');
-    const a = document.createElement('a');
-    a.href = dataURL;
-    a.download = `DG-Certificate-${r.certId}.png`;
-    a.click();
-    showToast('Certificate downloaded ✅');
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+    // A4 PDF via jsPDF
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+
+    // Fit canvas image to A4
+    const canvasW = canvas.width;
+    const canvasH = canvas.height;
+    const ratio = Math.min(pageW / canvasW, pageH / canvasH);
+    const imgW = canvasW * ratio;
+    const imgH = canvasH * ratio;
+    const x = (pageW - imgW) / 2;
+    const y = 0;
+
+    pdf.addImage(imgData, 'JPEG', x, y, imgW, imgH);
+    pdf.save(`DG-Certificate-${r.certId||'cert'}.pdf`);
+    showToast('✅ PDF saved — check Downloads folder');
   } catch(e) {
-    console.error('Download error:', e);
-    showToast('Download failed');
+    console.error('PDF error:', e);
+    // Fallback: save as JPEG if jsPDF fails
+    try {
+      const canvas2 = await drawDGCertificate(r, S.capturedImage);
+      canvas2.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `DG-Certificate-${r.certId||'cert'}.jpg`;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
+        showToast('✅ Certificate saved as image');
+      }, 'image/jpeg', 0.92);
+    } catch(e2) { showToast('Error: '+e2.message); }
   }
 }
 
