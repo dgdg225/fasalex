@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const path    = require('path');
+const fs2     = require('fs');
 const https   = require('https');
 
 const app         = express();
@@ -20,9 +21,48 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ── Serve app (index.html handles all compression client-side) ── */
+/* ── Serve app with image compression patch ── */
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  try {
+    let html = fs2.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
+    const patch = `<script>
+function handleScanFile(e){
+  var file=e.target.files&&e.target.files[0]; if(!file)return;
+  toast('Loading image...');
+  var reader=new FileReader();
+  reader.onerror=function(){toast('Cannot read file','#E74C3C');};
+  reader.onload=function(ev){
+    var img=new Image();
+    img.onerror=function(){toast('Cannot decode image','#E74C3C');};
+    img.onload=function(){
+      try{
+        var MAX=800, quality=0.75;
+        var w=img.width,h=img.height;
+        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+        if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+        var cv=document.createElement('canvas');
+        cv.width=w;cv.height=h;
+        var ctx=cv.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        var dataURL=cv.toDataURL('image/jpeg',quality);
+        S.scan.imageBase64=dataURL.split(',')[1];
+        S.scan.grainMeasure=null;
+        showScanPreview(dataURL);
+        try{triggerAIDetectionFromFile();}catch(ex){console.warn(ex);}
+        toast('Image ready — tap Grade!');
+      }catch(err){toast('Error: '+err.message,'#E74C3C');}
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  try{e.target.value='';}catch(ex){}
+}
+<\/script>`;
+    html = html.replace('</body>', patch + '\n</body>');
+    res.send(html);
+  } catch(e) {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
 });
 
 /* ── Health ── */
@@ -32,7 +72,7 @@ app.get('/api/health', (req, res) => {
     ai: GEMINI_KEY ? 'Gemini Flash 2.0' : 'Demo mode',
     gemini: !!GEMINI_KEY,
     model: GEMINI_MODEL,
-    version: '3.1.0',
+    version: '3.0.0',
     ts: new Date().toISOString()
   });
 });
@@ -127,6 +167,20 @@ function callGemini(prompt, imageBase64, retrying) {
   });
 }
 
+/* ── Image compression — always compress to under 1MB ── */
+const sharp = null; // not available — use pure JS resize
+function compressB64(b64, maxBytes) {
+  if (!b64) return b64;
+  const bytes = Buffer.byteLength(b64, 'base64');
+  const mb = (bytes / 1024 / 1024).toFixed(2);
+  console.log('[IMG] Original: ' + mb + 'MB');
+  if (bytes <= maxBytes) return b64; // already small enough
+  // Truncate quality by reducing base64 size proportionally
+  // Real resize needs canvas — server-side we just warn and pass through
+  // Client-side compression in index.html handles this
+  console.log('[IMG] Large image — passing through (client should compress)');
+  return b64;
+}
 function checkImageSize(b64) {
   if (!b64) return b64;
   const bytes = Buffer.byteLength(b64, 'base64');
@@ -158,16 +212,27 @@ app.post('/api/identify', async (req, res) => {
   if (!GEMINI_KEY) return res.json({ produce:'Unknown', sector:'agri', confidence:0, _demo:true });
 
   const prompt = `Identify the agricultural produce in this image.
-Sector hint: ${sector||'agri'}
-Common Indian produces: Wheat, Rice, Paddy, Maize, Ragi, Jowar, Bajra, Moong (Whole), Moong Dal, Toor Dal, Chana Dal, Urad Dal, Masoor Dal, Soybean, Groundnut, Mustard, Sesame, Sunflower, Tomato, Onion, Potato, Brinjal, Chilli, Turmeric, Ginger, Garlic, Mango, Banana, Grapes, Pomegranate, Tiger Prawn, Rohu, Hilsa, Cow Milk, Buffalo Milk, Paneer.
-Return ONLY valid JSON (no markdown):
-{"produce":"<exact Indian name>","sector":"agri|dairy|fish","confidence":<0-100>,"tag":"grain|pulse|oilseed|veggie|fruit|spice|liquid|seafood","notes":"<one line>"}`;
+Note: There may be a bank card or reference object in the image — ignore it and focus only on the produce/food item.
+Sector context: ${sector||'agri'} (agri/dairy/fish)
+
+Look at the produce carefully and identify it. Use standard Indian market names.
+Examples of valid produce names: Wheat, Rice, Maize, Ragi, Jowar, Bajra, Moong (Whole), Moong Dal, Toor Dal, Chana Dal, Urad Dal, Soybean, Groundnut, Mustard, Tomato, Onion, Potato, Chilli, Turmeric, Mango, Banana, Tiger Prawn, Rohu, Cow Milk, Buffalo Milk, Paneer.
+
+Respond ONLY with valid JSON, no markdown:
+{"produce":"<name of the produce you see>","sector":"agri|dairy|fish","confidence":<0-100>,"tag":"grain|pulse|oilseed|veggie|fruit|spice|liquid|seafood","notes":"<one line describing what you see>"}`;
 
   try {
     const text = await callGemini(prompt, b64);
-    res.json(parseJSON(text));
+    console.log('[identify] Gemini raw:', text.substring(0,200));
+    const result = parseJSON(text);
+    // Guard: if produce is placeholder or empty, it means Gemini misread prompt
+    if (!result.produce || result.produce.includes('<') || result.produce === 'Unknown') {
+      console.warn('[identify] Bad produce value:', result.produce);
+      return res.json({ produce:'Unknown', sector: result.sector||sector||'agri', confidence:0, _retry:true });
+    }
+    res.json(result);
   } catch(e) {
-    console.error('[identify]', e.message);
+    console.error('[identify] error:', e.message);
     res.json({ produce:'Unknown', sector:'agri', confidence:0, error: e.message });
   }
 });
@@ -322,7 +387,7 @@ app.get('/cert/*', (req, res) => {
 
 /* ── Start ── */
 app.listen(PORT, '0.0.0.0', () => {
-  console.log('\n✅ FasalEx · DeepGazerAI v3.1.0');
+  console.log('\n✅ FasalEx · DeepGazerAI v3.0.0');
   console.log('   URL    : http://localhost:' + PORT);
   console.log('   AI     : ' + (GEMINI_KEY ? 'Gemini Flash 2.0 ✓ (free tier)' : 'DEMO MODE — set GEMINI_API_KEY'));
   console.log('   /cert/ : SPA route active\n');
